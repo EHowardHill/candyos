@@ -1,16 +1,5 @@
 # CandyOS
 
-**LineageOS 21 that looks and feels like Android 4.4 KitKat.**
-
-CandyOS is a single-repo overlay on top of a stock LineageOS checkout: every
-CandyOS change lives in this repository, and the LineageOS source itself is
-never forked, vendored, or re-hosted. Everything needed to understand, build,
-and extend the ROM is here.
-
-Current status: boots and runs on the x86_64 emulator target
-(`lineage_sdk_phone_x86_64-ap2a-userdebug`, Pixel 3a geometry). UI conversion
-phases 1–21 are complete — see [docs/phases/TASKS.md](docs/phases/TASKS.md).
-
 ## Quickstart
 
 ```
