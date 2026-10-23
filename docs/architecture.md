@@ -47,6 +47,9 @@ with zero product-config changes.
   since the last refresh.
 * Applying uses `git am -3` first (three-way merge against upstream drift),
   with a plain `git am` as fallback.
+* The mbox `From <sha>` header of each patch is zeroed by `candyos-save.sh`:
+  `git am` mints new commit shas on every replay, so patch identity is the
+  content, not the sha.
 * Legacy commit messages in the series use the old project's prefixes
   (`KITKAT-P<n>`, `KitKat UI P<n>:`). New commits use `CandyOS P<n>:`
   (see docs/contributing.md).

@@ -27,6 +27,9 @@ for pair in "${CANDYOS_PATCHED[@]}"; do
     out="$CANDYOS_ROOT/patches/$series"
     rm -f "$out"/*.patch
     git -C "$TREE/$path" format-patch "$base..HEAD" -o "$out" >/dev/null
+    # git am mints new commit shas on every replay; zero the mbox "From <sha>"
+    # line so the stored series is byte-stable across save round-trips.
+    sed -i '1s/^From [0-9a-f]\{40\} /From 0000000000000000000000000000000000000000 /' "$out"/*.patch
     echo "$base" > "$out/BASE"
     echo "candyos: patches/$series regenerated ($n patch(es), BASE $base)"
 done
