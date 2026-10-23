@@ -1,0 +1,27 @@
+// KitKat UI P16 Tier 1: the Android 4.4 Calculator (com.android.calculator2)
+// ported per the Launcher3-Modern pattern - donor UI verbatim from
+// android-4.4.4_r1, modernized only where the build/API layer requires:
+//  - support-v4 ViewPager/PagerAdapter vendored under
+//    com.android.calculator2.viewpager with the compat layer collapsed
+//    onto framework APIs (EdgeEffectCompat boolean contract kept locally).
+//  - guava ImmutableMap -> java.util.HashMap (single replacement table).
+// Module keeps the name ExactCalculator so vendor/lineage PRODUCT_PACKAGES
+// (common.mk) resolves unchanged.
+android_app {
+    name: "ExactCalculator",
+    // Installs to the product partition like the app it replaces (the
+    // lineage_sdk target enforces GSI artifact-path requirements on
+    // /system - platform installs of these module names are rejected).
+    product_specific: true,
+    sdk_version: "current",
+    srcs: ["src/**/*.java"],
+    resource_dirs: ["res"],
+    static_libs: [
+        "arity",
+    ],
+}
+
+java_import {
+    name: "arity",
+    jars: ["arity-2.1.2.jar"],
+}

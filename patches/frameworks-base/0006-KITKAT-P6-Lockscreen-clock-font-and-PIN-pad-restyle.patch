@@ -1,0 +1,85 @@
+From f95c818fca325a1d7b718145e22c70e2a2a7edd8 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Tue, 20 Oct 2026 14:14:43 -0500
+Subject: [PATCH 06/29] KITKAT-P6: Lockscreen clock font and PIN pad restyle
+
+- clock_default_large typeface cleaned up (font family comes from
+  config_clockFontFamily -> kitkat-lock-clock = Roboto2013-Thin; TextAnimator
+  weight variations are no-ops against static fonts so Thin renders
+  regardless of requested weight)
+- num_pad_key_background is a transparent ripple; press feedback resolves
+  through colorControlHighlight (= Holo blue family via the monet pin)
+- Klondike letters (ABC/DEF/...) restored from the hidden state they were
+  left in (b/172360102)
+---
+ .../res/layout/clock_default_large.xml        |  2 +-
+ .../drawable/num_pad_key_background.xml       | 31 ++++++-------------
+ .../layout/keyguard_num_pad_key.xml           |  2 +-
+ 3 files changed, 12 insertions(+), 23 deletions(-)
+
+diff --git a/packages/SystemUI/customization/res/layout/clock_default_large.xml b/packages/SystemUI/customization/res/layout/clock_default_large.xml
+index 0139d50dcfba..8f5d0321ae7f 100644
+--- a/packages/SystemUI/customization/res/layout/clock_default_large.xml
++++ b/packages/SystemUI/customization/res/layout/clock_default_large.xml
+@@ -24,7 +24,7 @@
+     android:gravity="center_horizontal"
+     android:textSize="@dimen/large_clock_text_size"
+     android:fontFamily="@*android:string/config_clockFontFamily"
+-    android:typeface="monospace"
++    android:typeface="normal"
+     android:elegantTextHeight="false"
+     chargeAnimationDelay="200"
+     dozeWeight="200"
+diff --git a/packages/SystemUI/res-keyguard/drawable/num_pad_key_background.xml b/packages/SystemUI/res-keyguard/drawable/num_pad_key_background.xml
+index 7455ad2ac5f8..d22663943cc9 100644
+--- a/packages/SystemUI/res-keyguard/drawable/num_pad_key_background.xml
++++ b/packages/SystemUI/res-keyguard/drawable/num_pad_key_background.xml
+@@ -1,22 +1,11 @@
+ <?xml version="1.0" encoding="utf-8"?>
+-<!--
+-/*
+-* Copyright 2021, The Android Open Source Project
+-*
+-* Licensed under the Apache License, Version 2.0 (the "License");
+-* you may not use this file except in compliance with the License.
+-* You may obtain a copy of the License at
+-*
+-*     http://www.apache.org/licenses/LICENSE-2.0
+-*
+-* Unless required by applicable law or agreed to in writing, software
+-* distributed under the License is distributed on an "AS IS" BASIS,
+-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-* See the License for the specific language governing permissions and
+-* limitations under the License.
+-*/
+--->
+-<shape xmlns:android="http://schemas.android.com/apk/res/android" >
+-  <solid android:color="?android:attr/colorControlNormal" />
+-  <corners android:radius="10dp" />
+-</shape>
++<!-- KitKat UI Project (Phase 6): transparent key chrome; press shows a
++     holo blue ripple via colorControlHighlight (= colorAccent). -->
++<ripple xmlns:android="http://schemas.android.com/apk/res/android"
++    android:color="?android:attr/colorControlHighlight">
++    <item android:id="@android:id/mask">
++        <shape android:shape="oval">
++            <solid android:color="#ffffffff" />
++        </shape>
++    </item>
++</ripple>
+diff --git a/packages/SystemUI/res-keyguard/layout/keyguard_num_pad_key.xml b/packages/SystemUI/res-keyguard/layout/keyguard_num_pad_key.xml
+index 073f090027ba..600ab5437ca8 100644
+--- a/packages/SystemUI/res-keyguard/layout/keyguard_num_pad_key.xml
++++ b/packages/SystemUI/res-keyguard/layout/keyguard_num_pad_key.xml
+@@ -28,7 +28,7 @@
+         style="@style/Widget.TextView.NumPadKey.Klondike"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+-        android:visibility="gone"
++        android:visibility="visible"
+         />
+ </merge>
+ 
+-- 
+2.53.0
+

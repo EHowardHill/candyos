@@ -1,0 +1,62 @@
+From 65947aa51136ac797f51274ab17b85018200e88c Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Thu, 22 Oct 2026 08:00:23 -0500
+Subject: [PATCH 20/29] KitKat UI: close 18.4 in TASKS.md (qs_footer hidden,
+ root-caused)
+
+---
+ TASKS.md | 30 ++++++++++++++++--------------
+ 1 file changed, 16 insertions(+), 14 deletions(-)
+
+diff --git a/TASKS.md b/TASKS.md
+index 6ff85eb9836d..ad3a4a329bc6 100644
+--- a/TASKS.md
++++ b/TASKS.md
+@@ -1853,8 +1853,8 @@ Everything still open across the file (updated 2026-10-22):
+   retheme check) + Browser/ Messaging no-port ratified.
+ - P17: harness written+built; 17.6 CLOSED under the REVISED standard
+   (playground = canonical-AVD eyeball surface; no 4.4 VM diff).
+-- P18: 18.1/18.2/18.3/18.5 DONE+verified; 18.4 PARTIAL (48dp fix in,
+-  QS-fragment clock-margin trace remains).
++- P18: ALL FIVE DONE (18.4 closed: qs_footer hidden + padding 48dp;
++  visual confirmation rides the user battery).
+ - P19: SCRAPPED (2026-10-22, user): 4.4 cannot build on this machine
+   (modern host toolchain vs 4.4's make-3.8x/JDK6 toolchain gates).
+   ~/kitkat-build workspace abandoned; verification standard revised
+@@ -1942,19 +1942,21 @@ the next work batch.
+       pinned false; FooterViewBinder wires the visibility flow;
+       FooterView gains setManageButtonVisible. Re-enable = flip the
+       ViewModel line. Rides the next visual battery.
+-- [/] 18.4 Expanded-QS gap between header and brightness bar: NOT
++- [X] 18.4 Expanded-QS gap between header and brightness bar: NOT
+       donor geometry - the 4.4 QS panel had the slider immediately
+-      under the 48dp header. The 12.1 margin zeroing covered the
+-      half-open state only; the expanded-panel container margins
+-      (qqs_layout_* / stack padding) survive. Fix: apply the same
+-      margin zeroing to the expanded QS container.
+-      PARTIAL: qs_panel_padding_top 80dp -> 48dp (header-height
+-      clearance; the 80dp reserved the P15.1-removed modern big
+-      clock). Device measurement shows the remaining gap is QS
+-      fragment clock-container margins above the clock (~104dp
+-      between header bottom and clock at 440dpi) - needs the
+-      combined_qs_header clock-constraint trace; NOT fully donor-flat
+-      yet. Next pass: trace clock Y in the qs/qqs constraint sets.
++      under the 48dp header.
++      ROOT CAUSE (trace): qs_footer_impl - the MODERN build/version-text
++      footer - is included INSIDE QSPanel above the tile grid: 48dp
++      height + 8dp bottom margin, stacked on the qs_panel_padding_top
++      48dp clearance = the ~104dp dead band between header and slider.
++      4.4 had no build-text footer in QS.
++      FIXED (both parts): qs_panel_padding_top 80dp -> 48dp (the 80
++      reserved the P15.1-removed big clock) AND QSPanel.
++      onFinishInflate hides R.id.qs_footer (mFooter is assigned but
++      otherwise unused - safe). Slider now sits directly under the
++      header clearance. m -j8 green on the final image.
++      Pending: user visual check (slider under header on the
++      expanded shade).
+ - [X] 18.5 Shade-open transition fades like modern (window alpha),
+       not the 4.4 opaque PanelView height ride with grab handle.
+       DECIDED (user, 2026-10-21): FULL donor opaque-ride port (not
+-- 
+2.53.0
+

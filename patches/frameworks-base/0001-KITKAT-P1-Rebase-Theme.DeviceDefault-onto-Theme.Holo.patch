@@ -1,0 +1,1032 @@
+From 3d70ab1bf7316fa9177535a34d3bdb796e84c765 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Tue, 20 Oct 2026 14:14:23 -0500
+Subject: [PATCH 01/29] KITKAT-P1: Rebase Theme.DeviceDefault onto Theme.Holo
+
+- 35 Material parents swapped for Holo across the DeviceDefault family
+  (5 styles kept on Material for lack of Holo counterparts)
+- DeviceDefault dark/light palettes rewritten to holo_blue_light/dark with
+  black system bars, control colors, forceDarkAllowed=false
+- config_dialogCornerRadius and config_buttonCornerRadius -> 0dp
+- Status bar height 24dp -> 25dp
+- Monet seed pinned to 0xFF33B5E5 in ThemeOverlayController so wallpaper
+  colors never override the Holo palette in SystemUI
+- Also lands the square battery perimeter (config_batterymeterPerimeterPath,
+  Phase 2) and the kitkat-lock-clock family pointer (config_clockFontFamily,
+  Phase 6) since they share config.xml
+---
+ core/res/res/values/config.xml                |   8 +-
+ core/res/res/values/dimens.xml                |   4 +-
+ .../res/res/values/styles_device_defaults.xml | 352 +++++++++---------
+ .../res/res/values/themes_device_defaults.xml | 152 ++++----
+ .../theme/ThemeOverlayController.java         |   9 +-
+ 5 files changed, 274 insertions(+), 251 deletions(-)
+
+diff --git a/core/res/res/values/config.xml b/core/res/res/values/config.xml
+index aed3b8279045..f082768792f0 100644
+--- a/core/res/res/values/config.xml
++++ b/core/res/res/values/config.xml
+@@ -5022,9 +5022,9 @@
+     <string name="config_mediaProjectionPermissionDialogComponent" translatable="false">com.android.systemui/com.android.systemui.mediaprojection.permission.MediaProjectionPermissionActivity</string>
+ 
+     <!-- Corner radius of system dialogs -->
+-    <dimen name="config_dialogCornerRadius">28dp</dimen>
++    <dimen name="config_dialogCornerRadius">0dp</dimen>
+     <!-- Corner radius of system buttons -->
+-    <dimen name="config_buttonCornerRadius">4dp</dimen>
++    <dimen name="config_buttonCornerRadius">0dp</dimen>
+     <!-- Corner radius for bottom sheet system dialogs -->
+     <dimen name="config_bottomDialogCornerRadius">16dp</dimen>
+     <!-- Corner radius of system progress bars -->
+@@ -5039,7 +5039,7 @@
+     <string name="config_bodyFontFamilyMedium" translatable="false">sans-serif-medium</string>
+ 
+     <!-- Name of the font family to use in the default lockscreen clock -->
+-    <string name="config_clockFontFamily" translatable="false">monospace</string>
++    <string name="config_clockFontFamily" translatable="false">kitkat-lock-clock</string>
+ 
+     <!-- Size of icon shown beside a preference locked by admin -->
+     <dimen name="config_restrictedIconSize">@dimen/restricted_icon_size_material</dimen>
+@@ -5379,7 +5379,7 @@
+     <!-- All of the paths defined for the batterymeter are defined on a 12x20 canvas, and must
+      be parsable by android.utill.PathParser -->
+     <string name="config_batterymeterPerimeterPath" translatable="false">
+-                M3.5,2 v0 H1.33 C0.6,2 0,2.6 0,3.33 V13v5.67 C0,19.4 0.6,20 1.33,20 h9.33 C11.4,20 12,19.4 12,18.67 V13V3.33 C12,2.6 11.4,2 10.67,2 H8.5 V0 H3.5 z M2,18v-7V4h8v9v5H2L2,18z
++                M3.5,2 H0 V20 H12 V2 H8.5 V0 H3.5 z M2,18 V4 H10 V18 z
+     </string>
+     <string name="config_batterymeterErrorPerimeterPath" translatable="false">@string/config_batterymeterPerimeterPath</string>
+     <string name="config_batterymeterFillMask" translatable="false">
+diff --git a/core/res/res/values/dimens.xml b/core/res/res/values/dimens.xml
+index 291a5936330a..e20b9b3c9307 100644
+--- a/core/res/res/values/dimens.xml
++++ b/core/res/res/values/dimens.xml
+@@ -41,7 +41,7 @@
+ 
+     <!-- The default height of the status bar used in {@link SystemBarUtils#getStatusBarHeight} to
+          calculate the status bar height. -->
+-    <dimen name="status_bar_height_default">24dp</dimen>
++    <dimen name="status_bar_height_default">25dp</dimen>
+     <!-- Height of the status bar.
+          Do not read this dimen directly. Use {@link SystemBarUtils#getStatusBarHeight} instead.
+          -->
+@@ -49,7 +49,7 @@
+     <!-- Height of the status bar in portrait.
+          Do not read this dimen directly. Use {@link SystemBarUtils#getStatusBarHeight} instead.
+          -->
+-    <dimen name="status_bar_height_portrait">24dp</dimen>
++    <dimen name="status_bar_height_portrait">25dp</dimen>
+     <!-- Height of the status bar in landscape.
+          Do not read this dimen directly. Use {@link SystemBarUtils#getStatusBarHeight} instead.
+          -->
+diff --git a/core/res/res/values/styles_device_defaults.xml b/core/res/res/values/styles_device_defaults.xml
+index 3b2f24409a88..aa26fc5a81ce 100644
+--- a/core/res/res/values/styles_device_defaults.xml
++++ b/core/res/res/values/styles_device_defaults.xml
+@@ -32,69 +32,69 @@ easier.
+  -->
+ <resources>
+     <!-- Widget Styles -->
+-    <style name="Widget.DeviceDefault" parent="Widget.Material"/>
+-    <style name="Widget.DeviceDefault.Button" parent="Widget.Material.Button"/>
+-    <style name="Widget.DeviceDefault.Button.Small" parent="Widget.Material.Button.Small"/>
+-    <style name="Widget.DeviceDefault.Button.Inset" parent="Widget.Material.Button.Inset"/>
+-    <style name="Widget.DeviceDefault.Button.Toggle" parent="Widget.Material.Button.Toggle"/>
++    <style name="Widget.DeviceDefault" parent="Widget.Holo"/>
++    <style name="Widget.DeviceDefault.Button" parent="Widget.Holo.Button"/>
++    <style name="Widget.DeviceDefault.Button.Small" parent="Widget.Holo.Button.Small"/>
++    <style name="Widget.DeviceDefault.Button.Inset" parent="Widget.Holo.Button.Inset"/>
++    <style name="Widget.DeviceDefault.Button.Toggle" parent="Widget.Holo.Button.Toggle"/>
+     <style name="Widget.DeviceDefault.Button.Colored" parent="Widget.Material.Button.Colored">
+         <item name="outlineAmbientShadowColor">@color/btn_colored_background_material</item>
+         <item name="outlineSpotShadowColor">@color/btn_colored_background_material</item>
+         <item name="textAppearance">?attr/textAppearanceButton</item>
+         <item name="textColor">@color/btn_colored_text_material</item>
+     </style>
+-    <style name="Widget.DeviceDefault.TextView" parent="Widget.Material.TextView" />
+-    <style name="Widget.DeviceDefault.CheckedTextView" parent="Widget.Material.CheckedTextView"/>
+-    <style name="Widget.DeviceDefault.AutoCompleteTextView" parent="Widget.Material.AutoCompleteTextView"/>
+-    <style name="Widget.DeviceDefault.CompoundButton.CheckBox" parent="Widget.Material.CompoundButton.CheckBox"/>
+-    <style name="Widget.DeviceDefault.ListView.DropDown" parent="Widget.Material.ListView.DropDown"/>
+-    <style name="Widget.DeviceDefault.EditText" parent="Widget.Material.EditText"/>
+-    <style name="Widget.DeviceDefault.ExpandableListView" parent="Widget.Material.ExpandableListView"/>
+-    <style name="Widget.DeviceDefault.GridView" parent="Widget.Material.GridView"/>
+-    <style name="Widget.DeviceDefault.ImageButton" parent="Widget.Material.ImageButton"/>
+-    <style name="Widget.DeviceDefault.ListView" parent="Widget.Material.ListView"/>
+-    <style name="Widget.DeviceDefault.PopupWindow" parent="Widget.Material.PopupWindow"/>
+-    <style name="Widget.DeviceDefault.ProgressBar" parent="Widget.Material.ProgressBar"/>
+-    <style name="Widget.DeviceDefault.ProgressBar.Horizontal" parent="Widget.Material.ProgressBar.Horizontal"/>
+-    <style name="Widget.DeviceDefault.ProgressBar.Small" parent="Widget.Material.ProgressBar.Small"/>
+-    <style name="Widget.DeviceDefault.ProgressBar.Small.Title" parent="Widget.Material.ProgressBar.Small.Title"/>
+-    <style name="Widget.DeviceDefault.ProgressBar.Large" parent="Widget.Material.ProgressBar.Large"/>
+-    <style name="Widget.DeviceDefault.SeekBar" parent="Widget.Material.SeekBar"/>
+-    <style name="Widget.DeviceDefault.RatingBar" parent="Widget.Material.RatingBar"/>
+-    <style name="Widget.DeviceDefault.RatingBar.Indicator" parent="Widget.Material.RatingBar.Indicator"/>
+-    <style name="Widget.DeviceDefault.RatingBar.Small" parent="Widget.Material.RatingBar.Small"/>
+-    <style name="Widget.DeviceDefault.CompoundButton.RadioButton" parent="Widget.Material.CompoundButton.RadioButton"/>
+-    <style name="Widget.DeviceDefault.ScrollView" parent="Widget.Material.ScrollView"/>
+-    <style name="Widget.DeviceDefault.HorizontalScrollView" parent="Widget.Material.HorizontalScrollView"/>
+-    <style name="Widget.DeviceDefault.Spinner" parent="Widget.Material.Spinner"/>
+-    <style name="Widget.DeviceDefault.CompoundButton.Star" parent="Widget.Material.CompoundButton.Star"/>
+-    <style name="Widget.DeviceDefault.TabWidget" parent="Widget.Material.TabWidget">
++    <style name="Widget.DeviceDefault.TextView" parent="Widget.Holo.TextView" />
++    <style name="Widget.DeviceDefault.CheckedTextView" parent="Widget.Holo.CheckedTextView"/>
++    <style name="Widget.DeviceDefault.AutoCompleteTextView" parent="Widget.Holo.AutoCompleteTextView"/>
++    <style name="Widget.DeviceDefault.CompoundButton.CheckBox" parent="Widget.Holo.CompoundButton.CheckBox"/>
++    <style name="Widget.DeviceDefault.ListView.DropDown" parent="Widget.Holo.ListView.DropDown"/>
++    <style name="Widget.DeviceDefault.EditText" parent="Widget.Holo.EditText"/>
++    <style name="Widget.DeviceDefault.ExpandableListView" parent="Widget.Holo.ExpandableListView"/>
++    <style name="Widget.DeviceDefault.GridView" parent="Widget.Holo.GridView"/>
++    <style name="Widget.DeviceDefault.ImageButton" parent="Widget.Holo.ImageButton"/>
++    <style name="Widget.DeviceDefault.ListView" parent="Widget.Holo.ListView"/>
++    <style name="Widget.DeviceDefault.PopupWindow" parent="Widget.Holo.PopupWindow"/>
++    <style name="Widget.DeviceDefault.ProgressBar" parent="Widget.Holo.ProgressBar"/>
++    <style name="Widget.DeviceDefault.ProgressBar.Horizontal" parent="Widget.Holo.ProgressBar.Horizontal"/>
++    <style name="Widget.DeviceDefault.ProgressBar.Small" parent="Widget.Holo.ProgressBar.Small"/>
++    <style name="Widget.DeviceDefault.ProgressBar.Small.Title" parent="Widget.Holo.ProgressBar.Small.Title"/>
++    <style name="Widget.DeviceDefault.ProgressBar.Large" parent="Widget.Holo.ProgressBar.Large"/>
++    <style name="Widget.DeviceDefault.SeekBar" parent="Widget.Holo.SeekBar"/>
++    <style name="Widget.DeviceDefault.RatingBar" parent="Widget.Holo.RatingBar"/>
++    <style name="Widget.DeviceDefault.RatingBar.Indicator" parent="Widget.Holo.RatingBar.Indicator"/>
++    <style name="Widget.DeviceDefault.RatingBar.Small" parent="Widget.Holo.RatingBar.Small"/>
++    <style name="Widget.DeviceDefault.CompoundButton.RadioButton" parent="Widget.Holo.CompoundButton.RadioButton"/>
++    <style name="Widget.DeviceDefault.ScrollView" parent="Widget.Holo.ScrollView"/>
++    <style name="Widget.DeviceDefault.HorizontalScrollView" parent="Widget.Holo.HorizontalScrollView"/>
++    <style name="Widget.DeviceDefault.Spinner" parent="Widget.Holo.Spinner"/>
++    <style name="Widget.DeviceDefault.CompoundButton.Star" parent="Widget.Holo.CompoundButton.Star"/>
++    <style name="Widget.DeviceDefault.TabWidget" parent="Widget.Holo.TabWidget">
+         <item name="textAppearance">@style/TextAppearance.DeviceDefault.Widget.TabWidget</item>
+     </style>
+-    <style name="Widget.DeviceDefault.WebTextView" parent="Widget.Material.WebTextView"/>
+-    <style name="Widget.DeviceDefault.WebView" parent="Widget.Material.WebView"/>
+-    <style name="Widget.DeviceDefault.DropDownItem" parent="Widget.Material.DropDownItem">
++    <style name="Widget.DeviceDefault.WebTextView" parent="Widget.Holo.WebTextView"/>
++    <style name="Widget.DeviceDefault.WebView" parent="Widget.Holo.WebView"/>
++    <style name="Widget.DeviceDefault.DropDownItem" parent="Widget.Holo.DropDownItem">
+         <item name="textAppearance">@style/TextAppearance.DeviceDefault.Widget.DropDownItem</item>
+     </style>
+     <style name="Widget.DeviceDefault.DropDownItem.Spinner" parent="Widget.DeviceDefault.DropDownItem"/>
+-    <style name="Widget.DeviceDefault.TextView.SpinnerItem" parent="Widget.Material.TextView.SpinnerItem">
++    <style name="Widget.DeviceDefault.TextView.SpinnerItem" parent="Widget.Holo.TextView.SpinnerItem">
+         <item name="textAppearance">@style/TextAppearance.DeviceDefault.Widget.TextView.SpinnerItem</item>
+     </style>
+-    <style name="Widget.DeviceDefault.ListPopupWindow" parent="Widget.Material.ListPopupWindow"/>
+-    <style name="Widget.DeviceDefault.PopupMenu" parent="Widget.Material.PopupMenu"/>
+-    <style name="Widget.DeviceDefault.ActionButton" parent="Widget.Material.ActionButton"/>
+-    <style name="Widget.DeviceDefault.ActionButton.Overflow" parent="Widget.Material.ActionButton.Overflow"/>
+-    <style name="Widget.DeviceDefault.ActionButton.TextButton" parent="Widget.Material.ActionButton"/>
+-    <style name="Widget.DeviceDefault.ActionMode" parent="Widget.Material.ActionMode">
++    <style name="Widget.DeviceDefault.ListPopupWindow" parent="Widget.Holo.ListPopupWindow"/>
++    <style name="Widget.DeviceDefault.PopupMenu" parent="Widget.Holo.PopupMenu"/>
++    <style name="Widget.DeviceDefault.ActionButton" parent="Widget.Holo.ActionButton"/>
++    <style name="Widget.DeviceDefault.ActionButton.Overflow" parent="Widget.Holo.ActionButton.Overflow"/>
++    <style name="Widget.DeviceDefault.ActionButton.TextButton" parent="Widget.Holo.ActionButton"/>
++    <style name="Widget.DeviceDefault.ActionMode" parent="Widget.Holo.ActionMode">
+         <item name="titleTextStyle">@style/TextAppearance.DeviceDefault.Widget.ActionMode.Title</item>
+         <item name="subtitleTextStyle">@style/TextAppearance.DeviceDefault.Widget.ActionMode.Subtitle</item>
+     </style>
+-    <style name="Widget.DeviceDefault.ActionButton.CloseMode" parent="Widget.Material.ActionButton.CloseMode"/>
+-    <style name="Widget.DeviceDefault.ActionBar" parent="Widget.Material.ActionBar">
++    <style name="Widget.DeviceDefault.ActionButton.CloseMode" parent="Widget.Holo.ActionButton.CloseMode"/>
++    <style name="Widget.DeviceDefault.ActionBar" parent="Widget.Holo.ActionBar">
+         <item name="titleTextStyle">@style/TextAppearance.DeviceDefault.Widget.ActionBar.Title</item>
+         <item name="subtitleTextStyle">@style/TextAppearance.DeviceDefault.Widget.ActionBar.Subtitle</item>
+     </style>
+-    <style name="Widget.DeviceDefault.Button.Borderless" parent="Widget.Material.Button.Borderless"/>
++    <style name="Widget.DeviceDefault.Button.Borderless" parent="Widget.Holo.Button.Borderless"/>
+     <!-- Colored borderless ink button -->
+     <style name="Widget.DeviceDefault.Button.Borderless.Colored">
+         <item name="textAppearance">@style/TextAppearance.DeviceDefault.Widget.Button.Borderless.Colored</item>
+@@ -104,41 +104,41 @@ easier.
+         <item name="minWidth">@dimen/alert_dialog_button_bar_width</item>
+         <item name="minHeight">@dimen/alert_dialog_button_bar_height</item>
+     </style>
+-    <style name="Widget.DeviceDefault.Tab" parent="Widget.Material.Tab"/>
+-    <style name="Widget.DeviceDefault.CalendarView" parent="Widget.Material.CalendarView"/>
+-    <style name="Widget.DeviceDefault.DatePicker" parent="Widget.Material.DatePicker"/>
+-    <style name="Widget.DeviceDefault.ActionBar.TabView" parent="Widget.Material.ActionBar.TabView"/>
+-    <style name="Widget.DeviceDefault.ActionBar.TabText" parent="Widget.Material.ActionBar.TabText">
++    <style name="Widget.DeviceDefault.Tab" parent="Widget.Holo.Tab"/>
++    <style name="Widget.DeviceDefault.CalendarView" parent="Widget.Holo.CalendarView"/>
++    <style name="Widget.DeviceDefault.DatePicker" parent="Widget.Holo.DatePicker"/>
++    <style name="Widget.DeviceDefault.ActionBar.TabView" parent="Widget.Holo.ActionBar.TabView"/>
++    <style name="Widget.DeviceDefault.ActionBar.TabText" parent="Widget.Holo.ActionBar.TabText">
+         <item name="titleTextStyle">@style/TextAppearance.DeviceDefault.Widget.ActionBar.Title</item>
+         <item name="subtitleTextStyle">@style/TextAppearance.DeviceDefault.Widget.ActionBar.Subtitle</item>
+         <item name="textAppearance">@style/TextAppearance.DeviceDefault.Widget.TabWidget</item>
+     </style>
+-    <style name="Widget.DeviceDefault.ActionBar.TabBar" parent="Widget.Material.ActionBar.TabBar"/>
+-    <style name="Widget.DeviceDefault.ActionBar.Solid" parent="Widget.Material.ActionBar.Solid">
++    <style name="Widget.DeviceDefault.ActionBar.TabBar" parent="Widget.Holo.ActionBar.TabBar"/>
++    <style name="Widget.DeviceDefault.ActionBar.Solid" parent="Widget.Holo.ActionBar.Solid">
+         <item name="titleTextStyle">@style/TextAppearance.DeviceDefault.Widget.ActionBar.Title</item>
+         <item name="subtitleTextStyle">@style/TextAppearance.DeviceDefault.Widget.ActionBar.Subtitle</item>
+         <item name="background">?attr/colorPrimaryDark</item>
+         <item name="backgroundStacked">?attr/colorPrimaryDark</item>
+         <item name="backgroundSplit">?attr/colorPrimaryDark</item>
+     </style>
+-    <style name="Widget.DeviceDefault.Button.Borderless.Small" parent="Widget.Material.Button.Borderless.Small"/>
+-    <style name="Widget.DeviceDefault.AbsListView" parent="Widget.Material.AbsListView"/>
+-    <style name="Widget.DeviceDefault.Spinner.DropDown.ActionBar" parent="Widget.Material.Spinner.DropDown.ActionBar"/>
+-    <style name="Widget.DeviceDefault.PopupWindow.ActionMode" parent="Widget.Material.PopupWindow.ActionMode"/>
+-    <style name="Widget.DeviceDefault.CompoundButton.Switch" parent="Widget.Material.CompoundButton.Switch">
++    <style name="Widget.DeviceDefault.Button.Borderless.Small" parent="Widget.Holo.Button.Borderless.Small"/>
++    <style name="Widget.DeviceDefault.AbsListView" parent="Widget.Holo.AbsListView"/>
++    <style name="Widget.DeviceDefault.Spinner.DropDown.ActionBar" parent="Widget.Holo.Spinner.DropDown.ActionBar"/>
++    <style name="Widget.DeviceDefault.PopupWindow.ActionMode" parent="Widget.Holo.PopupWindow.ActionMode"/>
++    <style name="Widget.DeviceDefault.CompoundButton.Switch" parent="Widget.Holo.CompoundButton.Switch">
+         <item name="switchTextAppearance">@style/TextAppearance.DeviceDefault.Widget.Switch</item>
+     </style>
+-    <style name="Widget.DeviceDefault.ExpandableListView.White" parent="Widget.Material.ExpandableListView.White"/>
+-    <style name="Widget.DeviceDefault.FastScroll" parent="Widget.Material.FastScroll"/>
++    <style name="Widget.DeviceDefault.ExpandableListView.White" parent="Widget.Holo.ExpandableListView.White"/>
++    <style name="Widget.DeviceDefault.FastScroll" parent="Widget.Holo.FastScroll"/>
+     <!-- The FragmentBreadCrumbs widget is deprecated starting in API level 21 ({@link android.os.Build.VERSION_CODES#.L}). -->
+     <style name="Widget.DeviceDefault.FragmentBreadCrumbs" parent="Widget.Holo.FragmentBreadCrumbs"/>
+-    <style name="Widget.DeviceDefault.Gallery" parent="Widget.Material.Gallery"/>
+-    <style name="Widget.DeviceDefault.GestureOverlayView" parent="Widget.Material.GestureOverlayView"/>
+-    <style name="Widget.DeviceDefault.ImageWell" parent="Widget.Material.ImageWell"/>
+-    <style name="Widget.DeviceDefault.KeyboardView" parent="Widget.Material.KeyboardView"/>
+-    <style name="Widget.DeviceDefault.ListView.White" parent="Widget.Material.ListView.White"/>
+-    <style name="Widget.DeviceDefault.MediaRouteButton" parent="Widget.Material.MediaRouteButton" />
+-    <style name="Widget.DeviceDefault.NumberPicker" parent="Widget.Material.NumberPicker"/>
++    <style name="Widget.DeviceDefault.Gallery" parent="Widget.Holo.Gallery"/>
++    <style name="Widget.DeviceDefault.GestureOverlayView" parent="Widget.Holo.GestureOverlayView"/>
++    <style name="Widget.DeviceDefault.ImageWell" parent="Widget.Holo.ImageWell"/>
++    <style name="Widget.DeviceDefault.KeyboardView" parent="Widget.Holo.KeyboardView"/>
++    <style name="Widget.DeviceDefault.ListView.White" parent="Widget.Holo.ListView.White"/>
++    <style name="Widget.DeviceDefault.MediaRouteButton" parent="Widget.Holo.MediaRouteButton" />
++    <style name="Widget.DeviceDefault.NumberPicker" parent="Widget.Holo.NumberPicker"/>
+     <style name="Widget.DeviceDefault.Notification.Text" parent="Widget.Material.Notification.Text">
+         <item name="textAppearance">@style/TextAppearance.DeviceDefault.Notification</item>
+     </style>
+@@ -148,83 +148,83 @@ easier.
+     <style name="Widget.DeviceDefault.Notification.MessagingName" parent="Widget.Material.Notification.MessagingName">
+         <item name="textAppearance">@style/TextAppearance.DeviceDefault.Notification.Title</item>
+     </style>
+-    <style name="Widget.DeviceDefault.PreferenceFrameLayout" parent="Widget.Material.PreferenceFrameLayout"/>
+-    <style name="Widget.DeviceDefault.ProgressBar.Inverse" parent="Widget.Material.ProgressBar.Inverse"/>
+-    <style name="Widget.DeviceDefault.ProgressBar.Large.Inverse" parent="Widget.Material.ProgressBar.Large.Inverse"/>
+-    <style name="Widget.DeviceDefault.ProgressBar.Small.Inverse" parent="Widget.Material.ProgressBar.Small.Inverse"/>
+-    <style name="Widget.DeviceDefault.QuickContactBadge.WindowLarge" parent="Widget.Material.QuickContactBadge.WindowLarge"/>
+-    <style name="Widget.DeviceDefault.QuickContactBadge.WindowMedium" parent="Widget.Material.QuickContactBadge.WindowMedium"/>
+-    <style name="Widget.DeviceDefault.QuickContactBadge.WindowSmall" parent="Widget.Material.QuickContactBadge.WindowSmall"/>
+-    <style name="Widget.DeviceDefault.QuickContactBadgeSmall.WindowLarge" parent="Widget.Material.QuickContactBadgeSmall.WindowLarge"/>
+-    <style name="Widget.DeviceDefault.QuickContactBadgeSmall.WindowMedium" parent="Widget.Material.QuickContactBadgeSmall.WindowMedium"/>
+-    <style name="Widget.DeviceDefault.QuickContactBadgeSmall.WindowSmall" parent="Widget.Material.QuickContactBadgeSmall.WindowSmall"/>
+-    <style name="Widget.DeviceDefault.Spinner.DropDown" parent="Widget.Material.Spinner.DropDown"/>
+-    <style name="Widget.DeviceDefault.StackView" parent="Widget.Material.StackView"/>
+-    <style name="Widget.DeviceDefault.TextSelectHandle" parent="Widget.Material.TextSelectHandle"/>
+-    <style name="Widget.DeviceDefault.TextView.ListSeparator" parent="Widget.Material.TextView.ListSeparator"/>
+-    <style name="Widget.DeviceDefault.TimePicker" parent="Widget.Material.TimePicker"/>
++    <style name="Widget.DeviceDefault.PreferenceFrameLayout" parent="Widget.Holo.PreferenceFrameLayout"/>
++    <style name="Widget.DeviceDefault.ProgressBar.Inverse" parent="Widget.Holo.ProgressBar.Inverse"/>
++    <style name="Widget.DeviceDefault.ProgressBar.Large.Inverse" parent="Widget.Holo.ProgressBar.Large.Inverse"/>
++    <style name="Widget.DeviceDefault.ProgressBar.Small.Inverse" parent="Widget.Holo.ProgressBar.Small.Inverse"/>
++    <style name="Widget.DeviceDefault.QuickContactBadge.WindowLarge" parent="Widget.Holo.QuickContactBadge.WindowLarge"/>
++    <style name="Widget.DeviceDefault.QuickContactBadge.WindowMedium" parent="Widget.Holo.QuickContactBadge.WindowMedium"/>
++    <style name="Widget.DeviceDefault.QuickContactBadge.WindowSmall" parent="Widget.Holo.QuickContactBadge.WindowSmall"/>
++    <style name="Widget.DeviceDefault.QuickContactBadgeSmall.WindowLarge" parent="Widget.Holo.QuickContactBadgeSmall.WindowLarge"/>
++    <style name="Widget.DeviceDefault.QuickContactBadgeSmall.WindowMedium" parent="Widget.Holo.QuickContactBadgeSmall.WindowMedium"/>
++    <style name="Widget.DeviceDefault.QuickContactBadgeSmall.WindowSmall" parent="Widget.Holo.QuickContactBadgeSmall.WindowSmall"/>
++    <style name="Widget.DeviceDefault.Spinner.DropDown" parent="Widget.Holo.Spinner.DropDown"/>
++    <style name="Widget.DeviceDefault.StackView" parent="Widget.Holo.StackView"/>
++    <style name="Widget.DeviceDefault.TextSelectHandle" parent="Widget.Holo.TextSelectHandle"/>
++    <style name="Widget.DeviceDefault.TextView.ListSeparator" parent="Widget.Holo.TextView.ListSeparator"/>
++    <style name="Widget.DeviceDefault.TimePicker" parent="Widget.Holo.TimePicker"/>
+     <style name="Widget.DeviceDefault.Toolbar" parent="Widget.Material.Toolbar">
+         <item name="titleTextAppearance">@style/TextAppearance.DeviceDefault.Widget.Toolbar.Title</item>
+         <item name="subtitleTextAppearance">@style/TextAppearance.DeviceDefault.Widget.Toolbar.Subtitle</item>
+     </style>
+-    <style name="Widget.DeviceDefault.Light" parent="Widget.Material.Light"/>
+-    <style name="Widget.DeviceDefault.Light.Button" parent="Widget.Material.Light.Button"/>
+-    <style name="Widget.DeviceDefault.Light.Button.Small" parent="Widget.Material.Light.Button.Small"/>
+-    <style name="Widget.DeviceDefault.Light.Button.Inset" parent="Widget.Material.Light.Button.Inset"/>
+-    <style name="Widget.DeviceDefault.Light.Button.Toggle" parent="Widget.Material.Light.Button.Toggle"/>
+-    <style name="Widget.DeviceDefault.Light.StackView" parent="Widget.Material.Light.StackView"/>
+-    <style name="Widget.DeviceDefault.Light.TextView" parent="Widget.Material.Light.TextView"/>
+-    <style name="Widget.DeviceDefault.Light.CheckedTextView" parent="Widget.Material.Light.CheckedTextView"/>
+-    <style name="Widget.DeviceDefault.Light.AutoCompleteTextView" parent="Widget.Material.Light.AutoCompleteTextView"/>
+-    <style name="Widget.DeviceDefault.Light.CompoundButton.CheckBox" parent="Widget.Material.Light.CompoundButton.CheckBox"/>
+-    <style name="Widget.DeviceDefault.Light.ListView.DropDown" parent="Widget.Material.Light.ListView.DropDown"/>
+-    <style name="Widget.DeviceDefault.Light.EditText" parent="Widget.Material.Light.EditText"/>
+-    <style name="Widget.DeviceDefault.Light.ExpandableListView" parent="Widget.Material.Light.ExpandableListView"/>
+-    <style name="Widget.DeviceDefault.Light.FastScroll" parent="Widget.Material.Light.FastScroll"/>
++    <style name="Widget.DeviceDefault.Light" parent="Widget.Holo.Light"/>
++    <style name="Widget.DeviceDefault.Light.Button" parent="Widget.Holo.Light.Button"/>
++    <style name="Widget.DeviceDefault.Light.Button.Small" parent="Widget.Holo.Light.Button.Small"/>
++    <style name="Widget.DeviceDefault.Light.Button.Inset" parent="Widget.Holo.Light.Button.Inset"/>
++    <style name="Widget.DeviceDefault.Light.Button.Toggle" parent="Widget.Holo.Light.Button.Toggle"/>
++    <style name="Widget.DeviceDefault.Light.StackView" parent="Widget.Holo.Light.StackView"/>
++    <style name="Widget.DeviceDefault.Light.TextView" parent="Widget.Holo.Light.TextView"/>
++    <style name="Widget.DeviceDefault.Light.CheckedTextView" parent="Widget.Holo.Light.CheckedTextView"/>
++    <style name="Widget.DeviceDefault.Light.AutoCompleteTextView" parent="Widget.Holo.Light.AutoCompleteTextView"/>
++    <style name="Widget.DeviceDefault.Light.CompoundButton.CheckBox" parent="Widget.Holo.Light.CompoundButton.CheckBox"/>
++    <style name="Widget.DeviceDefault.Light.ListView.DropDown" parent="Widget.Holo.Light.ListView.DropDown"/>
++    <style name="Widget.DeviceDefault.Light.EditText" parent="Widget.Holo.Light.EditText"/>
++    <style name="Widget.DeviceDefault.Light.ExpandableListView" parent="Widget.Holo.Light.ExpandableListView"/>
++    <style name="Widget.DeviceDefault.Light.FastScroll" parent="Widget.Holo.Light.FastScroll"/>
+     <!-- The FragmentBreadCrumbs widget is deprecated starting in API level 21 ({@link android.os.Build.VERSION_CODES#.L}). -->
+     <style name="Widget.DeviceDefault.Light.FragmentBreadCrumbs" parent="Widget.Holo.Light.FragmentBreadCrumbs"/>
+-    <style name="Widget.DeviceDefault.Light.GridView" parent="Widget.Material.Light.GridView"/>
+-    <style name="Widget.DeviceDefault.Light.ImageButton" parent="Widget.Material.Light.ImageButton"/>
+-    <style name="Widget.DeviceDefault.Light.ListView" parent="Widget.Material.Light.ListView"/>
+-    <style name="Widget.DeviceDefault.Light.MediaRouteButton" parent="Widget.Material.Light.MediaRouteButton" />
+-    <style name="Widget.DeviceDefault.Light.PopupWindow" parent="Widget.Material.Light.PopupWindow"/>
+-    <style name="Widget.DeviceDefault.Light.ProgressBar" parent="Widget.Material.Light.ProgressBar"/>
+-    <style name="Widget.DeviceDefault.Light.ProgressBar.Horizontal" parent="Widget.Material.Light.ProgressBar.Horizontal"/>
+-    <style name="Widget.DeviceDefault.Light.ProgressBar.Small" parent="Widget.Material.Light.ProgressBar.Small"/>
+-    <style name="Widget.DeviceDefault.Light.ProgressBar.Small.Title" parent="Widget.Material.Light.ProgressBar.Small.Title"/>
+-    <style name="Widget.DeviceDefault.Light.ProgressBar.Large" parent="Widget.Material.Light.ProgressBar.Large"/>
+-    <style name="Widget.DeviceDefault.Light.ProgressBar.Inverse" parent="Widget.Material.Light.ProgressBar.Inverse"/>
+-    <style name="Widget.DeviceDefault.Light.ProgressBar.Small.Inverse" parent="Widget.Material.Light.ProgressBar.Small.Inverse"/>
+-    <style name="Widget.DeviceDefault.Light.ProgressBar.Large.Inverse" parent="Widget.Material.Light.ProgressBar.Large.Inverse"/>
+-    <style name="Widget.DeviceDefault.Light.SeekBar" parent="Widget.Material.Light.SeekBar"/>
+-    <style name="Widget.DeviceDefault.Light.RatingBar" parent="Widget.Material.Light.RatingBar"/>
+-    <style name="Widget.DeviceDefault.Light.RatingBar.Indicator" parent="Widget.Material.Light.RatingBar.Indicator"/>
+-    <style name="Widget.DeviceDefault.Light.RatingBar.Small" parent="Widget.Material.Light.RatingBar.Small"/>
+-    <style name="Widget.DeviceDefault.Light.CompoundButton.RadioButton" parent="Widget.Material.Light.CompoundButton.RadioButton"/>
+-    <style name="Widget.DeviceDefault.Light.ScrollView" parent="Widget.Material.Light.ScrollView"/>
+-    <style name="Widget.DeviceDefault.Light.HorizontalScrollView" parent="Widget.Material.Light.HorizontalScrollView"/>
+-    <style name="Widget.DeviceDefault.Light.Spinner" parent="Widget.Material.Light.Spinner"/>
+-    <style name="Widget.DeviceDefault.Light.CompoundButton.Star" parent="Widget.Material.Light.CompoundButton.Star"/>
++    <style name="Widget.DeviceDefault.Light.GridView" parent="Widget.Holo.Light.GridView"/>
++    <style name="Widget.DeviceDefault.Light.ImageButton" parent="Widget.Holo.Light.ImageButton"/>
++    <style name="Widget.DeviceDefault.Light.ListView" parent="Widget.Holo.Light.ListView"/>
++    <style name="Widget.DeviceDefault.Light.MediaRouteButton" parent="Widget.Holo.Light.MediaRouteButton" />
++    <style name="Widget.DeviceDefault.Light.PopupWindow" parent="Widget.Holo.Light.PopupWindow"/>
++    <style name="Widget.DeviceDefault.Light.ProgressBar" parent="Widget.Holo.Light.ProgressBar"/>
++    <style name="Widget.DeviceDefault.Light.ProgressBar.Horizontal" parent="Widget.Holo.Light.ProgressBar.Horizontal"/>
++    <style name="Widget.DeviceDefault.Light.ProgressBar.Small" parent="Widget.Holo.Light.ProgressBar.Small"/>
++    <style name="Widget.DeviceDefault.Light.ProgressBar.Small.Title" parent="Widget.Holo.Light.ProgressBar.Small.Title"/>
++    <style name="Widget.DeviceDefault.Light.ProgressBar.Large" parent="Widget.Holo.Light.ProgressBar.Large"/>
++    <style name="Widget.DeviceDefault.Light.ProgressBar.Inverse" parent="Widget.Holo.Light.ProgressBar.Inverse"/>
++    <style name="Widget.DeviceDefault.Light.ProgressBar.Small.Inverse" parent="Widget.Holo.Light.ProgressBar.Small.Inverse"/>
++    <style name="Widget.DeviceDefault.Light.ProgressBar.Large.Inverse" parent="Widget.Holo.Light.ProgressBar.Large.Inverse"/>
++    <style name="Widget.DeviceDefault.Light.SeekBar" parent="Widget.Holo.Light.SeekBar"/>
++    <style name="Widget.DeviceDefault.Light.RatingBar" parent="Widget.Holo.Light.RatingBar"/>
++    <style name="Widget.DeviceDefault.Light.RatingBar.Indicator" parent="Widget.Holo.Light.RatingBar.Indicator"/>
++    <style name="Widget.DeviceDefault.Light.RatingBar.Small" parent="Widget.Holo.Light.RatingBar.Small"/>
++    <style name="Widget.DeviceDefault.Light.CompoundButton.RadioButton" parent="Widget.Holo.Light.CompoundButton.RadioButton"/>
++    <style name="Widget.DeviceDefault.Light.ScrollView" parent="Widget.Holo.Light.ScrollView"/>
++    <style name="Widget.DeviceDefault.Light.HorizontalScrollView" parent="Widget.Holo.Light.HorizontalScrollView"/>
++    <style name="Widget.DeviceDefault.Light.Spinner" parent="Widget.Holo.Light.Spinner"/>
++    <style name="Widget.DeviceDefault.Light.CompoundButton.Star" parent="Widget.Holo.Light.CompoundButton.Star"/>
+     <style name="Widget.DeviceDefault.Light.TabWidget" parent="Widget.DeviceDefault.TabWidget"/>
+-    <style name="Widget.DeviceDefault.Light.WebTextView" parent="Widget.Material.Light.WebTextView"/>
+-    <style name="Widget.DeviceDefault.Light.WebView" parent="Widget.Material.Light.WebView"/>
++    <style name="Widget.DeviceDefault.Light.WebTextView" parent="Widget.Holo.Light.WebTextView"/>
++    <style name="Widget.DeviceDefault.Light.WebView" parent="Widget.Holo.Light.WebView"/>
+     <style name="Widget.DeviceDefault.Light.DropDownItem" parent="Widget.DeviceDefault.DropDownItem"/>
+     <style name="Widget.DeviceDefault.Light.DropDownItem.Spinner" parent="Widget.DeviceDefault.DropDownItem.Spinner"/>
+     <style name="Widget.DeviceDefault.Light.TextView.SpinnerItem" parent="Widget.DeviceDefault.TextView.SpinnerItem"/>
+-    <style name="Widget.DeviceDefault.Light.ListPopupWindow" parent="Widget.Material.Light.ListPopupWindow"/>
+-    <style name="Widget.DeviceDefault.Light.PopupMenu" parent="Widget.Material.Light.PopupMenu"/>
+-    <style name="Widget.DeviceDefault.Light.Tab" parent="Widget.Material.Light.Tab"/>
+-    <style name="Widget.DeviceDefault.Light.CalendarView" parent="Widget.Material.Light.CalendarView"/>
+-    <style name="Widget.DeviceDefault.Light.Button.Borderless.Small" parent="Widget.Material.Light.Button.Borderless.Small"/>
+-    <style name="Widget.DeviceDefault.Light.ActionButton" parent="Widget.Material.Light.ActionButton"/>
+-    <style name="Widget.DeviceDefault.Light.ActionButton.Overflow" parent="Widget.Material.Light.ActionButton.Overflow"/>
++    <style name="Widget.DeviceDefault.Light.ListPopupWindow" parent="Widget.Holo.Light.ListPopupWindow"/>
++    <style name="Widget.DeviceDefault.Light.PopupMenu" parent="Widget.Holo.Light.PopupMenu"/>
++    <style name="Widget.DeviceDefault.Light.Tab" parent="Widget.Holo.Light.Tab"/>
++    <style name="Widget.DeviceDefault.Light.CalendarView" parent="Widget.Holo.Light.CalendarView"/>
++    <style name="Widget.DeviceDefault.Light.Button.Borderless.Small" parent="Widget.Holo.Light.Button.Borderless.Small"/>
++    <style name="Widget.DeviceDefault.Light.ActionButton" parent="Widget.Holo.Light.ActionButton"/>
++    <style name="Widget.DeviceDefault.Light.ActionButton.Overflow" parent="Widget.Holo.Light.ActionButton.Overflow"/>
+     <style name="Widget.DeviceDefault.Light.ActionMode" parent="Widget.DeviceDefault.ActionMode"/>
+-    <style name="Widget.DeviceDefault.Light.ActionButton.CloseMode" parent="Widget.Material.Light.ActionButton.CloseMode"/>
++    <style name="Widget.DeviceDefault.Light.ActionButton.CloseMode" parent="Widget.Holo.Light.ActionButton.CloseMode"/>
+     <style name="Widget.DeviceDefault.Light.ActionBar" parent="Widget.DeviceDefault.ActionBar"/>
+     <style name="Widget.DeviceDefault.Light.ActionBar.TabView" parent="Widget.DeviceDefault.ActionBar.TabView" />
+     <style name="Widget.DeviceDefault.Light.ActionBar.TabText" parent="Widget.DeviceDefault.ActionBar.TabText" />
+     <style name="Widget.DeviceDefault.Light.ActionBar.TabBar" parent="Widget.DeviceDefault.ActionBar.TabBar" />
+-    <style name="Widget.DeviceDefault.Light.ActionBar.Solid" parent="Widget.Material.Light.ActionBar.Solid">
++    <style name="Widget.DeviceDefault.Light.ActionBar.Solid" parent="Widget.Holo.Light.ActionBar.Solid">
+         <item name="titleTextStyle">@style/TextAppearance.DeviceDefault.Widget.ActionBar.Title</item>
+         <item name="subtitleTextStyle">@style/TextAppearance.DeviceDefault.Widget.ActionBar.Subtitle</item>
+     </style>
+@@ -238,50 +238,50 @@ easier.
+     <style name="Widget.DeviceDefault.Light.ActionBar.TabText.Inverse" parent="Widget.Holo.Light.ActionBar.TabText.Inverse"/>
+     <!-- @deprecated Action bars are now themed using the inheritable android:theme attribute. -->
+     <style name="Widget.DeviceDefault.Light.ActionMode.Inverse" parent="Widget.Holo.Light.ActionMode.Inverse"/>
+-    <style name="Widget.DeviceDefault.Light.AbsListView" parent="Widget.Material.Light.AbsListView"/>
+-    <style name="Widget.DeviceDefault.Light.Spinner.DropDown.ActionBar" parent="Widget.Material.Light.Spinner.DropDown.ActionBar"/>
+-    <style name="Widget.DeviceDefault.Light.PopupWindow.ActionMode" parent="Widget.Material.Light.PopupWindow.ActionMode"/>
+-    <style name="Widget.DeviceDefault.Light.Button.Borderless" parent="Widget.Material.Light.Button.Borderless"/>
+-    <style name="Widget.DeviceDefault.Light.DatePicker" parent="Widget.Material.Light.DatePicker"/>
+-    <style name="Widget.DeviceDefault.Light.ExpandableListView.White" parent="Widget.Material.Light.ExpandableListView.White"/>
+-    <style name="Widget.DeviceDefault.Light.Gallery" parent="Widget.Material.Light.Gallery"/>
+-    <style name="Widget.DeviceDefault.Light.GestureOverlayView" parent="Widget.Material.Light.GestureOverlayView"/>
+-    <style name="Widget.DeviceDefault.Light.ImageWell" parent="Widget.Material.Light.ImageWell"/>
+-    <style name="Widget.DeviceDefault.Light.ListView.White" parent="Widget.Material.Light.ListView.White"/>
+-    <style name="Widget.DeviceDefault.Light.NumberPicker" parent="Widget.Material.Light.NumberPicker"/>
+-    <style name="Widget.DeviceDefault.Light.Spinner.DropDown" parent="Widget.Material.Light.Spinner.DropDown"/>
+-    <style name="Widget.DeviceDefault.Light.TextView.ListSeparator" parent="Widget.Material.Light.TextView.ListSeparator"/>
+-    <style name="Widget.DeviceDefault.Light.TimePicker" parent="Widget.Material.Light.TimePicker"/>
++    <style name="Widget.DeviceDefault.Light.AbsListView" parent="Widget.Holo.Light.AbsListView"/>
++    <style name="Widget.DeviceDefault.Light.Spinner.DropDown.ActionBar" parent="Widget.Holo.Light.Spinner.DropDown.ActionBar"/>
++    <style name="Widget.DeviceDefault.Light.PopupWindow.ActionMode" parent="Widget.Holo.Light.PopupWindow.ActionMode"/>
++    <style name="Widget.DeviceDefault.Light.Button.Borderless" parent="Widget.Holo.Light.Button.Borderless"/>
++    <style name="Widget.DeviceDefault.Light.DatePicker" parent="Widget.Holo.Light.DatePicker"/>
++    <style name="Widget.DeviceDefault.Light.ExpandableListView.White" parent="Widget.Holo.Light.ExpandableListView.White"/>
++    <style name="Widget.DeviceDefault.Light.Gallery" parent="Widget.Holo.Light.Gallery"/>
++    <style name="Widget.DeviceDefault.Light.GestureOverlayView" parent="Widget.Holo.Light.GestureOverlayView"/>
++    <style name="Widget.DeviceDefault.Light.ImageWell" parent="Widget.Holo.Light.ImageWell"/>
++    <style name="Widget.DeviceDefault.Light.ListView.White" parent="Widget.Holo.Light.ListView.White"/>
++    <style name="Widget.DeviceDefault.Light.NumberPicker" parent="Widget.Holo.Light.NumberPicker"/>
++    <style name="Widget.DeviceDefault.Light.Spinner.DropDown" parent="Widget.Holo.Light.Spinner.DropDown"/>
++    <style name="Widget.DeviceDefault.Light.TextView.ListSeparator" parent="Widget.Holo.Light.TextView.ListSeparator"/>
++    <style name="Widget.DeviceDefault.Light.TimePicker" parent="Widget.Holo.Light.TimePicker"/>
+ 
+     <!-- Text Appearance Styles -->
+-    <style name="TextAppearance.DeviceDefault" parent="TextAppearance.Material">
++    <style name="TextAppearance.DeviceDefault" parent="TextAppearance.Holo">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Inverse" parent="TextAppearance.Material.Inverse">
++    <style name="TextAppearance.DeviceDefault.Inverse" parent="TextAppearance.Holo.Inverse">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Large" parent="TextAppearance.Material.Large">
++    <style name="TextAppearance.DeviceDefault.Large" parent="TextAppearance.Holo.Large">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Large.Inverse" parent="TextAppearance.Material.Large.Inverse">
++    <style name="TextAppearance.DeviceDefault.Large.Inverse" parent="TextAppearance.Holo.Large.Inverse">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Medium" parent="TextAppearance.Material.Medium">
++    <style name="TextAppearance.DeviceDefault.Medium" parent="TextAppearance.Holo.Medium">
+         <item name="fontFamily">@string/config_bodyFontFamilyMedium</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Medium.Inverse" parent="TextAppearance.Material.Medium.Inverse">
++    <style name="TextAppearance.DeviceDefault.Medium.Inverse" parent="TextAppearance.Holo.Medium.Inverse">
+         <item name="fontFamily">@string/config_bodyFontFamilyMedium</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Small" parent="TextAppearance.Material.Small">
++    <style name="TextAppearance.DeviceDefault.Small" parent="TextAppearance.Holo.Small">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Small.Inverse" parent="TextAppearance.Material.Small.Inverse">
++    <style name="TextAppearance.DeviceDefault.Small.Inverse" parent="TextAppearance.Holo.Small.Inverse">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.SearchResult.Title" parent="TextAppearance.Material.SearchResult.Title">
++    <style name="TextAppearance.DeviceDefault.SearchResult.Title" parent="TextAppearance.Holo.SearchResult.Title">
+         <item name="fontFamily">@string/config_bodyFontFamilyMedium</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.SearchResult.Subtitle" parent="TextAppearance.Material.SearchResult.Subtitle">
++    <style name="TextAppearance.DeviceDefault.SearchResult.Subtitle" parent="TextAppearance.Holo.SearchResult.Subtitle">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+     <style name="TextAppearance.DeviceDefault.Notification" parent="TextAppearance.Material.Notification">
+@@ -302,87 +302,87 @@ easier.
+     <style name="TextAppearance.DeviceDefault.Notification.Time" parent="TextAppearance.Material.Notification.Time">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Widget" parent="TextAppearance.Material.Widget">
++    <style name="TextAppearance.DeviceDefault.Widget" parent="TextAppearance.Holo.Widget">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Widget.Button" parent="TextAppearance.Material.Widget.Button">
++    <style name="TextAppearance.DeviceDefault.Widget.Button" parent="TextAppearance.Holo.Widget.Button">
+         <item name="fontFamily">@string/config_headlineFontFamilyMedium</item>
+         <item name="textAllCaps">@bool/config_buttonTextAllCaps</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Widget.IconMenu.Item" parent="TextAppearance.Material.Widget.IconMenu.Item">
++    <style name="TextAppearance.DeviceDefault.Widget.IconMenu.Item" parent="TextAppearance.Holo.Widget.IconMenu.Item">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Widget.TabWidget" parent="TextAppearance.Material.Widget.TabWidget">
++    <style name="TextAppearance.DeviceDefault.Widget.TabWidget" parent="TextAppearance.Holo.Widget.TabWidget">
+         <item name="fontFamily">@string/config_bodyFontFamilyMedium</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Widget.TextView" parent="TextAppearance.Material.Widget.TextView">
++    <style name="TextAppearance.DeviceDefault.Widget.TextView" parent="TextAppearance.Holo.Widget.TextView">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Widget.TextView.PopupMenu" parent="TextAppearance.Material.Widget.TextView.PopupMenu">
++    <style name="TextAppearance.DeviceDefault.Widget.TextView.PopupMenu" parent="TextAppearance.Holo.Widget.TextView.PopupMenu">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Widget.DropDownHint" parent="TextAppearance.Material.Widget.DropDownHint">
++    <style name="TextAppearance.DeviceDefault.Widget.DropDownHint" parent="TextAppearance.Holo.Widget.DropDownHint">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Widget.DropDownItem" parent="TextAppearance.Material.Widget.DropDownItem">
++    <style name="TextAppearance.DeviceDefault.Widget.DropDownItem" parent="TextAppearance.Holo.Widget.DropDownItem">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Widget.TextView.SpinnerItem" parent="TextAppearance.Material.Widget.TextView.SpinnerItem">
++    <style name="TextAppearance.DeviceDefault.Widget.TextView.SpinnerItem" parent="TextAppearance.Holo.Widget.TextView.SpinnerItem">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Widget.EditText" parent="TextAppearance.Material.Widget.EditText">
++    <style name="TextAppearance.DeviceDefault.Widget.EditText" parent="TextAppearance.Holo.Widget.EditText">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Widget.Switch" parent="TextAppearance.Material.Widget.Switch">
++    <style name="TextAppearance.DeviceDefault.Widget.Switch" parent="TextAppearance.Holo.Widget.Switch">
+         <item name="fontFamily">@string/config_bodyFontFamilyMedium</item>
+     </style>
+     <style name="TextAppearance.DeviceDefault.Widget.Button.Borderless.Colored" parent="TextAppearance.DeviceDefault.Widget.Button">
+         <item name="textColor">@color/btn_colored_borderless_text_material</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Widget.PopupMenu" parent="TextAppearance.Material.Widget.PopupMenu">
++    <style name="TextAppearance.DeviceDefault.Widget.PopupMenu" parent="TextAppearance.Holo.Widget.PopupMenu">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Widget.PopupMenu.Large" parent="TextAppearance.Material.Widget.PopupMenu.Large">
++    <style name="TextAppearance.DeviceDefault.Widget.PopupMenu.Large" parent="TextAppearance.Holo.Widget.PopupMenu.Large">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Widget.PopupMenu.Small" parent="TextAppearance.Material.Widget.PopupMenu.Small">
++    <style name="TextAppearance.DeviceDefault.Widget.PopupMenu.Small" parent="TextAppearance.Holo.Widget.PopupMenu.Small">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Widget.ActionBar.Title" parent="TextAppearance.Material.Widget.ActionBar.Title">
++    <style name="TextAppearance.DeviceDefault.Widget.ActionBar.Title" parent="TextAppearance.Holo.Widget.ActionBar.Title">
+         <item name="fontFamily">@string/config_headlineFontFamilyMedium</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Widget.ActionBar.Subtitle" parent="TextAppearance.Material.Widget.ActionBar.Subtitle">
++    <style name="TextAppearance.DeviceDefault.Widget.ActionBar.Subtitle" parent="TextAppearance.Holo.Widget.ActionBar.Subtitle">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Widget.ActionMode.Title" parent="TextAppearance.Material.Widget.ActionMode.Title">
++    <style name="TextAppearance.DeviceDefault.Widget.ActionMode.Title" parent="TextAppearance.Holo.Widget.ActionMode.Title">
+         <item name="fontFamily">@string/config_bodyFontFamilyMedium</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Widget.ActionMode.Subtitle" parent="TextAppearance.Material.Widget.ActionMode.Subtitle">
++    <style name="TextAppearance.DeviceDefault.Widget.ActionMode.Subtitle" parent="TextAppearance.Holo.Widget.ActionMode.Subtitle">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.WindowTitle" parent="TextAppearance.Material.WindowTitle">
++    <style name="TextAppearance.DeviceDefault.WindowTitle" parent="TextAppearance.Holo.WindowTitle">
+         <item name="fontFamily">@string/config_headlineFontFamilyMedium</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.DialogWindowTitle" parent="TextAppearance.Material.DialogWindowTitle">
++    <style name="TextAppearance.DeviceDefault.DialogWindowTitle" parent="TextAppearance.Holo.DialogWindowTitle">
+         <item name="fontFamily">@string/config_headlineFontFamilyMedium</item>
+     </style>
+     <!-- @deprecated Action bars are now themed using the inheritable android:theme attribute. -->
+-    <style name="TextAppearance.DeviceDefault.Widget.ActionBar.Title.Inverse" parent="TextAppearance.Material.Widget.ActionBar.Title.Inverse">
++    <style name="TextAppearance.DeviceDefault.Widget.ActionBar.Title.Inverse" parent="TextAppearance.Holo.Widget.ActionBar.Title.Inverse">
+         <item name="fontFamily">@string/config_bodyFontFamilyMedium</item>
+     </style>
+     <!-- @deprecated Action bars are now themed using the inheritable android:theme attribute. -->
+-    <style name="TextAppearance.DeviceDefault.Widget.ActionBar.Subtitle.Inverse" parent="TextAppearance.Material.Widget.ActionBar.Subtitle.Inverse">
++    <style name="TextAppearance.DeviceDefault.Widget.ActionBar.Subtitle.Inverse" parent="TextAppearance.Holo.Widget.ActionBar.Subtitle.Inverse">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+     <!-- @deprecated Action bars are now themed using the inheritable android:theme attribute. -->
+-    <style name="TextAppearance.DeviceDefault.Widget.ActionMode.Title.Inverse" parent="TextAppearance.Material.Widget.ActionMode.Title.Inverse">
++    <style name="TextAppearance.DeviceDefault.Widget.ActionMode.Title.Inverse" parent="TextAppearance.Holo.Widget.ActionMode.Title.Inverse">
+         <item name="fontFamily">@string/config_bodyFontFamilyMedium</item>
+     </style>
+     <!-- @deprecated Action bars are now themed using the inheritable android:theme attribute. -->
+-    <style name="TextAppearance.DeviceDefault.Widget.ActionMode.Subtitle.Inverse" parent="TextAppearance.Material.Widget.ActionMode.Subtitle.Inverse">
++    <style name="TextAppearance.DeviceDefault.Widget.ActionMode.Subtitle.Inverse" parent="TextAppearance.Holo.Widget.ActionMode.Subtitle.Inverse">
+         <item name="fontFamily">@string/config_bodyFontFamily</item>
+     </style>
+-    <style name="TextAppearance.DeviceDefault.Widget.ActionBar.Menu" parent="TextAppearance.Material.Widget.ActionBar.Menu">
++    <style name="TextAppearance.DeviceDefault.Widget.ActionBar.Menu" parent="TextAppearance.Holo.Widget.ActionBar.Menu">
+         <item name="fontFamily">@string/config_bodyFontFamilyMedium</item>
+     </style>
+     <style name="TextAppearance.DeviceDefault.Widget.Toolbar.Title" parent="TextAppearance.DeviceDefault.Widget.ActionBar.Title"/>
+diff --git a/core/res/res/values/themes_device_defaults.xml b/core/res/res/values/themes_device_defaults.xml
+index ee191449ac35..665de2de9bd9 100644
+--- a/core/res/res/values/themes_device_defaults.xml
++++ b/core/res/res/values/themes_device_defaults.xml
+@@ -211,24 +211,33 @@ easier.
+         <item name="mediaRouteButtonStyle">@style/Widget.DeviceDefault.MediaRouteButton</item>
+ 
+         <!-- Color palette -->
+-        <item name="colorPrimary">@color/primary_device_default_dark</item>
+-        <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
+-        <item name="colorAccent">@color/accent_device_default_dark</item>
+-        <item name="colorAccentPrimary">@color/accent_primary_device_default</item>
+-        <item name="colorAccentSecondary">@color/accent_secondary_device_default</item>
+-        <item name="colorAccentTertiary">@color/accent_tertiary_device_default</item>
+-        <item name="colorAccentPrimaryVariant">@color/accent_primary_variant_dark_device_default</item>
+-        <item name="colorAccentSecondaryVariant">@color/accent_secondary_variant_dark_device_default</item>
+-        <item name="colorAccentTertiaryVariant">@color/accent_tertiary_variant_dark_device_default</item>
+-        <item name="colorSurface">@color/surface_dark</item>
+-        <item name="colorSurfaceHighlight">@color/surface_highlight_dark</item>
+-        <item name="colorSurfaceVariant">@color/surface_variant_dark</item>
+-        <item name="colorSurfaceHeader">@color/surface_header_dark</item>
+-        <item name="colorError">@color/error_color_device_default_dark</item>
+-        <item name="colorBackground">@color/background_device_default_dark</item>
+-        <item name="colorBackgroundFloating">@color/background_floating_device_default_dark</item>
++        <!-- KitKat UI Project (Phase 1): Holo palette -->
++        <item name="colorPrimary">@color/holo_blue_light</item>
++        <item name="colorPrimaryDark">@color/background_dark</item>
++        <item name="colorAccent">@color/holo_blue_light</item>
++        <item name="colorAccentPrimary">@color/holo_blue_light</item>
++        <item name="colorAccentSecondary">@color/holo_blue_dark</item>
++        <item name="colorAccentTertiary">@color/holo_blue_dark</item>
++        <item name="colorAccentPrimaryVariant">@color/holo_blue_dark</item>
++        <item name="colorAccentSecondaryVariant">@color/holo_blue_dark</item>
++        <item name="colorAccentTertiaryVariant">@color/holo_blue_dark</item>
++        <item name="colorSurface">@color/background_holo_dark</item>
++        <item name="colorSurfaceHighlight">@color/background_holo_dark</item>
++        <item name="colorSurfaceVariant">@color/background_dark</item>
++        <item name="colorSurfaceHeader">@color/background_holo_dark</item>
++        <item name="colorError">@color/holo_red_light</item>
++        <item name="colorBackground">@color/background_holo_dark</item>
++        <item name="colorBackgroundFloating">@color/background_holo_dark</item>
+         <item name="colorPopupBackground">?attr/colorBackgroundFloating</item>
+         <item name="panelColorBackground">?attr/colorBackgroundFloating</item>
++        <item name="colorControlActivated">@color/holo_blue_light</item>
++        <item name="colorControlNormal">#ffb3b3b3</item>
++        <item name="colorControlHighlight">#33999999</item>
++        <item name="colorEdgeEffect">@color/holo_blue_light</item>
++        <item name="statusBarColor">#ff000000</item>
++        <item name="navigationBarColor">#ff000000</item>
++        <item name="windowLightStatusBar">false</item>
++        <item name="forceDarkAllowed">false</item>
+         <item name="textColorPrimary">@color/text_color_primary_device_default_dark</item>
+         <item name="textColorSecondary">@color/text_color_secondary_device_default_dark</item>
+         <item name="textColorTertiary">@color/text_color_tertiary_device_default_dark</item>
+@@ -289,7 +298,7 @@ easier.
+     <style name="Theme.DeviceDefault" parent="Theme.DeviceDefaultBase" />
+ 
+     <!-- Variant of {@link #Theme_DeviceDefault} with no action bar -->
+-    <style name="Theme.DeviceDefault.NoActionBar" parent="Theme.Material.NoActionBar">
++    <style name="Theme.DeviceDefault.NoActionBar" parent="Theme.Holo.NoActionBar">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_dark</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
+@@ -384,7 +393,7 @@ easier.
+ 
+     <!-- Variant of {@link #Theme_DeviceDefault} with no action bar and no status bar.  This theme
+          sets {@link android.R.attr#windowFullscreen} to true.  -->
+-    <style name="Theme.DeviceDefault.NoActionBar.Fullscreen" parent="Theme.Material.NoActionBar.Fullscreen">
++    <style name="Theme.DeviceDefault.NoActionBar.Fullscreen" parent="Theme.Holo.NoActionBar.Fullscreen">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_dark</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
+@@ -481,7 +490,7 @@ easier.
+     extending in to overscan region.  This theme
+     sets {@link android.R.attr#windowFullscreen} and {@link android.R.attr#windowOverscan}
+     to true. -->
+-    <style name="Theme.DeviceDefault.NoActionBar.Overscan" parent="Theme.Material.NoActionBar.Overscan">
++    <style name="Theme.DeviceDefault.NoActionBar.Overscan" parent="Theme.Holo.NoActionBar.Overscan">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_dark</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
+@@ -577,7 +586,7 @@ easier.
+     <!-- Variant of {@link #Theme_DeviceDefault} that has no title bar and translucent
+          system decor.  This theme sets {@link android.R.attr#windowTranslucentStatus} and
+          {@link android.R.attr#windowTranslucentNavigation} to true. -->
+-    <style name="Theme.DeviceDefault.NoActionBar.TranslucentDecor" parent="Theme.Material.NoActionBar.TranslucentDecor">
++    <style name="Theme.DeviceDefault.NoActionBar.TranslucentDecor" parent="Theme.Holo.NoActionBar.TranslucentDecor">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_dark</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
+@@ -673,7 +682,7 @@ easier.
+     <!-- DeviceDefault theme for dialog windows and activities. This changes the window to be
+     floating (not fill the entire screen), and puts a frame around its contents. You can set this
+     theme on an activity if you would like to make an activity that looks like a Dialog. -->
+-    <style name="Theme.DeviceDefault.Dialog" parent="Theme.Material.Dialog" >
++    <style name="Theme.DeviceDefault.Dialog" parent="Theme.Holo.Dialog" >
+         <item name="windowTitleStyle">@style/DialogWindowTitle.DeviceDefault</item>
+         <item name="windowAnimationStyle">@style/Animation.DeviceDefault.Dialog</item>
+ 
+@@ -776,7 +785,7 @@ easier.
+ 
+     <!-- Variant of {@link #Theme_DeviceDefault_Dialog} that has a nice minimum width for a
+     regular dialog. -->
+-    <style name="Theme.DeviceDefault.Dialog.MinWidth" parent="Theme.Material.Dialog.MinWidth">
++    <style name="Theme.DeviceDefault.Dialog.MinWidth" parent="Theme.Holo.Dialog.MinWidth">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_dark</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
+@@ -870,7 +879,7 @@ easier.
+     </style>
+ 
+     <!-- Variant of {@link #Theme_DeviceDefault_Dialog} without an action bar -->
+-    <style name="Theme.DeviceDefault.Dialog.NoActionBar" parent="Theme.Material.Dialog.NoActionBar">
++    <style name="Theme.DeviceDefault.Dialog.NoActionBar" parent="Theme.Holo.Dialog.NoActionBar">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_dark</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
+@@ -965,7 +974,7 @@ easier.
+ 
+     <!-- Variant of {@link #Theme_DeviceDefault_Dialog_NoActionBar} that has a nice minimum width
+     for a regular dialog. -->
+-    <style name="Theme.DeviceDefault.Dialog.NoActionBar.MinWidth" parent="Theme.Material.Dialog.NoActionBar.MinWidth">
++    <style name="Theme.DeviceDefault.Dialog.NoActionBar.MinWidth" parent="Theme.Holo.Dialog.NoActionBar.MinWidth">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_dark</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
+@@ -1076,7 +1085,7 @@ easier.
+ 
+     <!-- DeviceDefault theme for a window that will be displayed either full-screen on smaller
+     screens (small, normal) or as a dialog on larger screens (large, xlarge). -->
+-    <style name="Theme.DeviceDefault.DialogWhenLarge" parent="Theme.Material.DialogWhenLarge">
++    <style name="Theme.DeviceDefault.DialogWhenLarge" parent="Theme.Holo.DialogWhenLarge">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_dark</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
+@@ -1172,7 +1181,7 @@ easier.
+     <!-- DeviceDefault theme for a window without an action bar that will be displayed either
+     full-screen on smaller screens (small, normal) or as a dialog on larger screens (large,
+     xlarge). -->
+-    <style name="Theme.DeviceDefault.DialogWhenLarge.NoActionBar" parent="Theme.Material.DialogWhenLarge.NoActionBar">
++    <style name="Theme.DeviceDefault.DialogWhenLarge.NoActionBar" parent="Theme.Holo.DialogWhenLarge.NoActionBar">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_dark</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
+@@ -1266,7 +1275,7 @@ easier.
+     </style>
+ 
+     <!-- DeviceDefault theme for a presentation window on a secondary display. -->
+-    <style name="Theme.DeviceDefault.Dialog.Presentation" parent="Theme.Material.Dialog.Presentation">
++    <style name="Theme.DeviceDefault.Dialog.Presentation" parent="Theme.Holo.Dialog.Presentation">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_dark</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
+@@ -1362,7 +1371,7 @@ easier.
+     <!-- DeviceDefault theme for panel windows. This removes all extraneous window
+     decorations, so you basically have an empty rectangle in which to place your content. It makes
+     the window floating, with a transparent background, and turns off dimming behind the window. -->
+-    <style name="Theme.DeviceDefault.Panel" parent="Theme.Material.Panel">
++    <style name="Theme.DeviceDefault.Panel" parent="Theme.Holo.Panel">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_dark</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
+@@ -1457,7 +1466,7 @@ easier.
+ 
+     <!-- DeviceDefault theme for windows that want to have the user's selected wallpaper appear
+     behind them. -->
+-    <style name="Theme.DeviceDefault.Wallpaper" parent="Theme.Material.Wallpaper">
++    <style name="Theme.DeviceDefault.Wallpaper" parent="Theme.Holo.Wallpaper">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_dark</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
+@@ -1552,7 +1561,7 @@ easier.
+ 
+     <!-- DeviceDefault theme for windows that want to have the user's selected wallpaper appear
+     behind them and without an action bar. -->
+-    <style name="Theme.DeviceDefault.Wallpaper.NoTitleBar" parent="Theme.Material.Wallpaper.NoTitleBar">
++    <style name="Theme.DeviceDefault.Wallpaper.NoTitleBar" parent="Theme.Holo.Wallpaper.NoTitleBar">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_dark</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
+@@ -1647,24 +1656,33 @@ easier.
+ 
+     <!-- DeviceDefault style for input methods, which is used by the
+          {@link android.inputmethodservice.InputMethodService} class.-->
+-    <style name="Theme.DeviceDefault.InputMethod" parent="Theme.Material.InputMethod">
++    <style name="Theme.DeviceDefault.InputMethod" parent="Theme.Holo.InputMethod">
+         <!-- Color palette -->
+-        <item name="colorPrimary">@color/primary_device_default_light</item>
+-        <item name="colorPrimaryDark">@color/primary_dark_device_default_light</item>
+-        <item name="colorAccent">@color/accent_device_default_light</item>
+-        <item name="colorAccentPrimary">@color/accent_primary_device_default</item>
+-        <item name="colorAccentSecondary">@color/accent_secondary_device_default</item>
+-        <item name="colorAccentTertiary">@color/accent_tertiary_device_default</item>
+-        <item name="colorAccentPrimaryVariant">@color/accent_primary_variant_light_device_default</item>
+-        <item name="colorAccentSecondaryVariant">@color/accent_secondary_variant_light_device_default</item>
+-        <item name="colorAccentTertiaryVariant">@color/accent_tertiary_variant_light_device_default</item>
+-        <item name="colorSurface">@color/surface_light</item>
+-        <item name="colorSurfaceHighlight">@color/surface_highlight_light</item>
+-        <item name="colorSurfaceVariant">@color/surface_variant_light</item>
+-        <item name="colorSurfaceHeader">@color/surface_header_light</item>
+-        <item name="colorError">@color/error_color_device_default_light</item>
+-        <item name="colorBackground">@color/background_device_default_light</item>
+-        <item name="colorBackgroundFloating">@color/background_floating_device_default_light</item>
++        <!-- KitKat UI Project (Phase 1): Holo palette -->
++        <item name="colorPrimary">@color/holo_blue_dark</item>
++        <item name="colorPrimaryDark">@color/background_dark</item>
++        <item name="colorAccent">@color/holo_blue_dark</item>
++        <item name="colorAccentPrimary">@color/holo_blue_light</item>
++        <item name="colorAccentSecondary">@color/holo_blue_dark</item>
++        <item name="colorAccentTertiary">@color/holo_blue_dark</item>
++        <item name="colorAccentPrimaryVariant">@color/holo_blue_light</item>
++        <item name="colorAccentSecondaryVariant">@color/holo_blue_dark</item>
++        <item name="colorAccentTertiaryVariant">@color/holo_blue_dark</item>
++        <item name="colorSurface">@color/background_holo_light</item>
++        <item name="colorSurfaceHighlight">@color/background_holo_light</item>
++        <item name="colorSurfaceVariant">@color/background_holo_light</item>
++        <item name="colorSurfaceHeader">@color/background_holo_light</item>
++        <item name="colorError">@color/holo_red_dark</item>
++        <item name="colorBackground">@color/background_holo_light</item>
++        <item name="colorBackgroundFloating">@color/background_holo_light</item>
++        <item name="colorControlActivated">@color/holo_blue_dark</item>
++        <item name="colorControlNormal">#ff666666</item>
++        <item name="colorControlHighlight">#33999999</item>
++        <item name="colorEdgeEffect">@color/holo_blue_dark</item>
++        <item name="statusBarColor">#ff000000</item>
++        <item name="navigationBarColor">#ff000000</item>
++        <item name="windowLightStatusBar">false</item>
++        <item name="forceDarkAllowed">false</item>
+         <item name="textColorPrimary">@color/text_color_primary_device_default_light</item>
+         <item name="textColorSecondary">@color/text_color_secondary_device_default_light</item>
+         <item name="textColorTertiary">@color/text_color_tertiary_device_default_light</item>
+@@ -1835,7 +1853,7 @@ easier.
+         <item name="materialColorError">@color/system_error_light</item>
+     </style>
+ 
+-    <style name="Theme.DeviceDefault.Dialog.Alert" parent="Theme.Material.Dialog.Alert">
++    <style name="Theme.DeviceDefault.Dialog.Alert" parent="Theme.Holo.Dialog.Alert">
+         <item name="windowTitleStyle">@style/DialogWindowTitle.DeviceDefault</item>
+ 
+         <!-- Dialog attributes -->
+@@ -1937,7 +1955,7 @@ easier.
+         <item name="windowCloseOnTouchOutside">false</item>
+     </style>
+ 
+-    <style name="Theme.DeviceDefault.SearchBar" parent="Theme.Material.SearchBar">
++    <style name="Theme.DeviceDefault.SearchBar" parent="Theme.Holo.SearchBar">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_dark</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
+@@ -2030,7 +2048,7 @@ easier.
+         <item name="materialColorError">@color/system_error_dark</item>
+     </style>
+ 
+-    <style name="Theme.DeviceDefault.Dialog.NoFrame" parent="Theme.Material.Dialog.NoFrame">
++    <style name="Theme.DeviceDefault.Dialog.NoFrame" parent="Theme.Holo.Dialog.NoFrame">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_dark</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
+@@ -2124,7 +2142,7 @@ easier.
+     </style>
+ 
+     <!-- Variant of {@link #Theme_DeviceDefault} with a light-colored style -->
+-    <style name="Theme.DeviceDefault.Light" parent="Theme.Material.Light" >
++    <style name="Theme.DeviceDefault.Light" parent="Theme.Holo.Light" >
+         <!-- Text styles -->
+         <item name="textAppearance">@style/TextAppearance.DeviceDefault</item>
+         <item name="textAppearanceInverse">@style/TextAppearance.DeviceDefault.Inverse</item>
+@@ -2356,7 +2374,7 @@ easier.
+ 
+     <!-- Variant of the DeviceDefault (light) theme that has a solid (opaque) action bar with an
+     inverse color profile. -->
+-    <style name="Theme.DeviceDefault.Light.DarkActionBar" parent="Theme.Material.Light.DarkActionBar">
++    <style name="Theme.DeviceDefault.Light.DarkActionBar" parent="Theme.Holo.Light.DarkActionBar">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_dark</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_dark</item>
+@@ -2450,7 +2468,7 @@ easier.
+     </style>
+ 
+     <!-- Variant of {@link #Theme_DeviceDefault_Light} with no action bar -->
+-    <style name="Theme.DeviceDefault.Light.NoActionBar" parent="Theme.Material.Light.NoActionBar">
++    <style name="Theme.DeviceDefault.Light.NoActionBar" parent="Theme.Holo.Light.NoActionBar">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_light</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_light</item>
+@@ -2545,7 +2563,7 @@ easier.
+ 
+     <!-- Variant of {@link #Theme_DeviceDefault_Light} with no action bar and no status bar.
+          This theme sets {@link android.R.attr#windowFullscreen} to true.  -->
+-    <style name="Theme.DeviceDefault.Light.NoActionBar.Fullscreen" parent="Theme.Material.Light.NoActionBar.Fullscreen">
++    <style name="Theme.DeviceDefault.Light.NoActionBar.Fullscreen" parent="Theme.Holo.Light.NoActionBar.Fullscreen">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_light</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_light</item>
+@@ -2642,7 +2660,7 @@ easier.
+     and extending in to overscan region.  This theme
+     sets {@link android.R.attr#windowFullscreen} and {@link android.R.attr#windowOverscan}
+     to true. -->
+-    <style name="Theme.DeviceDefault.Light.NoActionBar.Overscan" parent="Theme.Material.Light.NoActionBar.Overscan">
++    <style name="Theme.DeviceDefault.Light.NoActionBar.Overscan" parent="Theme.Holo.Light.NoActionBar.Overscan">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_light</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_light</item>
+@@ -2738,7 +2756,7 @@ easier.
+     <!-- Variant of {@link #Theme_DeviceDefault_Light} that has no title bar and translucent
+          system decor.  This theme sets {@link android.R.attr#windowTranslucentStatus} and
+          {@link android.R.attr#windowTranslucentNavigation} to true. -->
+-    <style name="Theme.DeviceDefault.Light.NoActionBar.TranslucentDecor" parent="Theme.Material.Light.NoActionBar.TranslucentDecor">
++    <style name="Theme.DeviceDefault.Light.NoActionBar.TranslucentDecor" parent="Theme.Holo.Light.NoActionBar.TranslucentDecor">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_light</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_light</item>
+@@ -2834,7 +2852,7 @@ easier.
+     <!-- DeviceDefault light theme for dialog windows and activities. This changes the window to be
+     floating (not fill the entire screen), and puts a frame around its contents. You can set this
+     theme on an activity if you would like to make an activity that looks like a Dialog.-->
+-    <style name="Theme.DeviceDefault.Light.Dialog" parent="Theme.Material.Light.Dialog">
++    <style name="Theme.DeviceDefault.Light.Dialog" parent="Theme.Holo.Light.Dialog">
+         <item name="windowTitleStyle">@style/DialogWindowTitle.DeviceDefault.Light</item>
+         <item name="windowAnimationStyle">@style/Animation.DeviceDefault.Dialog</item>
+ 
+@@ -2935,7 +2953,7 @@ easier.
+ 
+     <!-- Variant of {@link #Theme_DeviceDefault_Light_Dialog} that has a nice minimum width for a
+     regular dialog. -->
+-    <style name="Theme.DeviceDefault.Light.Dialog.MinWidth" parent="Theme.Material.Light.Dialog.MinWidth">
++    <style name="Theme.DeviceDefault.Light.Dialog.MinWidth" parent="Theme.Holo.Light.Dialog.MinWidth">
+         <item name="windowTitleStyle">@style/DialogWindowTitle.DeviceDefault.Light</item>
+         <item name="windowAnimationStyle">@style/Animation.DeviceDefault.Dialog</item>
+ 
+@@ -3032,7 +3050,7 @@ easier.
+     </style>
+ 
+     <!-- Variant of {@link #Theme_DeviceDefault_Light_Dialog} without an action bar -->
+-    <style name="Theme.DeviceDefault.Light.Dialog.NoActionBar" parent="Theme.Material.Light.Dialog.NoActionBar">
++    <style name="Theme.DeviceDefault.Light.Dialog.NoActionBar" parent="Theme.Holo.Light.Dialog.NoActionBar">
+         <item name="windowTitleStyle">@style/DialogWindowTitle.DeviceDefault.Light</item>
+         <item name="windowAnimationStyle">@style/Animation.DeviceDefault.Dialog</item>
+ 
+@@ -3130,7 +3148,7 @@ easier.
+ 
+     <!-- Variant of {@link #Theme_DeviceDefault_Light_Dialog_NoActionBar} that has a nice minimum
+     width for a regular dialog. -->
+-    <style name="Theme.DeviceDefault.Light.Dialog.NoActionBar.MinWidth" parent="Theme.Material.Light.Dialog.NoActionBar.MinWidth">
++    <style name="Theme.DeviceDefault.Light.Dialog.NoActionBar.MinWidth" parent="Theme.Holo.Light.Dialog.NoActionBar.MinWidth">
+         <item name="windowTitleStyle">@style/DialogWindowTitle.DeviceDefault.Light</item>
+         <item name="windowAnimationStyle">@style/Animation.DeviceDefault.Dialog</item>
+ 
+@@ -3386,7 +3404,7 @@ easier.
+ 
+     <!-- DeviceDefault light theme for a window that will be displayed either full-screen on smaller
+     screens (small, normal) or as a dialog on larger screens (large, xlarge). -->
+-    <style name="Theme.DeviceDefault.Light.DialogWhenLarge" parent="Theme.Material.Light.DialogWhenLarge">
++    <style name="Theme.DeviceDefault.Light.DialogWhenLarge" parent="Theme.Holo.Light.DialogWhenLarge">
+         <item name="windowTitleStyle">@style/DialogWindowTitle.DeviceDefault.Light</item>
+         <item name="windowAnimationStyle">@style/Animation.DeviceDefault.Dialog</item>
+ 
+@@ -3485,7 +3503,7 @@ easier.
+     <!-- DeviceDefault light theme for a window without an action bar that will be displayed either
+     full-screen on smaller screens (small, normal) or as a dialog on larger screens (large,
+     xlarge). -->
+-    <style name="Theme.DeviceDefault.Light.DialogWhenLarge.NoActionBar" parent="Theme.Material.Light.DialogWhenLarge.NoActionBar">
++    <style name="Theme.DeviceDefault.Light.DialogWhenLarge.NoActionBar" parent="Theme.Holo.Light.DialogWhenLarge.NoActionBar">
+         <item name="windowTitleStyle">@style/DialogWindowTitle.DeviceDefault.Light</item>
+         <item name="windowAnimationStyle">@style/Animation.DeviceDefault.Dialog</item>
+ 
+@@ -3582,7 +3600,7 @@ easier.
+     </style>
+ 
+     <!-- DeviceDefault light theme for a presentation window on a secondary display. -->
+-    <style name="Theme.DeviceDefault.Light.Dialog.Presentation" parent="Theme.Material.Light.Dialog.Presentation">
++    <style name="Theme.DeviceDefault.Light.Dialog.Presentation" parent="Theme.Holo.Light.Dialog.Presentation">
+         <item name="windowTitleStyle">@style/DialogWindowTitle.DeviceDefault.Light</item>
+         <item name="windowAnimationStyle">@style/Animation.DeviceDefault.Dialog</item>
+ 
+@@ -3681,7 +3699,7 @@ easier.
+     <!-- DeviceDefault light theme for panel windows. This removes all extraneous window
+     decorations, so you basically have an empty rectangle in which to place your content. It makes
+     the window floating, with a transparent background, and turns off dimming behind the window. -->
+-    <style name="Theme.DeviceDefault.Light.Panel" parent="Theme.Material.Light.Panel">
++    <style name="Theme.DeviceDefault.Light.Panel" parent="Theme.Holo.Light.Panel">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_light</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_light</item>
+@@ -3774,7 +3792,7 @@ easier.
+         <item name="materialColorError">@color/system_error_light</item>
+     </style>
+ 
+-    <style name="Theme.DeviceDefault.Light.Dialog.Alert" parent="Theme.Material.Light.Dialog.Alert">
++    <style name="Theme.DeviceDefault.Light.Dialog.Alert" parent="Theme.Holo.Light.Dialog.Alert">
+         <item name="windowTitleStyle">@style/DialogWindowTitle.DeviceDefault.Light</item>
+ 
+         <!-- Color palette -->
+@@ -3871,7 +3889,7 @@ easier.
+ 
+     <style name="Theme.DeviceDefault.Dialog.Alert.DayNight" parent="Theme.DeviceDefault.Light.Dialog.Alert" />
+ 
+-    <style name="Theme.DeviceDefault.Light.SearchBar" parent="Theme.Material.Light.SearchBar">
++    <style name="Theme.DeviceDefault.Light.SearchBar" parent="Theme.Holo.Light.SearchBar">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_light</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_light</item>
+@@ -4315,7 +4333,7 @@ easier.
+     </style>
+ 
+     <!-- Variant of {@link #Theme_DeviceDefault_Settings_Dark} with no action bar -->
+-    <style name="Theme.DeviceDefault.Settings.Dark.NoActionBar" parent="Theme.Material.NoActionBar">
++    <style name="Theme.DeviceDefault.Settings.Dark.NoActionBar" parent="Theme.Holo.NoActionBar">
+         <!-- Color palette -->
+         <item name="colorPrimary">@color/primary_device_default_settings</item>
+         <item name="colorPrimaryDark">@color/primary_dark_device_default_settings</item>
+diff --git a/packages/SystemUI/src/com/android/systemui/theme/ThemeOverlayController.java b/packages/SystemUI/src/com/android/systemui/theme/ThemeOverlayController.java
+index 3fe5fe4ef8c7..0dec4b2d5fc3 100644
+--- a/packages/SystemUI/src/com/android/systemui/theme/ThemeOverlayController.java
++++ b/packages/SystemUI/src/com/android/systemui/theme/ThemeOverlayController.java
+@@ -636,11 +636,16 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
+      * Return the main theme color from a given {@link WallpaperColors} instance.
+      */
+     protected int getNeutralColor(@NonNull WallpaperColors wallpaperColors) {
+-        return ColorScheme.getSeedColor(wallpaperColors);
++        // KitKat UI Project (Phase 1): pin the monet seed to Holo blue so
++        // wallpaper colors never override the Holo palette in SystemUI. The
++        // fabricated neutral/accent/dynamic overlays are all derived from this
++        // seed, so the whole palette stays in the Holo blue family.
++        return 0xFF33B5E5;
+     }
+ 
+     protected int getAccentColor(@NonNull WallpaperColors wallpaperColors) {
+-        return ColorScheme.getSeedColor(wallpaperColors);
++        // KitKat UI Project (Phase 1): see getNeutralColor.
++        return 0xFF33B5E5;
+     }
+ 
+     private static DynamicScheme dynamicSchemeFromStyle(Style style, int color,
+-- 
+2.53.0
+

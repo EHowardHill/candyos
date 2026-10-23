@@ -1,0 +1,37 @@
+// KitKat UI P16 Tier 2: the Android 4.4 Calendar (com.android.calendar)
+// ported per the Launcher3-Modern pattern - donor UI verbatim from
+// android-4.4.4_r1 (95 java files), with its four framework-lib dependencies
+// vendored in-tree with the donor resource sets node-wise merged:
+//   com.android.ex.chips          (frameworks/ex/chips)
+//   com.android.colorpicker        (frameworks/opt/colorpicker)
+//   com.android.datetimepicker    (frameworks/opt/datetimepicker,
+//                                  accessibility ExploreByTouchHelper
+//                                  ported to public APIs + IntList shim)
+//   com.android.timezonepicker    (frameworks/opt/timezonepicker)
+// Modernization (build/API layer only):
+//  - target 29 (pre-30 on purpose), product_specific.
+//  - support-v4 TaskStackBuilder -> android.app.TaskStackBuilder;
+//    LruCache -> android.util.LruCache; ExploreByTouchHelper vendored.
+//  - exported=true on intent-filter components (API 31+ rule).
+// Module keeps the name Etar so vendor PRODUCT_PACKAGES resolves unchanged.
+android_app {
+    name: "Etar",
+    product_specific: true,
+    min_sdk_version: "21",
+    sdk_version: "29",
+    srcs: ["src/**/*.java"],
+    resource_dirs: ["res"],
+    optimize: {
+        proguard_flags_files: ["proguard.flags"],
+    },
+    overrides: ["Calendar"],
+}
+// KitKat UI P16: keep the CalendarTests module (platform_test_list.mk
+// expects it) - donor 4.4 test sources under tests/, instrumenting the
+// donor Calendar app (same package).
+android_test {
+    name: "CalendarTests",
+    srcs: ["tests/src/**/*.java"],
+    manifest: "tests/AndroidManifest.xml",
+    test_suites: ["device-tests"],
+}

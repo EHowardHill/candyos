@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<RelativeLayout xmlns:ns0="http://schemas.android.com/apk/res/android" ns0:id="@+id/time_display" ns0:layout_width="match_parent" ns0:layout_height="match_parent" ns0:layout_gravity="center" ns0:background="@color/white">
+        <View ns0:id="@+id/center_view" ns0:layout_width="1dp" ns0:layout_height="1dp" ns0:background="#00000000" ns0:layout_centerInParent="true" ns0:visibility="invisible" ns0:importantForAccessibility="no" />
+
+        <TextView ns0:id="@+id/hour_space" ns0:layout_width="wrap_content" ns0:layout_height="wrap_content" ns0:text="@string/time_placeholder" ns0:layout_toLeftOf="@+id/separator" ns0:layout_centerVertical="true" ns0:visibility="invisible" style="@style/time_label" ns0:importantForAccessibility="no" />
+        <FrameLayout ns0:layout_width="0dp" ns0:layout_height="match_parent" ns0:layout_alignRight="@+id/hour_space" ns0:layout_alignLeft="@+id/hour_space" ns0:layout_marginLeft="@dimen/extra_time_label_margin" ns0:layout_marginRight="@dimen/extra_time_label_margin" ns0:layout_centerVertical="true">
+            <com.android.datetimepicker.AccessibleTextView ns0:id="@+id/hours" ns0:layout_width="wrap_content" ns0:layout_height="wrap_content" ns0:text="@string/time_placeholder" ns0:textColor="@color/blue" ns0:gravity="center_horizontal" ns0:layout_gravity="center" style="@style/time_label" />
+            </FrameLayout>
+
+        <TextView ns0:id="@+id/separator" ns0:layout_width="wrap_content" ns0:layout_height="wrap_content" ns0:text="@string/time_separator" ns0:paddingLeft="@dimen/separator_padding" ns0:paddingRight="@dimen/separator_padding" ns0:layout_alignRight="@+id/center_view" ns0:layout_centerVertical="true" style="@style/time_label" ns0:importantForAccessibility="no" />
+
+        <TextView ns0:id="@+id/minutes_space" ns0:layout_width="wrap_content" ns0:layout_height="wrap_content" ns0:text="@string/time_placeholder" ns0:layout_toRightOf="@+id/separator" ns0:layout_centerVertical="true" ns0:visibility="invisible" style="@style/time_label" ns0:importantForAccessibility="no" />
+        <FrameLayout ns0:layout_width="0dp" ns0:layout_height="match_parent" ns0:layout_alignRight="@+id/minutes_space" ns0:layout_alignLeft="@+id/minutes_space" ns0:layout_marginLeft="@dimen/extra_time_label_margin" ns0:layout_marginRight="@dimen/extra_time_label_margin" ns0:layout_centerVertical="true">
+            <com.android.datetimepicker.AccessibleTextView ns0:id="@+id/minutes" style="@style/time_label" ns0:layout_width="wrap_content" ns0:layout_height="wrap_content" ns0:gravity="center_horizontal" ns0:text="@string/time_placeholder" ns0:layout_gravity="center" />
+        </FrameLayout>
+        <com.android.datetimepicker.AccessibleTextView ns0:id="@+id/ampm_hitspace" ns0:layout_width="@dimen/ampm_label_size" ns0:layout_height="wrap_content" ns0:layout_alignParentTop="true" ns0:layout_alignParentBottom="true" ns0:layout_alignLeft="@+id/ampm_label" ns0:layout_alignRight="@+id/ampm_label" />
+        <TextView ns0:id="@+id/ampm_label" ns0:layout_width="wrap_content" ns0:layout_height="wrap_content" ns0:text="@string/time_placeholder" ns0:paddingLeft="@dimen/ampm_left_padding" ns0:paddingRight="@dimen/ampm_left_padding" ns0:layout_toRightOf="@+id/minutes_space" ns0:layout_alignBaseline="@+id/separator" style="@style/ampm_label" ns0:importantForAccessibility="no" />
+  </RelativeLayout>

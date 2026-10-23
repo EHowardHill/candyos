@@ -1,0 +1,52 @@
+From 1410e242357c9e4f8e769e120179ce368b37a372 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Thu, 22 Oct 2026 08:39:06 -0500
+Subject: [PATCH 24/29] KitKat UI: Phase 20 decisions recorded
+ (20.2/20.6/20.8/20.10) + rule hardened
+
+20.2 = approximation (risk-ruled: donor clip is keyguard-coupled
+surgery; fix plan a-d written). 20.6 = source-faithful gradient
+(user's flat-black read was the 20.7 tile color). 20.8 = full donor
+brightness tile + dialog - fidelity > UX ruling HARDENS the
+governing rule. 20.10 = full donor tile set + order, modern-only
+tiles dropped from the grid (no exceptions requested).
+---
+ TASKS.md | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/TASKS.md b/TASKS.md
+index 92e083a1fd7b..7a2df2d4f0e1 100644
+--- a/TASKS.md
++++ b/TASKS.md
+@@ -1864,8 +1864,14 @@ Everything still open across the file (updated 2026-10-22):
+   (supersedes 18.4), 20.6 tile gaps + QS page bg (layer corrected),
+   20.7 tile flat-color bg #161616/#212121 no ripple, 20.8 brightness
+   slider-vs-tile DECISION, 20.9 header clock/date pill + typography,
+-  20.10 QS tile set/order vs donor. User decisions pending: 20.2,
+-  20.6 pairing, 20.8, 20.10.
++  20.10 QS tile set/order vs donor. ALL FOUR DECISIONS MADE
++  (2026-10-22): 20.2 = approximation (risk-ruled: donor clip is
++  keyguard-coupled surgery; the sole shade fidelity trade), 20.6 =
++  source-faithful gradient (user's flat-black read was the 20.7
++  tile color), 20.8 = full donor brightness tile + dialog
++  (fidelity > UX ruling), 20.10 = full donor tile set + order
++  (modern-only tiles dropped from the grid, no exceptions
++  requested). Fix batch next: 20.1-20.10, then full shade battery.
+ - P19: SCRAPPED (2026-10-22, user): 4.4 cannot build on this machine
+   (modern host toolchain vs 4.4's make-3.8x/JDK6 toolchain gates).
+   ~/kitkat-build workspace abandoned; verification standard revised
+@@ -2034,6 +2040,11 @@ the next work batch.
+   donor geometry/behavior) or honestly modern - nothing in
+   between. 18.3 (footer drop) and 18.5 (full opaque-ride) were both
+   decided under this rule; apply it to every future delta call.
++  HARDENED (2026-10-22, 20.8 ruling): FIDELITY > UX on every
++  donor-capable surface - "better UX" is no longer an accepted
++  reason to keep a modern hybrid where the donor can run. The one
++  exception on the books is 20.2 (approximation over donor clip),
++  which was ruled on RISK, not UX - keyguard-window coupling.
+ 
+ ## Work plan - FINAL ROUND (everything needed to complete TASKS.md)
+ 
+-- 
+2.53.0
+

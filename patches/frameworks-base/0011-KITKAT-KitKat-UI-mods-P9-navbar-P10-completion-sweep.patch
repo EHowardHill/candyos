@@ -1,0 +1,592 @@
+From c5d8f35324204237f7d9fd01c81ea6ea5653e737 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Wed, 21 Oct 2026 19:01:45 -0500
+Subject: [PATCH 11/29] KITKAT: KitKat UI mods - P9 navbar, P10 completion
+ sweep (framework theme/fonts, SystemUI shade/QS/recents/ticker/navbar,
+ Settings icons, hybrid 2013 emoji font, easter egg)
+
+---
+ TASKS.md                                      | 484 +++++++++++++++++-
+ .../res/res/values/styles_device_defaults.xml |  29 +-
+ 2 files changed, 494 insertions(+), 19 deletions(-)
+
+diff --git a/TASKS.md b/TASKS.md
+index 6cbeb2bfab9b..b256e08c2203 100644
+--- a/TASKS.md
++++ b/TASKS.md
+@@ -20,6 +20,36 @@ Marker legend:
+     [?] - needs questions answered
+     [/] - partially completed
+ 
++## Project philosophy (user direction, 2026-10-21)
++
++The rules every decision in this file defers to:
++
++1. AUTHENTIC, not a theme. Where a KitKat surface can be ported for
++   real (real 4.4 code, real 4.4 assets, at the real tree path - the
++   Launcher3-Modern pattern), port it. Never restyle something into a
++   KitKat costume when the genuine article can be made to run.
++2. Never break modern functionality. The hard constraint governs
++   porting too: an app whose 4.4 donor cannot be made modern-functional
++   (APIs, permissions, telephony/camera contracts) ships MODERN and
++   gets the theme cascade only - "tacky theme" is the failure mode this
++   rule exists to prevent.
++3. Vanilla. Defaults are KitKat (Holo, Roboto 2013, Holo blue, 4.4
++   sounds); post-KitKat surfaces that must exist render normal-modern.
++   No invented hybrid designs; where 4.4 has no counterpart, keep
++   stock and let the cascade dress it.
++4. DeviceDefault is the boundary. Theme.Material apps keep Material -
++   we will not restyle the Material widget tree. Holo chrome ships as
++   the DEFAULT (Theme.DeviceDefault == Holo) and nothing force-breaks
++   third parties.
++5. Accept and document. Where a port or pixel-match is not achievable,
++   the delta is recorded here, not silently approximated.
++6. Verification standard: pixel-diff against a REAL android-4.4.4_r1
++   emulator build - "virtually identical - where it can be". AVD-only
++   until real hardware exists; hardware pass deferred, not cancelled.
++7. Canonical QA device: the Pixel 3a-sized emulator (440dpi class).
++   All geometry claims made on the 560dpi box are superseded; re-run
++   against the canonical AVD before closing items.
++
+ ## Phase 0 - Infrastructure [/]
+ 
+ - [X] Pin frameworks/base and Settings forks in .repo/local_manifests/kitkat_ui_mods.xml
+@@ -579,14 +609,16 @@ Decision: boot animation stays untouched.
+ 
+ ## Open questions
+ 
+-1. Scope check: does "system elements" include AOSP system app UIs (Dialer,
+-   Messaging, Camera), or stop at framework + SystemUI + Settings?
++1. ANSWERED (see Phase 16 + philosophy): AOSP system app UIs ARE in
++   scope, but only safe ports - apps whose 4.4 donors cannot be made
++   modern-functional (Dialer/telecom risk, etc.) ship modern on the
++   DeviceDefault cascade.
+ 
+-2. Which emulator configuration is canonical for QA? The 10.1 pass ran on the
+-   1080x2220 SwiftShader emulator at 560dpi; the new bugs in Phase 11 were
+-   reported on the Pixel 3a-sized emulator (440dpi-class). Pick one AVD,
+-   record its display-cutout config (also feeds the P1 25dp status-bar
+-   caveat and 11.2), and re-run Phase 11 verification against it.
++2. ANSWERED: the Pixel 3a-sized emulator (440dpi class) is canonical
++   for ALL QA. Re-run the Phase 11 battery and every pending
++   on-device verification against it; record its display-cutout config
++   (feeds the P1 25dp status-bar caveat and 11.2). The 560dpi
++   measurements in 10.1/10.7 are superseded by 11.1's findings.
+ 
+ 3. ANSWERED (12.1 implementation): the half-open shade now shows
+    notifications only, exactly like the 4.4 first pull - QQS tiles are
+@@ -1059,8 +1091,20 @@ REOPENED (on-device, second build): the carrier label renders at
+       .Emphasis -> #ffcccccc, Time inherits Info. This also fixes a
+       latent bug: the old *_current color selectors resolve to DARK text
+       in day mode, which was dark-on-dark against the P3 #ff252525 rows.
+-      The icon-chip delta (donor notification_template_icon_bg) is moot -
+-      modern rows show the small app icon without the chip.
++      The icon-chip delta (donor notification_template_icon_bg) was
++      REOPENED by user direction: port the FULL 4.4 row/chip geometry
++      (icon chip background 9-patch, row paddings/dividers from the
++      donor notification_template_* layouts) onto the modern
++      remote-view styles - typography alone is not the whole row.
++      SPIKE NEEDED (2026-10-21 batch): the modern chip (on-device
++      verification saw a chip render top-left) is drawn somewhere the
++      static audit could not locate (framework notification_template_*
++      layouts do not reference notification_template_icon_bg in this
++      tree; the color-drawable #3333B5E5 exists but nothing consumes it
++      in core/res) - identify the render path ON DEVICE (dumpsys
++      notification + uiautomator/screencap of a test post) before
++      porting the 9-patch over it. Pending: that spike + chip asset
++      port + on-device pixel check vs the donor 4.4 build.
+ 
+ ## Phase 13 - KitKat keyboard (LatinIME) [/]
+ 
+@@ -1114,6 +1158,26 @@ PARTIAL ON DEVICE (second build): dark Holo keyboard renders (dark
+       (input text "KITKAT4x4" landed in the Dialer search EditText).
+       Gesture typing, clipboard strip and hardware-keyboard switching
+       still need a human pass; suggestion strip visually present.
++- [/] 13.4 BUG (user QA): key LETTERS do not appear on the keyboard -
++      keys render (dark Holo chrome + press feedback) but the glyph
++      labels are missing/blank.
++      ROOT CAUSE (source audit): themes-kitkat.xml pointed keyTextColor
++      and keyPreviewTextColor at the donor's res/color/
++      key_text_color_holo.xml, a ColorStateList SELECTOR. The donor 4.4
++      KeyboardView resolved it per key state via getColorStateList; the
++      modern engine reads key text attrs in KeyVisualAttributes via
++      TypedArray.getColor(), which cannot resolve a selector and falls
++      back to 0 = fully transparent - every label painted alpha-0.
++      The LXX themes never hit this because they use flat colors.
++      FIXED: both attrs repointed to @color/key_text_color_normal_holo
++      (white) - the value every donor selector state resolves to for
++      letter keys; functional/toggle/inactive states keep their own
++      flat colors (key_text_color_functional_holo = white anyway, so
++      per-state parity with 4.4 holds). Emoji tab selector
++      (emoji_tab_label_color_holo) untouched - TextView.setTextColor
++      consumes it as a proper ColorStateList.
++      Pending: on-device re-verify on the canonical Pixel 3a AVD;
++      then 13.2's human pass.
+ - [X] 13.3 Fallback
+       NOT NEEDED: the full theme port landed; no Material restyle
+       fallback required.
+@@ -1234,9 +1298,9 @@ PARTIAL ON DEVICE (second build): the volume dialog renders dark
+       Colors already restyled by P6 (lock icon ripple + swipe-up hints +
+       UDFPS auth ripple -> holo blue, bouncer whites). The remaining
+       modern signature is geometric (pill hint + bottom shortcuts vs the
+-      4.4 ring), and the new keyguard view system makes that a
+-      reskin-beyond-colors lift - DEFERRED consistent with the P6
+-      "keyguard reskin only" decision. No change in this batch.
++      4.4 ring). DECIDED (user): attempt the 4.4 ring-hint geometry port
++      ONCE THE SHADE WORK (P15) STABILIZES - add as a tracked work item
++      then, not a reskin-by-colors lift. Deferred until that gate.
+ 
+ ## Phase 15 - KitKat shade port, Launcher3-style [/]
+ 
+@@ -1398,4 +1462,398 @@ emulator - drive by screencap.
+ ON DEVICE (second build): most chrome verified incidentally through
+       the battery (header 48dp row, tiles 3-col donor geometry, carrier
+       label, dark QS); the full donor-capture diff stays open until the
+-      12.1/12.3/15.3 fixes land in the next build.
+\ No newline at end of file
++      12.1/12.3/15.3 fixes land in the next build.
++
++## Phase 16 - KitKat app ports (Launcher3-style) [ ]
++
++Answers open question 1: yes, AOSP system app UIs are in scope. This is
++the wholesale-port roadmap, same approach as Launcher3-Modern - pull the
++android-4.4.4_r1 app, modernize the build/API layer, keep 4.4 UI and UX.
++Donors come from ~/kitkat-src shallow clones (add repos as needed per
++9.0); ports land as new pinned forks in kitkat_ui_mods.xml (the
++Launcher3 pattern: remove-project the Lineage tree app, project at the
++same path from my_github, then PRODUCT_PACKAGES swaps in
++vendor/lineage/common_mobile*.mk or device mk).
++
++Big synergy note: after the P1 rebase, Theme.DeviceDefault IS Holo -
++so every ported app just declares Theme.DeviceDefault (like it did in
++4.4, where DeviceDefault==Holo) and gets KitKat chrome, 2013 Roboto,
++Holo blue accents and the P8 sounds for free. The porting work is
++therefore mostly build plumbing, not theme duplication.
++
++Common porting checklist (applies to every app below; from the
++Launcher3-Modern experience):
++
++1. Android.bp/Android.mk modernization: 4.4 makefiles -> soong; add
++   minSdkVersion >= 21, targetSdkVersion <= 29 (pre-30 target on
++   purpose, same reasoning as Launcher3), platform api scope.
++2. Drop/remove: pre-support-library shims (4.4 bundles its own
++   android-support-v4 jars) -> use framework classes; deprecated
++   removed APIs case by case.
++3. Runtime permissions (API 23+): 4.4 apps predate the model -
++   CONTACTS/PHONE/SMS/CAMERA/MIC/STORAGE permissions need grants to
++   still be modern-functional.
++4. Notification channels (26+) for anything that posts (Music,
++   Messaging, DeskClock, Calendar).
++5. Theme/manifest: keep 4.4 layouts/drawables verbatim where
++   possible; theme -> Theme.DeviceDefault (+Light where 4.4 used
++   Holo Light); app icons/naming verbatim.
++6. privapp-permissions whitelists where a port keeps
++   signature/privileged permissions.
++
++### Tier 1 - direct ports (4.4 UI, light modernization)
++
++- [/] Calculator (donor packages/apps/Calculator) -> replace
++      ExactCalculator. Pure UI + trivial math; the only work is the
++      build file and theme. Lowest-risk port; do first as the template.
++      DONE IN TREE (2026-10-21 batch, fourth): donor android-4.4.4_r1
++      installed verbatim at packages/apps/ExactCalculator (donor
++      com.android.calculator2, manifest Theme.Holo.NoActionBar kept).
++      Modernization per the checklist:
++      - Android.bp rewritten (soong): android_app name "ExactCalculator"
++        (keeps vendor/lineage PRODUCT_PACKAGES stable - no mk edits),
++        sdk_version current, java_import prebuilt for arity-2.1.2.jar.
++      - support-v4 ViewPager/PagerAdapter vendored under
++        com.android.calculator2.viewpager with the compat layer
++        collapsed onto framework APIs: ViewCompat/ViewConfigurationCompat
++        call sites -> View methods, ParcelableCompat CREATOR -> plain
++        Creator, accessibility compat -> AccessibilityEvent/
++        AccessibilityNodeInfo direct; EdgeEffectCompat kept as a local
++        wrapper (framework onPull/onRelease return void; donor contract
++        returned boolean). Donor cloned to ~/kitkat-src/support-4.4.
++      - guava ImmutableMap (CalculatorEditText replacement table) ->
++        java.util.HashMap.
++      - No runtime permissions/channels needed (no perm-gated
++        surfaces, posts nothing).
++      NOTE: this REPLACES the LineageOS ExactCalculator checkout
++      contents wholesale (modern calculator gone until re-forked);
++      repo sync will fight the tree - either commit the replacement
++      locally, or fork to EHowardHill and pin in kitkat_ui_mods.xml
++      the Trebuchet way. Pending: build + on-device battery + pixel
++      check vs the 4.4 donor.
++- [/] SoundRecorder (donor packages/apps/SoundRecorder) -> replace
++      Recorder. Tiny app; add MIC runtime permission; MediaRecorder
++      path unchanged. The 4.4 mic UI (press-to-record list) is iconic.
++      DONE IN TREE (2026-10-21 batch, fourth): donor installed verbatim
++      at packages/apps/Recorder (com.android.soundrecorder, donor
++      Theme.Holo.DialogWhenLarge kept, activity exported=true for API
++      31+). Android.bp: android_app name "Recorder" (PRODUCT_PACKAGES
++      stable). Modernization:
++      - RECORD_AUDIO runtime-permission shim (request on create,
++        finish with a toast on denial) - 4.4 predates runtime perms.
++      - Recordings written to getExternalFilesDir (scoped storage)
++        instead of the storage root, published via MediaStore
++        (addToMediaDB unchanged - the app's own contribution needs no
++        WRITE_EXTERNAL_STORAGE on API 29+).
++      - RemainingTimeCalculator stats the same app-writable dir.
++      Same repo-sync caveat as Calculator. Pending: build + on-device
++      battery (record/playback/mic-permission dialog/MediaStore
++      publish) + pixel check vs the 4.4 donor.
++- [ ] Music (donor packages/apps/Music) -> replace Eleven. MediaStore
++      Music columns/scan behavior unchanged; add notification channel
++      + legacy storage handling. NOT STARTED (next Tier 1 port - use
++      the Calculator/SoundRecorder template; donor needs cloning to
++      ~/kitkat-src/music-4.4 first; expect targetSdk-29 legacy-storage
++      decisions to be the main modernization surface).
++- [ ] DeskClock/Clock (donor packages/apps/DeskClock) -> replace the
++      modern DeskClock. AlarmManager/AlarmClockManager intents stable;
++      ports: runtime ALTER_SETTINGS? (no - SET_EXACT_ALARM new-model
++      handling), notification channel for alarms, vibrate policy.
++      4.4 alarm/world-clock/stopwatch UI verbatim.
++- [ ] Messaging (donor packages/apps/Mms) -> replace Messaging
++      (com.android.mms). 4.4 Mms source is present in Lineage already
++      as BasicSmsReceiver donor bits; full port: SEND_SMS/CONTACTS
++      runtime perms, default-SMS role plumbing (RoleManager), keep
++      modern car/SMS restrictions. KitKat hangout-style dark thread UI.
++
++### Tier 2 - paired ports (must land together)
++
++- [ ] Dialer: DECIDED (philosophy rule 2) - evaluate first, ship
++      modern if unsafe. The 4.4 dialtacts UI on the modern telecom
++      binding (InCallService) is the port IF it can be done without
++      breaking calls (MSIM, IMS, VT fallback). The risk: 4.4 predates
++      the telecom contract entirely; the port is a re-skin of 4.4
++      call/list UI over a NEW service layer. Spike before committing;
++      if the spike fails the safety bar, keep modern Dialer on the
++      DeviceDefault cascade and close this [X]-no-port-needed with
++      the spike documented. User is explicit: an unsafe Dialer port
++      would read "tacky theme" - authenticity means shipping modern
++      where 4.4 cannot honestly run.
++- [ ] Contacts (donor packages/apps/Contacts) -> lands WITH Dialer
++      IF the Dialer spike passes (shares PhoneCommon, contacts-suggest).
++      ContactsProvider API stable; runtime CONTACTS; targetSdk 29 for
++      legacy import/export file paths. If Dialer ships modern,
++      evaluate Contacts standalone - its donor is lower-risk (no
++      telephony contract), so a Contacts-only port stays possible.
++- [ ] Calendar (donor packages/apps/Calendar) -> replace Etar
++      (Etar is a fork of the same app's descendants). Keep modern
++      CalendarProvider contract; add channels, READ_CALENDAR runtime.
++      4.4 month/day/week UI verbatim. CalendarProvider itself stays
++      modern (stock) - app-only port.
++
++### Tier 3 - heavy ports (evaluate before committing)
++
++- [ ] Gallery: DECIDED (user) - USE THE EARLIER-VERSION GALLERY.
++      Preferred order: (a) donor Gallery2 from android-4.4.4_r1
++      (Gallery2 IS the 4.4 app; a Gallery1/earlier donor is an option
++      only if Gallery2 cannot build), modernized onto the modern tree
++      at its existing path per the Launcher3 pattern. Spike the JNI
++      first (the 4.4 jni/ stack uses removed skia APIs - port or
++      substitute). If the JNI port stalls: fall back to
++      rebase-backward (4.4 layouts/drawables/GL surface onto modern
++      Gallery2). Accept modern Gallery2 + cascade ONLY as last resort,
++      and document the delta.
++- [ ] Camera: DECIDED (user) - USE AN EARLIER-VERSION CAMERA where
++      possible. The 4.4 donor targets android.hardware.Camera
++      (camera1); on modern HALs that API runs in constrained legacy
++      mode (no HDR/vendor tags/new AF modes). Attempt order:
++      (a) spike the 4.4 Camera port on the canonical AVD - if
++      camera1 legacy mode produces a modern-functional camera
++      (preview/capture/video OK), ship the 4.4 UI;
++      (b) if camera1 fails the safety bar, evaluate an
++      earlier-camera2-era UI (5.x/6.x) for an authentic-but-modern
++      hybrid; (c) last resort: keep modern Camera/Aperture on the
++      DeviceDefault cascade and document. Same rule as Dialer:
++      never ship a camera that cannot actually take pictures.
++- [ ] Browser (donor packages/apps/Browser). RECOMMENDATION: skip -
++      depends on removed android.webkit APIs and the old
++      QuickSearchProvider stack; Lineage's Jelly already reads
++      KitKat-dark via DeviceDefault. No port (philosophy rule 2/3:
++      the 4.4 Browser cannot be made modern-functional).
++
++### Tier 4 - theme-only (already cascades from P1/P7; listed to close
++the audit - no ports)
++
++- [ ] PackageInstaller: modern signature/permission/SDK install flow
++      must stay (the 4.4 installer is pre-permission-model);
++      retheme only. This is the Settings-style treatment, not a port.
++      (Action if it still reads modern: same fixes as 14.4.)
++- [ ] DocumentsUI / StorageManager / SettingsIntelligence / SetupWizard
++      / EmergencyInfo: post-4.4 surfaces with no 4.4 counterpart;
++      DeviceDefault cascade only.
++- [ ] CellBroadcastReceiver, CertInstaller, KeyChain, Stk,
++      ManagedProvisioning: tiny dialogs already Holo via P1 rebase.
++- [ ] AudioFX / MusicFX / FMRadio / Profiles / LineageParts: no 4.4
++      AOSP donor (CM11-era equivalents are CyanogenMod apps, different
++      lineage); keep as-is on DeviceDefault cascade.
++
++### Tier 5 - infra donors (needed to build the above; not shipped apps)
++
++- [ ] packages/apps/PhoneCommon 4.4 -> shared with Dialer/Contacts
++      ports (modern PhoneCommon tree can also serve if API-compatible;
++      prefer the donor + modern fixes).
++- [ ] Gallery donor JNI deps ( Gallery2 4.4 uses in-tree jni/) - the
++      Tier 3 Gallery spike will tell whether the 4.4 jni libs port or
++      the rebase-backward alternative wins.
++- [ ] external/* deps per 4.4 Android.mk audit at port time (4.4 apps
++      pre-bundle support-lib jars; the modern tree already has
++      androidx in prebuilts - the Launcher3-Modern approach of
++      replacing support classes with framework equivalents applies).
++
++### Manifest & packaging work
++
++- [ ] Add the chosen ports to kitkat_ui_mods.xml one at a time as
++      forks are ready (EHowardHill/<app>-Modern pattern), starting
++      Tier 1; remove the replaced LineageOS projects the Trebuchet
++      way.
++- [ ] PRODUCT_PACKAGES swaps: vendor/lineage/common_mobile(_full).mk
++      entries (ExactCalculator, Eleven, Etar, Recorder, Messaging,
++      DeskClock, Dialer, Contacts, Gallery2...) -> ported module names
++      (same module names, different source trees, keeps common.mk
++      stable).
++- [ ] Pin all new donor references into ~/kitkat-src as needed
++      (packages/apps per 9.0) - never in the ROM trees.
++- [ ] Do a wholesale-port decision review per app before starting:
++      for any app the modern tree ships whose 4.4 donor cannot be
++      made modern-functional within the hard constraint, fall back to
++      the P1/P7 theme treatment and mark the port [X]-no-port-needed
++      the way P2 immersive and 10.2 rotation were closed.
++
++## Phase 17 - Widget pass: full KitKat widget parity [ ]
++
++Goal: every widget that existed in 4.4 renders IDENTICALLY (buttons,
++sliders, checkboxes, radios, switches, spinners, pickers, etc.) across
++system surfaces. P1 already rebased 176 Widget.DeviceDefault styles
++onto Holo and the Holo asset stack still ships in-tree (97 selector
++XMLs + 454 9-patches per density); 14.12 spot-checked progress/seek/
++spinner/tab/ratingbar. This phase closes the remaining gaps.
++
++- [/] 17.1 The 18 residual Material styles from P1 (kept "for lack of
++      Holo counterparts"): Per-item disposition, per the philosophy:
++      - Widget.DeviceDefault.Button.Colored RE-PARENTED from
++        Widget.Material.Button.Colored to Widget.DeviceDefault.Button
++        (styles_device_defaults.xml): 4.4 had no colored-button concept,
++        the Holo ghost button IS the accent button. Built.
++      - Notification.* / Toolbar / Material typography scale / Preference.*
++        / AlertDialog.DeviceDefault / ButtonBar / SegmentedButton:
++        ACCEPT-AND-DOCUMENT (doc block in styles_device_defaults.xml):
++        remote-view contracts, Toolbar did not exist in 4.4, typography
++        scale is Lollipop-era, Settings renders via SettingsLib
++        PreferenceTheme (P7 chrome). No code change.
++      Done in tree; resource-only change rides the next build.
++- [X] 17.2 Theme.Material tree decision. DECIDED (philosophy rule 4):
++      DeviceDefault-only is the boundary. Theme.Material apps keep
++      Material chrome; we will NOT port Holo styles into the Material
++      tree. Nothing force-breaks third parties; defaults are KitKat.
++      No work item.
++- [/] 17.3 Runtime override bucket sweep: base values/ styles are
++      Holo, but values-night/, -v21/, -v31/, -v34/ (and the -v23/-v24
++      elevation/StateListAnimator/backgroundTint defaults) override at
++      runtime - the same trap 11.6 hit in Settings v31/v34. Every
++      DeviceDefault widget style needs a per-bucket audit so no
++      monet/elevation leak survives at runtime. (Material buckets are
++      OUT OF SCOPE per 17.2.)
++      AUDITED (2026-10-21 batch): core/res has NO values-v21/v31/v34
++      widget-style buckets (only values-night); values-night colors/
++      themes refs resolve to the P1/P7-pinned holo blues (Settings/
++      SystemUI v31/v34 were pinned in 11.6); the framework
++      system_accent1/system_neutral* refs are the accepted
++      monet-derived chain (blue family via the ThemeOverlayController
++      seed pin). No leak found; residual: the on-device visual battery
++      (17.6) on the canonical AVD.
++- [/] 17.4 Code-driven modern chrome (styles alone cannot fix):
++      AUDITED (2026-10-21 batch): NO-CHANGE NEEDED - elevation defaults
++      are 0 (Holo themes never set window elevation), StateListAnimator
++      is only attached by Material button styles (our DeviceDefault
++      buttons parent Holo 9-patch selectors), EditText/progress
++      backgroundTintList is null unless a Material theme sets it, and
++      RippleDrawable only arrives via ?attr/selectableItemBackground
++      which Holo themes resolve to the 4.4 state-list. All the modern
++      chrome dies with the P1 Holo parents. Residual: on-device spot
++      check (a Material-declaring app renders Material per 17.2 - by
++      design).
++- [/] 17.5 Per-widget donor delta pass (vs ~/kitkat-src/frameworks-base
++      captures): Button/ImageButton/ToggleButton/CheckBox/RadioButton/
++      CheckedTextView, Spinner (+dropdown), ProgressBar (4 variants +
++      inverse), SeekBar, RatingBar, Switch, EditText/
++      AutoCompleteTextView (+dropdown), DatePicker/TimePicker/
++      NumberPicker (the big Holo dialog widgets - highest risk),
++      ZoomControls, QuickContactBadge, TabWidget, Chronometer/
++      TextClock, SearchView, ListPopupWindow/PopupMenu, toast
++      (already 4.4 via P1). Each: diff against donor, port the delta,
++      record accept-and-document calls.
++      STATUS: the P1 rebase already re-parented this entire inventory
++      (confirmed in styles_device_defaults.xml - all of the above
++      including DatePicker/TimePicker/NumberPicker/CalendarView and
++      Light variants resolve Widget.Holo.*, verified 2026-10-21).
++      The remaining delta work is VISUAL (render differences the
++      static parents cannot show) - owned by the 17.6 pixel-diff
++      battery.
++- [/] 17.6 Widget playground acceptance gate (per philosophy rule 6):
++      HARNESS WRITTEN (2026-10-21 batch):
++      development/samples/KitKatWidgetPlayground - a dev-tool APK
++      (android_app "KitKatWidgetPlayground", NOT in any PRODUCT_PACKAGES)
++      exercising every 17.5 widget in a single ScrollView, dark
++      (Theme.DeviceDefault) and Light (Theme.DeviceDefault.Light)
++      activities. Build both ROMs with it, screencap, pixel-diff vs
++      the same layout on a REAL android-4.4.4_r1 build, accept-and-
++      document each residual delta. Also retires the 14.12 "visual
++      walk pending" line. Build with: m KitKatWidgetPlayground.
++      Pending: build on both trees + the diff pass (canonical Pixel 3a
++      AVD).
++
++## Consolidated remaining-work index
++
++Everything still open across the file (2026-10-21):
++
++- P0: commit/push the Launcher3-Modern 7 files, uncomment the Trebuchet
++  replacement, repo sync.
++- P1/P2: on-device verification of theme rebase, widget skins, accents,
++  dialogs, animations, dimens, fonts, monet pin, status bar OPAQUE,
++  KitKat icon sets, clock position, navbar outlines.
++- P3: notification rows, shade header gear, clear-all button, bottom
++  drag handle, carrier label, ticker marquee polish (14.11).
++- P4: QS toggle row shape (superseded by 10.7/11.1 geometry - verify),
++  volume panel full KitKat slim-slider rebuild (14.10 carried), power
++  menu verification.
++- P5: recents snapshot/async-loading jank check (move thumbnails off
++  the UI thread if needed), card press feedback.
++- P6: bouncer PIN container/delete-enter styling review, keyguard
++  colors on light wallpapers, clock font, emergency button contrast.
++- P7: Settings on-device walk (about page, dark-mode switches) - partly
++  superseded by 11.6 verification.
++- P8: easter egg on-device check; emoji font DONE (10.3) - verify no
++  dangling references remain.
++- P9: navbar on-device look check (9.1), glow/sound re-verify (9.2,
++  carried by 11.4), landscape + RTL layout (9.3), LightsOut/dark-light
++  wallpaper exercise (9.4).
++- P11: full battery re-run after 12.1/12.3/15.3 tree fixes land in a
++  build (flip [/] -> [X]).
++- P12: 12.1 QQS-empty re-verify, 12.3 handle-above-navbar re-verify,
++  12.6 notification typography re-verify (done once, recheck).
++- P14: 14.1 overscroll glow eyeball (or paint-color check), 14.10
++  slim-rail eyeball, 14.11 ticker polish on fast hardware, 14.12
++  visual walk (folds into 17.6), 14.13 lockscreen ring-hint geometry
++  port - gated on P15 shade stabilization (decided: attempt it).
++- P15: 15.3 below-the-fold re-verify post-fix, 15.2 fling feel on real
++  touch (deferred to hardware pass, per philosophy rule 6), 15.4
++  donor-capture frame diff.
++- P16: Tier 1 Calculator DONE IN TREE + SoundRecorder DONE IN TREE
++  (2026-10-21 fourth batch - see tier items for the repo-sync/pin
++  caveats); remaining Tier 1: Music -> DeskClock -> Messaging (use
++  the Calculator/SoundRecorder template, clone donors to
++  ~/kitkat-src); Tier 2 Dialer SPIKE (ship modern if unsafe) +
++  Contacts (standalone if Dialer no-go) + Calendar; Tier 3 Gallery
++  earlier-version port (spike JNI), Camera earlier-version spike
++  (camera1 legacy-mode trial), Browser no-port (ratified);
++  Tier 4 retheme PackageInstaller if it reads modern. Manifest/mk:
++  nothing needed - both ports keep their PRODUCT_PACKAGES module
++  names (ExactCalculator/Recorder) - but fork+pin or commit before
++  any repo sync of those trees.
++- P17: 17.1 DONE (Button.Colored re-parent + accept-and-document
++  block), 17.3/17.4 audited no-leak/no-change-needed, 17.5 inventory
++  confirmed Holo + folded into 17.6, 17.6 harness WRITTEN
++  (development/samples/KitKatWidgetPlayground). Remaining: build the
++  playground on both trees + the pixel-diff pass on the canonical AVD.
++- P13.4: key-letter bug FIXED IN TREE (selector-vs-getColor root
++  cause); re-verify on next build.
++- 12.6 chip: on-device render-path spike first (see item).
++- Open questions: all answered (1 -> P16 scope; 2 -> Pixel 3a AVD
++  canonical, 440dpi class - re-run P11 battery + all pending
++  on-device verifications against it; record its cutout config).
++  Hardware pass deferred to the future, not cancelled.
++
++## Implementation notes (2026-10-21, fourth batch)
++
++Everything in this batch is CODE-WRITTEN-BUT-UNBUILT (m misbehaves in
++OpenCode; the user runs the build and reports back). Trees touched:
++
++- packages/inputmethods/LatinIME (unpinned local edits - re-apply
++  after sync): themes-kitkat.xml - keyTextColor/keyPreviewTextColor
++  repointed to flat @color/key_text_color_normal_holo (13.4 root
++  cause: modern KeyVisualAttributes reads via TypedArray.getColor(),
++  which cannot resolve the donor res/color/key_text_color_holo.xml
++  ColorStateList selector and paints alpha-0).
++- frameworks/base core/res (pinned fork): styles_device_defaults.xml -
++  Widget.DeviceDefault.Button.Colored re-parented to
++  Widget.DeviceDefault.Button (P17.1), residual-Material doc block.
++  P17.3/17.4 audits found no further framework edits needed.
++- packages/apps/ExactCalculator (REPLACED): android-4.4.4_r1
++  Calculator installed verbatim with the modernization set (soong
++  Android.bp keeping module name ExactCalculator, vendored
++  viewpager, arity java_import, guava -> HashMap). Donor refs:
++  ~/kitkat-src/calculator-4.4, ~/kitkat-src/support-4.4.
++- packages/apps/Recorder (REPLACED): android-4.4.4_r1 SoundRecorder
++  installed verbatim with runtime-permission + scoped-storage
++  modernization, Android.bp keeping module name Recorder. Donor:
++  ~/kitkat-src/soundrecorder-4.4.
++- development/samples/KitKatWidgetPlayground (ADDED): P17.6 harness,
++  android_app KitKatWidgetPlayground, deliberately NOT in
++  PRODUCT_PACKAGES (dev tool - build on demand with
++  `m KitKatWidgetPlayground` on both this tree and a real 4.4 tree).
++
++Build gates for the next m -j4 (first compile of this batch):
++ExactCalculator (vendored ViewPager compiles against API 34;
++arity java_import), Recorder (runtime-permission shim +
++RemainingTimeCalculator signature change), LatinIME (no new
++resources - the two color attr repoints), framework-res
++(Button.Colored parent change), playground (standalone).
++Cross-references verified statically (resource names, imports,
++call-site replacements grepped clean); the vendored ViewPager
++still needs its compile pass to catch anything the eye missed.
++
++Repo-sync stability: ExactCalculator and Recorder are stock LineageOS
++checkouts carrying wholesale local replacements now - DO NOT repo-sync
++those projects before committing or pinning them (or the sync will
++clobber/blow up on the tree). Same class of caveat as LatinIME and
++PermissionController, but stronger: full-tree replacements, not edits.
+\ No newline at end of file
+diff --git a/core/res/res/values/styles_device_defaults.xml b/core/res/res/values/styles_device_defaults.xml
+index aa26fc5a81ce..21cae74dba6f 100644
+--- a/core/res/res/values/styles_device_defaults.xml
++++ b/core/res/res/values/styles_device_defaults.xml
+@@ -37,12 +37,12 @@ easier.
+     <style name="Widget.DeviceDefault.Button.Small" parent="Widget.Holo.Button.Small"/>
+     <style name="Widget.DeviceDefault.Button.Inset" parent="Widget.Holo.Button.Inset"/>
+     <style name="Widget.DeviceDefault.Button.Toggle" parent="Widget.Holo.Button.Toggle"/>
+-    <style name="Widget.DeviceDefault.Button.Colored" parent="Widget.Material.Button.Colored">
+-        <item name="outlineAmbientShadowColor">@color/btn_colored_background_material</item>
+-        <item name="outlineSpotShadowColor">@color/btn_colored_background_material</item>
+-        <item name="textAppearance">?attr/textAppearanceButton</item>
+-        <item name="textColor">@color/btn_colored_text_material</item>
+-    </style>
++    <!-- KitKat UI P17.1: 4.4 had no "colored button" concept - the normal
++         DeviceDefault button IS the accent button (Holo ghost-outline +
++         blue fill on press). Re-parent from Widget.Material.Button.Colored
++         (which carries elevation/tint chrome) to the Holo DeviceDefault
++         button. -->
++    <style name="Widget.DeviceDefault.Button.Colored" parent="Widget.DeviceDefault.Button"/>
+     <style name="Widget.DeviceDefault.TextView" parent="Widget.Holo.TextView" />
+     <style name="Widget.DeviceDefault.CheckedTextView" parent="Widget.Holo.CheckedTextView"/>
+     <style name="Widget.DeviceDefault.AutoCompleteTextView" parent="Widget.Holo.AutoCompleteTextView"/>
+@@ -139,6 +139,23 @@ easier.
+     <style name="Widget.DeviceDefault.ListView.White" parent="Widget.Holo.ListView.White"/>
+     <style name="Widget.DeviceDefault.MediaRouteButton" parent="Widget.Holo.MediaRouteButton" />
+     <style name="Widget.DeviceDefault.NumberPicker" parent="Widget.Holo.NumberPicker"/>
++    <!-- KitKat UI P17.1 residual-Material notes (philosophy: accept and
++         document - post-KitKat surfaces render normal-modern):
++         - Notification.* widgets/typography below stay Material ON PURPOSE:
++           they back app remote views; the 4.4 typography is pinned directly
++           onto the Material notification styles (P12.6), and re-parenting
++           would risk breaking modern MessagingStyle/remote-input contracts.
++         - Widget.DeviceDefault.Toolbar stays Material: Toolbar did not exist
++           in 4.4 (4.4 used action bars); keep modern chrome, only the
++           title/subtitle text appearances are DeviceDefault-pinned above.
++         - TextAppearance.Material typography scale (Body1/2, Subhead,
++           Headline, Display*, Title, Caption) stays Material: Lollipop-era
++           concepts with no 4.4 counterpart; modern apps measure against it.
++         - Preference.DeviceDefault.* / AlertDialog.DeviceDefault / ButtonBar
++           / SegmentedButton stay Material: modern Settings renders through
++           SettingsLib PreferenceTheme and depends on Material measure
++           behavior (P7 styled the chrome at the SettingsLib layer instead).
++         -->
+     <style name="Widget.DeviceDefault.Notification.Text" parent="Widget.Material.Notification.Text">
+         <item name="textAppearance">@style/TextAppearance.DeviceDefault.Notification</item>
+     </style>
+-- 
+2.53.0
+

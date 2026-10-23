@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Button xmlns:ns0="http://schemas.android.com/apk/res/android" ns0:layout_width="match_parent" ns0:layout_height="wrap_content" ns0:text="@string/copy_email" ns0:id="@+android:id/button1" ns0:background="@null" ns0:layout_gravity="left" />

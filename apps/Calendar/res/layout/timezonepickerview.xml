@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:ns0="http://schemas.android.com/apk/res/android" ns0:layout_width="match_parent" ns0:layout_height="wrap_content" ns0:minWidth="300dp" ns0:orientation="vertical">
+
+    <FrameLayout ns0:layout_width="match_parent" ns0:layout_height="wrap_content" ns0:layout_gravity="center_vertical">
+
+        <AutoCompleteTextView ns0:id="@+id/searchBox" style="@style/font_family_thin" ns0:layout_width="match_parent" ns0:layout_height="wrap_content" ns0:layout_marginBottom="8dp" ns0:layout_marginLeft="8dp" ns0:layout_marginRight="8dp" ns0:completionThreshold="1" ns0:hint="@string/hint_time_zone_search" ns0:imeOptions="actionDone" ns0:minHeight="48dp" ns0:singleLine="true" ns0:paddingRight="30dp">
+        </AutoCompleteTextView>
+        <ImageButton ns0:id="@+id/clear_search" ns0:layout_width="wrap_content" ns0:layout_height="wrap_content" ns0:paddingStart="8dp" ns0:paddingEnd="8dp" ns0:paddingTop="8dp" ns0:paddingBottom="8dp" ns0:layout_marginRight="8dp" ns0:layout_gravity="right|center_vertical" ns0:background="?android:attr/selectableItemBackground" ns0:src="@drawable/ic_clear_search_holo_light" ns0:visibility="gone" ns0:contentDescription="@string/searchview_description_clear" />
+    </FrameLayout>
+
+    <ListView ns0:id="@+id/timezonelist" ns0:layout_width="match_parent" ns0:layout_height="wrap_content" ns0:background="#FFECECEC" ns0:choiceMode="singleChoice">
+    </ListView>
+</LinearLayout>

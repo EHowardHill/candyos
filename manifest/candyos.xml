@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  CandyOS local manifest (installed into .repo/local_manifests/ by
+  scripts/candyos-init.sh).
+
+  LineageOS 21 tree, KitKat look-and-feel. The LineageOS source stays stock;
+  CandyOS layers its changes on top after every sync:
+
+    * frameworks/base, packages/apps/Settings and
+      packages/inputmethods/LatinIME stay as STOCK LineageOS checkouts.
+      scripts/candyos-sync.sh replays the ordered git-am series from
+      patches/ on top of them.
+
+    * The six app slots below are removed from the manifest entirely so the
+      stock (and forked) versions never get checked out. scripts/
+      candyos-sync.sh fills each slot with the corresponding CandyOS-vendored
+      KitKat app from apps/. Module names are intentionally kept identical
+      to the stock apps (TrebuchetQuickStep, ExactCalculator, Recorder,
+      Eleven, DeskClock, Etar, LatinIME) so vendor/lineage product config
+      keeps resolving without changes:
+
+      packages/apps/Trebuchet      <- apps/Launcher3-Modern (KitKat Launcher3 port)
+      packages/apps/ExactCalculator<- apps/Calculator     (4.4.4_r1 Calculator)
+      packages/apps/Recorder       <- apps/SoundRecorder   (4.4.4_r1 SoundRecorder)
+      packages/apps/Eleven         <- apps/Music           (4.4.4_r1 Music)
+      packages/apps/DeskClock      <- apps/DeskClock       (4.4.4_r1 DeskClock)
+      packages/apps/Etar           <- apps/Calendar        (4.4.4_r1 Calendar)
+-->
+<manifest>
+  <remove-project name="LineageOS/android_packages_apps_Trebuchet" />
+  <remove-project name="LineageOS/android_packages_apps_ExactCalculator" />
+  <remove-project name="LineageOS/android_packages_apps_Recorder" />
+  <remove-project name="LineageOS/android_packages_apps_Eleven" />
+  <remove-project name="LineageOS/android_packages_apps_DeskClock" />
+  <remove-project name="LineageOS/android_packages_apps_Etar" />
+</manifest>

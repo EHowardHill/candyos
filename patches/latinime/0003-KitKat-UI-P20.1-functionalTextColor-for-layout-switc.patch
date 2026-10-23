@@ -1,0 +1,34 @@
+From c4812dda028a81ff1e63238057563e2098b05c31 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Thu, 22 Oct 2026 09:09:04 -0500
+Subject: [PATCH 3/3] KitKat UI P20.1: functionalTextColor for layout-switch
+ keys
+
+The ?123/ABC toggle keys carry followFunctionalTextColor; themes-kitkat
+carried no functionalTextColor so KeyDrawParams read 0 = transparent =
+blank layout-switch keys (same class of bug as 13.4). Pinned to the key
+text color (white), matching every donor selector state.
+---
+ java/res/values/themes-kitkat.xml | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/java/res/values/themes-kitkat.xml b/java/res/values/themes-kitkat.xml
+index 97928092a..508fd934b 100644
+--- a/java/res/values/themes-kitkat.xml
++++ b/java/res/values/themes-kitkat.xml
+@@ -90,6 +90,12 @@
+              their own flat colors below. -->
+         <item name="keyTextColor">@color/key_text_color_normal_holo</item>
+         <item name="keyTextInactivatedColor">@color/key_text_inactivated_color_holo</item>
++        <!-- 20.1 fix: the ?123/ABC layout-switch keys carry
++             followFunctionalTextColor; without this attr they paint
++             transparent (blank toggle keys - same class of bug as 13.4).
++             Donor KeyboardView.KLP used the key text color for functional
++             labels; white matches every donor selector state. -->
++        <item name="functionalTextColor">@color/key_text_color_normal_holo</item>
+         <item name="keyHintLetterColor">@color/key_hint_letter_color_holo</item>
+         <item name="keyHintLabelColor">@color/key_hint_label_color_holo</item>
+         <item name="keyShiftedLetterHintInactivatedColor">@color/key_shifted_letter_hint_inactivated_color_holo</item>
+-- 
+2.53.0
+

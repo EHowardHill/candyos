@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<FrameLayout xmlns:ns0="http://schemas.android.com/apk/res/android" ns0:layout_width="match_parent" ns0:layout_height="wrap_content">
+
+    <include layout="@layout/chips_recipient_dropdown_item" />
+
+</FrameLayout>

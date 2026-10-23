@@ -1,0 +1,34 @@
+// KitKat UI P16 Tier 1: the Android 4.4 Music app (com.android.music)
+// ported per the Launcher3-Modern pattern - donor UI verbatim from
+// android-4.4.4_r1 (27 java files + playback AIDL, no support-lib deps),
+// modernized only where the hard-constraint layer requires:
+//  - target 29 (pre-30 on purpose, same reasoning as Launcher3-Modern):
+//    legacy external storage keeps the donor MediaStore flow working
+//    with a runtime READ_EXTERNAL_STORAGE grant (requested in
+//    MusicBrowserActivity).
+//  - API 26+ notification channel + Builder around the donor
+//    RemoteViews playback status notification (MediaPlaybackService).
+//  - PendingIntent.FLAG_IMMUTABLE on all donor PendingIntent call sites
+//    (API 31+ requirement).
+//  - exported=true on the launcher activity and the media-button/widget
+//    receivers (API 31+ manifest rule).
+// Module keeps the name Eleven so vendor/lineage PRODUCT_PACKAGES
+// (common_mobile_full.mk) resolves unchanged.
+android_app {
+    name: "Eleven",
+    // Installs to the product partition like the app it replaces (the
+    // lineage_sdk target enforces GSI artifact-path requirements on
+    // /system).
+    product_specific: true,
+    // Pre-30 target on purpose (see header).
+    min_sdk_version: "21",
+    sdk_version: "29",
+    srcs: [
+        "src/**/*.java",
+        "src/com/android/music/IMediaPlaybackService.aidl",
+    ],
+    resource_dirs: ["res"],
+    optimize: {
+        proguard_flags_files: ["proguard.flags"],
+    },
+}

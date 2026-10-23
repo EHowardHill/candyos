@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TextView xmlns:ns0="http://schemas.android.com/apk/res/android" ns0:id="@+id/text1" ns0:textColor="#aaaaaa" ns0:textSize="18sp" ns0:layout_width="wrap_content" ns0:layout_height="wrap_content" ns0:text="@string/more_string" ns0:paddingLeft="8dip" ns0:paddingRight="8dip" />

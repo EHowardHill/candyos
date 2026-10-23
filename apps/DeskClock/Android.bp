@@ -1,0 +1,35 @@
+// KitKat UI P16 Tier 1 (final): the Android 4.4 DeskClock ported per the
+// Launcher3-Modern pattern - donor UI verbatim from android-4.4.4_r1
+// (packages/apps/DeskClock + frameworks/opt/datetimepicker vendored
+// in-tree as com.android.deskclock.viewpager / com.android.datetimepicker),
+// modernized only where the build/API layer requires:
+//  - support-v4/v13 ViewPager/PagerAdapter vendored with the compat layer
+//    collapsed onto framework APIs (EdgeEffectCompat kept locally);
+//    androidx ExploreByTouchHelper for datetimepicker accessibility;
+//    SparseArrayCompat -> android.util.SparseArray.
+//  - targetSdk 29 (pre-30 on purpose, same reasoning as Music).
+//  - SCHEDULE_EXACT_ALARM manifest permission (API 31+; alarm schedule
+//    shim is app-side handled by the donor AlarmManager paths +
+//    AlarmClockManager intents, unchanged).
+//  - exported=true on intent-filter components (API 31+ manifest rule).
+//  - Application theme KitKatDeskClockTheme = donor Theme.Holo choice.
+// Module keeps the name DeskClock so PRODUCT_PACKAGES resolves unchanged.
+android_app {
+    name: "DeskClock",
+    product_specific: true,
+    min_sdk_version: "21",
+    sdk_version: "29",
+    srcs: [
+        "src/**/*.java",
+    ],
+    resource_dirs: [
+        "res",
+    ],
+    static_libs: [
+        
+    ],
+    optimize: {
+        proguard_flags_files: ["proguard.flags"],
+    },
+    overrides: ["AlarmClock"],
+}

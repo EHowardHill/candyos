@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:ns0="http://schemas.android.com/apk/res/android" ns0:layout_width="@dimen/date_picker_component_width" ns0:layout_height="match_parent" ns0:background="@color/date_picker_view_animator" ns0:gravity="center" ns0:orientation="vertical">
+
+    <LinearLayout ns0:layout_width="wrap_content" ns0:layout_height="@dimen/selected_calendar_layout_height" ns0:orientation="vertical">
+
+        <include layout="@layout/date_picker_selected_date" />
+    </LinearLayout>
+
+    <include layout="@layout/date_picker_view_animator" />
+
+    <View ns0:layout_width="@dimen/date_picker_component_width" ns0:layout_height="1dip" ns0:background="@color/line_background" />
+
+    <include layout="@layout/date_picker_done_button" />
+
+</LinearLayout>

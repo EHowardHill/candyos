@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:ns0="http://schemas.android.com/apk/res/android" ns0:layout_width="match_parent" ns0:layout_height="wrap_content" ns0:background="?android:attr/selectableItemBackground" ns0:gravity="center_vertical" ns0:orientation="vertical" ns0:padding="8dp">
+
+    <TextView ns0:id="@+id/value" style="@style/font_family_thin" ns0:layout_width="wrap_content" ns0:layout_height="wrap_content" ns0:layout_gravity="center_vertical" ns0:ellipsize="marquee" ns0:gravity="center_vertical" ns0:minHeight="32dp" ns0:maxLines="2" ns0:textAppearance="?android:attr/textAppearanceMedium" />
+
+</LinearLayout>

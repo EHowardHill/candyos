@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:ns0="http://schemas.android.com/apk/res/android" ns0:layout_width="match_parent" ns0:layout_height="@dimen/date_picker_view_animator_height" ns0:gravity="center" ns0:orientation="horizontal">
+
+    <LinearLayout ns0:layout_width="wrap_content" ns0:layout_height="match_parent" ns0:layout_gravity="center" ns0:background="@color/white" ns0:orientation="vertical">
+
+        <LinearLayout ns0:layout_width="wrap_content" ns0:layout_height="0dip" ns0:layout_weight="1" ns0:orientation="vertical">
+
+            <include layout="@layout/date_picker_header_view" />
+
+            <include layout="@layout/date_picker_selected_date" />
+        </LinearLayout>
+
+        <View ns0:layout_width="match_parent" ns0:layout_height="1dip" ns0:background="@color/line_background" />
+
+        <include layout="@layout/date_picker_done_button" />
+    </LinearLayout>
+
+    <include layout="@layout/date_picker_view_animator" />
+
+</LinearLayout>

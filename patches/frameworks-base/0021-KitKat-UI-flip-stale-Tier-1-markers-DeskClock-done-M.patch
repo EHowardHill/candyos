@@ -1,0 +1,44 @@
+From 7d369eb99318208dbd92acee35af0d4cea9db31c Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Thu, 22 Oct 2026 08:00:56 -0500
+Subject: [PATCH 21/29] KitKat UI: flip stale Tier 1 markers (DeskClock done,
+ Messaging decided-no-port)
+
+---
+ TASKS.md | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/TASKS.md b/TASKS.md
+index ad3a4a329bc6..abb14ccf1e00 100644
+--- a/TASKS.md
++++ b/TASKS.md
+@@ -1618,16 +1618,16 @@ Launcher3-Modern experience):
+       FORKED + PINNED:
+       github.com/EHowardHill/android_packages_apps_Eleven
+       lineage-21.0 - sync-safe.
+-- [ ] DeskClock/Clock (donor packages/apps/DeskClock) -> replace the
+-      modern DeskClock. AlarmManager/AlarmClockManager intents stable;
+-      ports: runtime ALTER_SETTINGS? (no - SET_EXACT_ALARM new-model
+-      handling), notification channel for alarms, vibrate policy.
+-      4.4 alarm/world-clock/stopwatch UI verbatim.
+-- [ ] Messaging (donor packages/apps/Mms) -> replace Messaging
+-      (com.android.mms). 4.4 Mms source is present in Lineage already
+-      as BasicSmsReceiver donor bits; full port: SEND_SMS/CONTACTS
+-      runtime perms, default-SMS role plumbing (RoleManager), keep
+-      modern car/SMS restrictions. KitKat hangout-style dark thread UI.
++- [X] DeskClock/Clock (donor packages/apps/DeskClock) -> replace the
++      modern DeskClock. DONE + VERIFIED + FORKED + PINNED
++      (2026-10-22, sixth/seventh batches - datetimepicker vendored,
++      alarm schedules end-to-end; see the ratification block and the
++      seventh-batch implementation notes for the full modernization
++      set). Alarm-ring + playback sound: user audio AVD.
++- [X] Messaging (donor packages/apps/Mms): DECIDED (user, 2026-10-21)
++      NO PORT - DEFERRED ENTIRELY. Cannot be tested without a SIM;
++      ship modern Messaging on the DeviceDefault cascade. Documented
++      hybrid per philosophy rules 2/3.
+ 
+ ### Tier 2 - paired ports (must land together)
+ 
+-- 
+2.53.0
+

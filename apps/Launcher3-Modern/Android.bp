@@ -1,0 +1,52 @@
+// KitKat UI Project: in-tree build for the 4.4 KitKat Launcher3 port
+// (github.com/EHowardHill/Launcher3-Modern).
+//
+// Registers under the TrebuchetQuickStep name because
+// vendor/lineage/config/common_mobile.mk adds that module to
+// PRODUCT_PACKAGES for non-Go products. The name is the only quickstep-ish
+// thing about it: this is the KitKat launcher with no overview or gesture
+// integration; recents is handled by SystemUI instead (see TASKS.md, Phase 5).
+android_app {
+    name: "TrebuchetQuickStep",
+
+    srcs: ["src/**/*.java"],
+    // The protobuf-nano based backup helper is excluded (its generated code
+    // came from the internal AOSP build); LauncherBackupAgentHelper is a
+    // documented no-op without it.
+    exclude_srcs: [
+        "src/com/android/launcher3/LauncherBackupHelper.java",
+        "src/com/android/launcher3/FolderAutoScrollHelper.java",
+    ],
+    resource_dirs: ["res"],
+    aaptflags: ["--auto-add-overlay"],
+
+    platform_apis: true,
+    min_sdk_version: "21",
+
+    optimize: {
+        enabled: false,
+    },
+
+    privileged: true,
+    system_ext_specific: true,
+    overrides: [
+        "Home",
+        "Launcher2",
+        "Launcher3",
+        "Launcher3QuickStep",
+        "QuickSearchBox",
+    ],
+    required: ["privapp_whitelist_com.android.launcher3"],
+}
+
+// KitKat UI Project: Trebuchet used to provide the TAPL (Test Automation
+// Programming Library) module that platform_testing (flicker, launcher-helper)
+// links against. The KitKat launcher has no TAPL sources, but the module name
+// must exist for soong dependency resolution. The test consumers are not part
+// of the system image, so an empty library is sufficient.
+android_library {
+    name: "launcher-aosp-tapl",
+    srcs: [],
+    resource_dirs: [],
+    sdk_version: "current",
+}

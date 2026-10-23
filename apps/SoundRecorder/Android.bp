@@ -1,0 +1,18 @@
+// KitKat UI P16 Tier 1: the Android 4.4 SoundRecorder
+// (com.android.soundrecorder) ported from android-4.4.4_r1. Donor UI and
+// code verbatim; modernization limited to the hard-constraint layer:
+//  - RECORD_AUDIO runtime-permission shim (SoundRecorder.onCreate).
+//  - recordings written to the app external files dir (scoped storage)
+//    and published via MediaStore, as in 4.4.
+// Module keeps the name Recorder so vendor/lineage PRODUCT_PACKAGES
+// (common_mobile_full.mk) resolves unchanged.
+android_app {
+    name: "Recorder",
+    // Installs to the product partition like the app it replaces (the
+    // lineage_sdk target enforces GSI artifact-path requirements on
+    // /system - platform installs of these module names are rejected).
+    product_specific: true,
+    sdk_version: "current",
+    srcs: ["src/**/*.java"],
+    resource_dirs: ["res"],
+}

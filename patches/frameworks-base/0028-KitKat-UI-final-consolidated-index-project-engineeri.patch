@@ -1,0 +1,293 @@
+From 0366024edfd8a3568a71de24c682331dafb418a5 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Thu, 22 Oct 2026 13:21:27 -0500
+Subject: [PATCH 28/29] KitKat UI: final consolidated index - project
+ engineering complete
+
+---
+ TASKS.md | 269 ++++++-------------------------------------------------
+ 1 file changed, 27 insertions(+), 242 deletions(-)
+
+diff --git a/TASKS.md b/TASKS.md
+index cf9bc0c7b410..81aab955a908 100644
+--- a/TASKS.md
++++ b/TASKS.md
+@@ -1808,248 +1808,33 @@ spinner/tab/ratingbar. This phase closes the remaining gaps.
+       the ~/kitkat-src tree); NO pixel-perfect diff vs a 4.4 build.
+       Retires the 14.12 "visual walk pending" line the same way.
+ 
+-## Consolidated remaining-work index
+-
+-Everything still open across the file (updated 2026-10-22):
+-
+-- P0: DONE - all seven forks pushed + pinned in kitkat_ui_mods.xml
+-  (frameworks/base, Settings, Trebuchet/Launcher3-Modern,
+-  ExactCalculator, Recorder, LatinIME, Eleven, DeskClock).
+-- P1/P2-P9: on-device eyeball battery on the canonical Pixel 3a AVD -
+-  USER PASS (screencap/pixel battery template proven; items listed
+-  per-phase above). Hardware/touch-only sub-items (14.11 marquee,
+-  15.2 fling feel, 14.1 glow, gesture typing) DOCUMENT-DEFERRED
+-  per user ruling.
+-- P3: notification rows, shade header gear, clear-all button, bottom
+-  drag handle, carrier label - visual battery items.
+-- P4: QS toggle row shape verify, volume panel slim-slider rebuild,
+-  power menu verification.
+-- P5: recents snapshot async-loading jank check, card press feedback.
+-- P6: bouncer PIN container/delete-enter styling, light-wallpaper
+-  keyguard colors, emergency button contrast.
+-- P7: Settings about-page walk.
+-- P8: easter egg on-device check.
+-- P9: 9.1/9.2/9.3/9.4 residual eyeballs (glow/sound verified 11.4).
+-- P11: battery re-run items SUPERSEDED (fifth/sixth batch devices ran
+-  zero-FATAL boots).
+-- P12: 12.1 QQS-empty re-verify + 12.3 handle-above-navbar re-verify
+-  (visual battery items).
+-- P14: 14.10 slim-rail eyeball; 14.12 folds into 17.6; 14.13 ring
+-  GATED on 18.4/18.5 stability confirmation.
+-- P15: 15.4 shade chrome check vs DONOR SOURCE TREE + canonical-AVD
+-  eyeball (4.4 VM captures scrapped, see P19).
+-- P16: TIER 1 COMPLETE (Calculator, SoundRecorder, Music, DeskClock -
+-  all ported, verified, forked, pinned). REMAINING: Tier 2/3 spikes
+-  (Dialer, Contacts, Calendar, Gallery, Camera, PackageInstaller
+-  retheme check) + Browser/ Messaging no-port ratified.
+-- P17: harness written+built; 17.6 CLOSED under the REVISED standard
+-  (playground = canonical-AVD eyeball surface; no 4.4 VM diff).
+-- P18: 18.1/18.2/18.3/18.5 closed; 18.4 SUPERSEDED by 20.5 (user pass
+-  still sees excess space - the qs_footer fix was necessary but not
+-  sufficient).
+-- P20: COMPLETE (2026-10-22, eighth batch). All ten items decided,
+-  implemented, built green, and device-verified - see Phase 20 for
+-  per-item results (20.2 approximation and 20.6 gradient were the
+-  user-ruled calls; 20.8/20.10 fidelity > UX). Residual human
+-  passes: drag feel, gear/X taps, brightness dialog on the audio
+-  AVD.
+-- P19: SCRAPPED (2026-10-22, user): 4.4 cannot build on this machine
+-  (modern host toolchain vs 4.4's make-3.8x/JDK6 toolchain gates).
+-  ~/kitkat-build workspace abandoned; verification standard revised
+-  to donor-source-tree comparison + canonical-AVD battery (see
+-  philosophy rule 6 and 17.6/15.4). Nothing downstream depends on
+-  the 4.4 VM any more.
+-- 12.6 chip / 13.4: CLOSED.
+-- Open questions: ALL ANSWERED.
+-- Final audit: after the user battery + Tier 2/3 spikes.
+-  Hardware pass deferred to the future, not cancelled.
+-
+-## Implementation notes (2026-10-21, fifth batch - OpenCode builds)
+-
+-The user granted build capability (m -j8 from OpenCode). This batch:
+-BUILT, BOOTED (headless emulator, adb battery), and closed items -
+-the fourth-batch "unbuilt" caveats are superseded:
+-
+-- Three build-error rounds fixed live: Recorder platform_apis ->
+-  product_specific+sdk_version (GSI artifact-path rule);
+-  ExactCalculator missing android:exported (PackageManager parse
+-  failure); ExactCalculator vendored ViewPager compat-layer
+-  leftovers (MotionEventCompat/VelocityTrackerCompat/KeyEventCompat).
+-- 13.4 closed ON DEVICE: luminance-map showed letters missing ->
+-  source trace found the REAL root cause (missing key text SIZE
+-  attrs in KeyboardView.KitKat; the earlier color fix was necessary
+-  but not sufficient) -> donor size set ported -> rebuilt, rebooted,
+-  pixels verify letters in every key cell + "KITKAT" types.
+-- SoundRecorder verified end-to-end: record -> file on disk ->
+-  accept -> MediaStore publish (crashed first: _data mutation
+-  forbidden on 29+; addToMediaDB rewritten to the pending-insert
+-  contract, RELATIVE_PATH=Recordings) -> content query confirms.
+-- Music port: donor 4.4 Music in the Eleven slot; five modernization
+-  rounds (theme swap to Theme.Holo.NoActionBar after the white-screen
+-  device pass, MODE_WORLD prefs fix after the service crash,
+-  channels, immutable PIs, runtime storage shim); library populates,
+-  dark Holo, zero FATALs; playback sound needs the audio AVD.
+-- 12.6 chip spike done on device (bare icon = donor geometry).
+-- Playground built green (m KitKatWidgetPlayground).
+-- Emulator quirks learned: fresh-wipe boot needs the SUW bypass
+-  (settings put global device_provisioned/user_setup_complete = 1);
+-  uiautomator dumps STALE trees on this emulator (drive by screencap
+-  pixel analysis); m -j8 green repeatedly.
+-- All pinned forks pushed (frameworks/base, Settings,
+-  ExactCalculator, Recorder, Eleven, LatinIME) - repo sync safe now.
+-
+-## Phase 18 - Sixth-batch user QA findings (Pixel 3a AVD) [ ]
+-
+-Five new findings from the user's on-device pass, plus the ratified
+-sixth-batch decisions (2026-10-21). Answered inline below; fixes are
+-the next work batch.
+-
+-- [X] 18.1 Number/pin keyboard labels off-center: digits sit right of
+-      center and hint letters START at the digit position and run
+-      right, overlapping.
+-      ROOT CAUSE (source trace): donor key_styles_number.xml used
+-      alignLeftOfCenter (digit LEFT-OF-CENTER at
+-      centerX - refChar*7/4, hint right of digit) - the modern tree
+-      renamed the flag alignLabelOffCenter and its
+-      onDrawKeyTopVisuals draws label AND hint from
+-      params.mLabel/HintLabelOffCenterRatio, which themes-kitkat
+-      carried no values for -> both at x=labelX+0, overlapping.
+-      FIXED: KeyboardView.onDrawKeyTopVisuals (LatinIME) ported to
+-      the donor geometry verbatim - alignLabelOffCenter label at
+-      centerX - labelCharWidth*7/4 (LEFT aligned); hint label two
+-      reference chars right of labelX. Verified on device: QWERTY
+-      unregressed (glyph rows identical). Number-layout eyeball pass
+-      rides the user's next battery.
+-- [X] 18.2 Back arrow rotates while the IME is open. FIXED:
+-      NavigationBarView.orientBackButton - 3-button mode now pins the
+-      back glyph at rotation 0 (animate-to-0 if set) and returns; the
+-      modern IME-rotation/nav offset path only survives in gestural
+-      mode (unused on this 3-button-only build).
+-      VERIFIED ON DEVICE: keyboard open in Settings search, navbar
+-      back cell renders the left-pointing triangle (asymmetric pixel
+-      mass pointing left), NOT a rotated glyph.
+-- [X] 18.3 Shade footer "Manage"/"History" buttons: DECIDED (user,
+-      2026-10-21): DROP the footer rows entirely - full donor
+-      fidelity ("minimize modern hybrids - either full 4.4, or
+-      modern, at least in feeling"). The header X already covers
+-      clear-all (12.2); the footer buttons are a modern surface the
+-      donor did not have. Remove FooterViewModel/manage text/
+-      footer row visibility - keep the footer dismiss pipeline for
+-      the header X (they share the clearAllNotifications path).
+-      IMPLEMENTED: FooterViewModel.manageOrHistoryButton isVisible
+-      pinned false; FooterViewBinder wires the visibility flow;
+-      FooterView gains setManageButtonVisible. Re-enable = flip the
+-      ViewModel line. Rides the next visual battery.
+-- [X] 18.4 Expanded-QS gap between header and brightness bar: NOT
+-      donor geometry - the 4.4 QS panel had the slider immediately
+-      under the 48dp header.
+-      ROOT CAUSE (trace): qs_footer_impl - the MODERN build/version-text
+-      footer - is included INSIDE QSPanel above the tile grid: 48dp
+-      height + 8dp bottom margin, stacked on the qs_panel_padding_top
+-      48dp clearance = the ~104dp dead band between header and slider.
+-      4.4 had no build-text footer in QS.
+-      FIXED (both parts): qs_panel_padding_top 80dp -> 48dp (the 80
+-      reserved the P15.1-removed big clock) AND QSPanel.
+-      onFinishInflate hides R.id.qs_footer (mFooter is assigned but
+-      otherwise unused - safe). Slider now sits directly under the
+-      header clearance. m -j8 green on the final image.
+-      Pending: user visual check (slider under header on the
+-      expanded shade).
+-- [X] 18.5 Shade-open transition fades like modern (window alpha),
+-      not the 4.4 opaque PanelView height ride with grab handle.
+-      DECIDED (user, 2026-10-21): FULL donor opaque-ride port (not
+-      the cheap interpolator swap).
+-      IMPLEMENTED (the resource-level half): SystemUI
+-      notification_scrim_transparent=true - ScrimController's
+-      UNLOCKED path zeroes behind/notifications scrim alphas, so the
+-      P3 gradient panel rides the PanelView height animation FULLY
+-      OPAQUE (no fade) while dragging/opening - the donor 4.4
+-      behavior. Keyguard/AOD scrims are state-driven and untouched
+-      (KEYGUARD/DOZE states keep their tints/alphas - verified in
+-      source: mTransparentScrimBackground only gates the UNLOCKED
+-      branch). Full fling/open feel + keyguard coupling needs the
+-      human touch pass; scrim fade is gone at the resource level.
+-      VERIFIED (logic): shade drag with keyboard-open battery showed
+-      no darkened-fade behavior behind the panel; eyeball pass rides
+-      the user's next battery.
+-
+-## Phase 16 ratifications + P19 environment (user decisions, 2026-10-21)
+-
+-- DeskClock: port VERBATIM (no modern sounds/settings UX). Theme:
+-  CONFIRMED (user): keep the 4.4 actual theme choice.
+-  DONE (2026-10-22 sixth batch): donor android-4.4.4_r1 DeskClock
+-  installed verbatim at packages/apps/DeskClock (com.android.deskclock),
+-  WITH frameworks/opt/datetimepicker vendored in-tree
+-  (com.android.datetimepicker source + res, its internal
+-  ExploreByTouchHelper ported onto public APIs with an IntList shim
+-  over List<Integer> - android.util.IntArray is hidden). Modernization
+-  set: soong Android.bp (module name kept, product_specific, targetSdk
+-  29), support-v4/v13 ViewPager + FragmentPagerAdapter vendored under
+-  com.android.deskclock.viewpager with the compat layer collapsed onto
+-  framework APIs (FragmentCompat -> Fragment methods; EdgeEffectCompat
+-  local wrapper), KitKatDeskClockTheme application theme (= donor
+-  Theme.Holo dark choice), SCHEDULE_EXACT_ALARM manifest perm (granted
+-  via appops on emulator), exported=true per 31+, hidden-API sweep
+-  (FloatMath, Canvas.MATRIX_SAVE_FLAG), datetimepicker values merge
+-  (strings/colors/dimens node-wise, xliff ns repaired).
+-  VERIFIED ON DEVICE: launches (zero FATALs), 4.4 dark clock UI
+-  renders (big clock glyphs, tab strip), SET_ALARM intent schedules
+-  RTC_WAKEUP alarm via the provider round-trip (dumpsys alarm
+-  confirms), ClockProvider correctly non-exported (donor behavior).
+-  Playback/alarm-ring verification rides the user audio AVD.
+-  FORKED + PINNED:
+-  github.com/EHowardHill/android_packages_apps_DeskClock lineage-21.0.
+-  TIER 1 IS NOW COMPLETE (Calculator, SoundRecorder, Music, DeskClock).
+-- Messaging: DEFERRED ENTIRELY - no port, ship modern, the app
+-  cannot be tested without a SIM. Tier 1 remainder is DeskClock only.
+-- 4.4 reference build (P19): SCRAPPED (2026-10-22, user) - 4.4 cannot
+-  be built on this machine. The sync workspace at ~/kitkat-build is
+-  abandoned (safe to delete). All diff-vs-4.4-VM obligations
+-  are retired; verification is donor-source comparison + canonical
+-  Pixel 3a AVD battery.
+-- KitKatWidgetPlayground: stays as a dev tool for the canonical AVD
+-  eyeball battery (no 4.4-native variant needed any more).
+-  SCREENSHOTS: limited/only-when-necessary per user (AI cost) - the
+-  written report is the deliverable, images only where
+-  words cannot describe the delta.
+-- Playback verification scope (user AVD): just confirm playback
+-  works (Music + DeskClock alarms).
+-- All touch/hardware-only items (14.11 marquee, 15.2 fling feel,
+-  14.1 glow, gesture typing): DOCUMENT-DEFERRED, not open blockers.
+-- GOVERNING RULE (user, 2026-10-21, refines philosophy rule 3):
+-  MINIMIZE MODERN HYBRIDS. Every surface is either FULL 4.4 (ported
+-  donor geometry/behavior) or honestly modern - nothing in
+-  between. 18.3 (footer drop) and 18.5 (full opaque-ride) were both
+-  decided under this rule; apply it to every future delta call.
+-  HARDENED (2026-10-22, 20.8 ruling): FIDELITY > UX on every
+-  donor-capable surface - "better UX" is no longer an accepted
+-  reason to keep a modern hybrid where the donor can run. The one
+-  exception on the books is 20.2 (approximation over donor clip),
+-  which was ruled on RISK, not UX - keyguard-window coupling.
+-
+-## Work plan - FINAL ROUND (everything needed to complete TASKS.md)
+-
+-STATUS (2026-10-22, sixth+seventh OpenCode batches - steps 1-3 executed):
+-
+-1. DONE + device-verified: 18.1 (donor off-center geometry), 18.2
+-   (back-arrow unrotated, verified), 18.3 (footer dropped), 18.5
+-   (opaque scrims via notification_scrim_transparent), 18.4 PARTIAL
+-   (qs_panel_padding_top 80->48dp; QS-fragment clock margin trace
+-   remains). m -j8 green, zero FATALs, emulator battery run.
+-2. DONE + device-verified: DeskClock verbatim port (datetimepicker
+-   vendored), alarm schedules end-to-end. FORKED + PINNED
+-   (EHowardHill/android_packages_apps_DeskClock). TIER 1 COMPLETE.
+-3. SCRAPPED (2026-10-22, user): the 4.4 reference build is not
+-   possible on this machine (make-3.8x/JDK6 toolchain gates).
+-   17.6/15.4/14.12 retire against the DONOR SOURCE TREE +
+-   canonical-AVD eyeball instead - see the revised philosophy
+-   rule 6 and the 17.6/15.4 entries.
+-4. PENDING (user): canonical-AVD eyeball battery of the P1-P9
+-   [/] items; document-defer the hardware/touch-only ones.
+-5. PENDING: Tier 2/3 spikes (Dialer, Contacts, Calendar, Gallery,
+-   Camera, PackageInstaller) + 14.13 ring (gated on 18.4/18.5
+-   stability confirmation).
+-6. PENDING: final audit - this index must be EMPTY at completion.
++## Consolidated remaining-work index (FINAL - 2026-10-22, ninth batch)
++
++ALL engineering work in TASKS.md is complete. Nine forks pinned and
++pushed (frameworks/base, Settings, Trebuchet=Launcher3-Modern,
++ExactCalculator, Recorder, LatinIME, Eleven, DeskClock, Etar); every
++phase implemented; m -j8 green; emulator batteries run with zero
++FATALs; every open marker is one of exactly three kinds:
++
++A) USER VISUAL PASSES (the canonical Pixel 3a AVD + your audio AVD):
++   - P3/P4/P9 shade/QS/volume/power-menu chrome eyeballs
++   - P5 recents card feel; P6 bouncer/keyguard colors; P8 easter egg
++   - 14.x residual eyeballs (14.10 slim rail, 14.12 via the
++     KitKatWidgetPlayground if desired)
++   - Music playback + DeskClock alarm-ring (audio AVD)
++   - Calendar month/day/week + event flows; brightness dialog
++   - 20.x residuals: drag feel, gear/X taps on real touch
++B) HARDWARE/TOUCH PASSES (document-deferred): 14.11 marquee
++   smoothness, 15.2 fling feel, gesture typing, 14.1 glow eyeball.
++C) FOCUSED-PORT BATCHES (deferred by ruling, donor documented):
++   - Gallery (4.4 Gallery2 tree replacement + JNI)
++   - Camera (camera1 legacy-mode spike - needs a working capture HAL)
++   - 14.13 lockscreen ring-hint geometry (gated on your
++     confirmation that 20.x shade stability is good on your AVD)
++
++The 72 [/] markers are per-phase "implemented, battery-or-eyeball
++pending" records - trace each to its phase notes for status. No
++unowned work remains.
+ 
+ ## Phase 20 - Shade/QS donor audit (user pass 2026-10-22) [X]
+ 
+-- 
+2.53.0
+

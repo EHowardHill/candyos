@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:ns0="http://schemas.android.com/apk/res/android" ns0:id="@+id/time_picker_dialog" ns0:layout_height="@dimen/dialog_height" ns0:layout_width="wrap_content" ns0:orientation="horizontal" ns0:focusable="true" ns0:layout_marginLeft="@dimen/minimum_margin_sides" ns0:layout_marginRight="@dimen/minimum_margin_sides" ns0:layout_marginTop="@dimen/minimum_margin_top_bottom" ns0:layout_marginBottom="@dimen/minimum_margin_top_bottom">
+    <LinearLayout ns0:layout_width="@dimen/left_side_width" ns0:layout_height="match_parent" ns0:orientation="vertical">
+        <FrameLayout ns0:id="@+id/time_display_background" ns0:layout_width="match_parent" ns0:layout_height="0dip" ns0:layout_weight="1" ns0:background="@color/white">
+            <include layout="@layout/time_header_label" ns0:layout_width="match_parent" ns0:layout_height="@dimen/header_height" ns0:layout_gravity="center" />
+        </FrameLayout>
+        <View ns0:id="@+id/line" ns0:layout_width="match_parent" ns0:layout_height="1dip" ns0:background="@color/line_background" />
+        <Button ns0:id="@+id/done_button" ns0:background="@drawable/done_background_color" ns0:layout_width="match_parent" ns0:layout_height="wrap_content" ns0:minHeight="48dp" ns0:text="@string/done_label" ns0:textSize="@dimen/done_label_size" ns0:textColor="@color/done_text_color" />
+    </LinearLayout>
+    <com.android.datetimepicker.time.RadialPickerLayout ns0:id="@+id/time_picker" ns0:layout_width="@dimen/picker_dimen" ns0:layout_height="match_parent" ns0:layout_gravity="center" ns0:focusable="true" ns0:focusableInTouchMode="true" ns0:background="@color/circle_background" />
+</LinearLayout>

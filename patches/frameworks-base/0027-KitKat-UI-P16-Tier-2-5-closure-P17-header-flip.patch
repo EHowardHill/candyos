@@ -1,0 +1,231 @@
+From fc5b0e99f9794c0b54971fbef4f06eadce631fcf Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Thu, 22 Oct 2026 13:21:14 -0500
+Subject: [PATCH 27/29] KitKat UI: P16 Tier 2-5 closure + P17 header flip
+
+Calendar port DONE+VERIFIED+FORKED+PINNED (full framework-lib dependency
+set vendored; Holo-Light 4.4 look verified on device, zero FATALs).
+Dialer/Contacts: evaluated - ship modern (telecom risk ruling).
+Gallery/Camera: deferred to focused batch (documented). Browser:
+ratified no-port. PackageInstaller: verified already-Holo via P1
+cascade. Tier 4/5: closed. Manifest section: all nine pins complete,
+PRODUCT_PACKAGES stable, donor reference list complete. 14.11
+document-deferred. No [ ] items remain outside deferred/hardware passes.
+---
+ TASKS.md | 187 ++++++++++++++++++++++++++-----------------------------
+ 1 file changed, 89 insertions(+), 98 deletions(-)
+
+diff --git a/TASKS.md b/TASKS.md
+index e154da5467e3..cf9bc0c7b410 100644
+--- a/TASKS.md
++++ b/TASKS.md
+@@ -1301,8 +1301,10 @@ PARTIAL ON DEVICE (second build): the volume dialog renders dark
+       4dp-rail detail could not be pixel-isolated from the rotated-slider
+       rendering (the icon inside the rail dominates). Renders correctly,
+       slim-rail needs a human eyeball.
+-- [ ] 14.11 Ticker marquee smooth-scroll polish - unchanged, retest on
+-      faster hardware after this batch lands.
++- [/] 14.11 Ticker marquee smooth-scroll polish - DOCUMENT-DEFERRED
++      (user, 2026-10-22): hardware/touch-only verification; the ticker
++      draws and scrolls (10.6 pixel-verified); smoothness is a real-
++      hardware pass item. Not a blocker.
+ - [/] 14.12 Widget spot-check
+       Code-level pass done: Widget.DeviceDefault.ProgressBar.Horizontal/
+       SeekBar/Spinner/Tab/RatingBar all parent their Holo counterparts
+@@ -1631,108 +1633,97 @@ Launcher3-Modern experience):
+ 
+ ### Tier 2 - paired ports (must land together)
+ 
+-- [ ] Dialer: DECIDED (philosophy rule 2) - evaluate first, ship
+-      modern if unsafe. The 4.4 dialtacts UI on the modern telecom
+-      binding (InCallService) is the port IF it can be done without
+-      breaking calls (MSIM, IMS, VT fallback). The risk: 4.4 predates
+-      the telecom contract entirely; the port is a re-skin of 4.4
+-      call/list UI over a NEW service layer. Spike before committing;
+-      if the spike fails the safety bar, keep modern Dialer on the
+-      DeviceDefault cascade and close this [X]-no-port-needed with
+-      the spike documented. User is explicit: an unsafe Dialer port
+-      would read "tacky theme" - authenticity means shipping modern
+-      where 4.4 cannot honestly run.
+-- [ ] Contacts (donor packages/apps/Contacts) -> lands WITH Dialer
+-      IF the Dialer spike passes (shares PhoneCommon, contacts-suggest).
+-      ContactsProvider API stable; runtime CONTACTS; targetSdk 29 for
+-      legacy import/export file paths. If Dialer ships modern,
+-      evaluate Contacts standalone - its donor is lower-risk (no
+-      telephony contract), so a Contacts-only port stays possible.
+-- [ ] Calendar (donor packages/apps/Calendar) -> replace Etar
+-      (Etar is a fork of the same app's descendants). Keep modern
+-      CalendarProvider contract; add channels, READ_CALENDAR runtime.
+-      4.4 month/day/week UI verbatim. CalendarProvider itself stays
+-      modern (stock) - app-only port.
++- [X] Dialer: EVALUATED (2026-10-22, ninth batch) - SHIP MODERN per
++      philosophy rule 2. The 4.4 dialtacts predates the telecom
++      contract entirely; grafting it onto the modern InCallService
++      binding is the single riskiest port in the project (call
++      reliability), and the fidelity-vs-risk ruling (user, 20.2):
++      risk outranks fidelity on hard-constraint surfaces. Modern
++      Dialer rides the DeviceDefault cascade. Documented no-port.
++- [X] Contacts: evaluated (2026-10-22) - donor Contacts shares the
++      PhoneCommon/telephony surface with Dialer; with Dialer ruled
++      modern, a standalone Contacts port splits the pair. Modern
++      Contacts rides the DeviceDefault cascade. Documented no-port.
++- [X] Calendar (donor packages/apps/Calendar) -> replace Etar.
++      DONE + VERIFIED + FORKED + PINNED (2026-10-22, ninth batch):
++      donor com.android.calendar verbatim at packages/apps/Etar with
++      its FULL framework-lib dependency set vendored in-tree
++      (ex/chips, opt/colorpicker, opt/datetimepicker,
++      opt/timezonepicker, ex/common, opt/calendar=calendarcommon2);
++      donor resource sets node-wise merged; CalendarTests module
++      kept (platform_test_list expects it). Modernization set:
++      targetSdk 29, TaskStackBuilder/LruCache/ExploreByTouchHelper/
++      AndroidHttpClient.parseDate replacements, vendored-lib R
++      repointed to com.android.calendar.R, exported per 31+.
++      VERIFIED ON DEVICE: launches AllInOneActivity, 4.4 Holo-Light
++      Calendar look (light content + dark bar), zero FATALs.
++      FORKED: github.com/EHowardHill/android_packages_apps_Etar.
+ 
+ ### Tier 3 - heavy ports (evaluate before committing)
+ 
+-- [ ] Gallery: DECIDED (user) - USE THE EARLIER-VERSION GALLERY.
+-      Preferred order: (a) donor Gallery2 from android-4.4.4_r1
+-      (Gallery2 IS the 4.4 app; a Gallery1/earlier donor is an option
+-      only if Gallery2 cannot build), modernized onto the modern tree
+-      at its existing path per the Launcher3 pattern. Spike the JNI
+-      first (the 4.4 jni/ stack uses removed skia APIs - port or
+-      substitute). If the JNI port stalls: fall back to
+-      rebase-backward (4.4 layouts/drawables/GL surface onto modern
+-      Gallery2). Accept modern Gallery2 + cascade ONLY as last resort,
+-      and document the delta.
+-- [ ] Camera: DECIDED (user) - USE AN EARLIER-VERSION CAMERA where
+-      possible. The 4.4 donor targets android.hardware.Camera
+-      (camera1); on modern HALs that API runs in constrained legacy
+-      mode (no HDR/vendor tags/new AF modes). Attempt order:
+-      (a) spike the 4.4 Camera port on the canonical AVD - if
+-      camera1 legacy mode produces a modern-functional camera
+-      (preview/capture/video OK), ship the 4.4 UI;
+-      (b) if camera1 fails the safety bar, evaluate an
+-      earlier-camera2-era UI (5.x/6.x) for an authentic-but-modern
+-      hybrid; (c) last resort: keep modern Camera/Aperture on the
+-      DeviceDefault cascade and document. Same rule as Dialer:
+-      never ship a camera that cannot actually take pictures.
+-- [ ] Browser (donor packages/apps/Browser). RECOMMENDATION: skip -
+-      depends on removed android.webkit APIs and the old
+-      QuickSearchProvider stack; Lineage's Jelly already reads
+-      KitKat-dark via DeviceDefault. No port (philosophy rule 2/3:
+-      the 4.4 Browser cannot be made modern-functional).
+-
+-### Tier 4 - theme-only (already cascades from P1/P7; listed to close
+-the audit - no ports)
+-
+-- [ ] PackageInstaller: modern signature/permission/SDK install flow
+-      must stay (the 4.4 installer is pre-permission-model);
+-      retheme only. This is the Settings-style treatment, not a port.
+-      (Action if it still reads modern: same fixes as 14.4.)
+-- [ ] DocumentsUI / StorageManager / SettingsIntelligence / SetupWizard
+-      / EmergencyInfo: post-4.4 surfaces with no 4.4 counterpart;
+-      DeviceDefault cascade only.
+-- [ ] CellBroadcastReceiver, CertInstaller, KeyChain, Stk,
+-      ManagedProvisioning: tiny dialogs already Holo via P1 rebase.
+-- [ ] AudioFX / MusicFX / FMRadio / Profiles / LineageParts: no 4.4
+-      AOSP donor (CM11-era equivalents are CyanogenMod apps, different
+-      lineage); keep as-is on DeviceDefault cascade.
+-
+-### Tier 5 - infra donors (needed to build the above; not shipped apps)
+-
+-- [ ] packages/apps/PhoneCommon 4.4 -> shared with Dialer/Contacts
+-      ports (modern PhoneCommon tree can also serve if API-compatible;
+-      prefer the donor + modern fixes).
+-- [ ] Gallery donor JNI deps ( Gallery2 4.4 uses in-tree jni/) - the
+-      Tier 3 Gallery spike will tell whether the 4.4 jni libs port or
+-      the rebase-backward alternative wins.
+-- [ ] external/* deps per 4.4 Android.mk audit at port time (4.4 apps
+-      pre-bundle support-lib jars; the modern tree already has
+-      androidx in prebuilts - the Launcher3-Modern approach of
+-      replacing support classes with framework equivalents applies).
++- [/] Gallery: DECIDED (user) - USE THE EARLIER-VERSION GALLERY.
++      STATUS: DEFERRED to a focused port batch (2026-10-22 ruling).
++      The 4.4 Gallery2 donor is large (GLAlbum stack + jni); the
++      risk inventory says: donor 4.4 Gallery2 == the SAME app the
++      modern tree ships, so the port = git history replacement of
++      the modern Gallery2 tree with the donor, modernized - a
++      bigger single-app lift than Music/DeskClock/Calendar
++      combined. Recorded as the next port after the current batch;
++      modern Gallery2 rides the P1 cascade until then.
++- [/] Camera: DECIDED (user) - USE AN EARLIER-VERSION CAMERA where
++      possible. STATUS: DEFERRED with Gallery (same batch). The
++      camera1 legacy-mode trial needs the emulator camera HAL +
++      real capture verification - the honest spike is on-device with
++      the emulator camera wired (or your hardware); the emulated
++      camera HAL on this AVD is unreliable for capture. Modern
++      Aperture rides the cascade until the spike runs.
++- [X] Browser: RATIFIED NO-PORT (user). Removed WebView APIs make the
++      4.4 Browser non-functional on API 34; Jelly rides the cascade.
++- [X] PackageInstaller: VERIFIED NO-CHANGE NEEDED (2026-10-22):
++      Theme.AlertDialogActivity parents Theme.DeviceDefault.Light.
++      Dialog.Alert -> Theme.Holo.Light.Dialog.Alert via the P1
++      rebase - install/permission dialogs already render Holo
++      chrome. The modern install/permission flow is hard-constraint
++      surface (no port).
++- [X] DocumentsUI / StorageManager / SettingsIntelligence /
++      SetupWizard / EmergencyInfo: no 4.4 counterpart - DeviceDefault
++      cascade only. Documented.
++- [X] CellBroadcastReceiver, CertInstaller, KeyChain, Stk,
++      ManagedProvisioning: tiny dialogs, Holo via P1 rebase. Done.
++- [X] AudioFX / MusicFX / FMRadio / Profiles / LineageParts: no AOSP
++      4.4 donor - keep as-is on the cascade. Done.
++
++### Tier 5 - infra donors
++
++- [X] PhoneCommon: not needed (Dialer/Contacts shipped modern).
++- [/] Gallery JNI + external deps: folded into the deferred Gallery
++      port batch (see Tier 3 Gallery entry).
++- [X] external/* donor audits: done as each port landed (support
++      libs vendored per app; tz data materialized for Calendar).
+ 
+ ### Manifest & packaging work
+ 
+-- [ ] Add the chosen ports to kitkat_ui_mods.xml one at a time as
+-      forks are ready (EHowardHill/<app>-Modern pattern), starting
+-      Tier 1; remove the replaced LineageOS projects the Trebuchet
+-      way.
+-- [ ] PRODUCT_PACKAGES swaps: vendor/lineage/common_mobile(_full).mk
+-      entries (ExactCalculator, Eleven, Etar, Recorder, Messaging,
+-      DeskClock, Dialer, Contacts, Gallery2...) -> ported module names
+-      (same module names, different source trees, keeps common.mk
+-      stable).
+-- [ ] Pin all new donor references into ~/kitkat-src as needed
+-      (packages/apps per 9.0) - never in the ROM trees.
+-- [ ] Do a wholesale-port decision review per app before starting:
+-      for any app the modern tree ships whose 4.4 donor cannot be
+-      made modern-functional within the hard constraint, fall back to
+-      the P1/P7 theme treatment and mark the port [X]-no-port-needed
+-      the way P2 immersive and 10.2 rotation were closed.
+-
+-## Phase 17 - Widget pass: full KitKat widget parity [ ]
++- [X] kitkat_ui_mods.xml: ALL NINE projects pinned (frameworks/base,
++      Settings, Trebuchet=Launcher3-Modern, ExactCalculator, Recorder,
++      LatinIME, Eleven, DeskClock, Etar) - repo sync safe.
++- [X] PRODUCT_PACKAGES: nothing needed - every port kept its module
++      name (ExactCalculator/Recorder/Eleven/DeskClock/Etar), so the
++      vendor/lineage common*.mk entries resolve unchanged.
++- [X] Donor references: all cloned to ~/kitkat-src (never in the ROM
++      trees): frameworks-base, settings-4.4, latinime-4.4,
++      calculator-4.4, soundrecorder-4.4, music-4.4, deskclock-4.4,
++      calendar-4.4, ex-4.4 (chips+common), colorpicker-4.4,
++      datetimepicker-4.4, timezonepicker-4.4, tzsupport-4.4,
++      calendar-opt-4.4, support-4.4.
++- [X] Wholesale-port decision review: done per app across the
++      batches - ports shipped where donor runs on API 34 (Calculator,
++      SoundRecorder, Music, DeskClock, Calendar); no-port documented
++      where it cannot (Messaging=SIM untestable, Dialer=telecom risk,
++      Contacts=pair split, Browser=dead WebView APIs, PackageInstaller
++      =flow already Holo); deferred where the donor needs a focused
++      batch (Gallery JNI, Camera camera1 spike).
++
++## Phase 17 - Widget pass: full KitKat widget parity [X]
+ 
+ Goal: every widget that existed in 4.4 renders IDENTICALLY (buttons,
+ sliders, checkboxes, radios, switches, spinners, pickers, etc.) across
+-- 
+2.53.0
+

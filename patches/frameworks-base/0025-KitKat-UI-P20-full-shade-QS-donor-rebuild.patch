@@ -1,0 +1,992 @@
+From b5780aae24f03c0df3fe5d497b43e09376e89915 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Thu, 22 Oct 2026 09:08:58 -0500
+Subject: [PATCH 25/29] KitKat UI P20: full shade/QS donor rebuild
+
+- 20.2a NotificationShadeDepthController.shouldApplyShadeBlur -> false
+  (shade blur/zoom off; keyguard pipeline untouched) - risk-ruled
+  approximation per user decision.
+- 20.2c NotificationsQSContainerController: shade_bottom_handle rides
+  the expansion edge (donor NotificationPanelView.draw semantics) via
+  ShadeExpansionStateManager listener.
+- 20.3 FooterView.setFooterLabelVisible: normal path keeps BOTH
+  buttons hidden (legacy branch re-showed them every layout pass,
+  defeating the 18.3 ViewModel hide) - donor had no footer buttons.
+- 20.4 combined_qs_header: donor 50dp ic_notify_settings +
+  ic_notify_button_bg on both header buttons (art ported per density).
+- 20.6 qs_tile_margin_* 8dp -> 4dp (donor quick_settings_cell_gap).
+- 20.7 shadeActive/shadeInactive #2d2d2d -> #ff161616 (donor
+  qs_tile_background flat color), ripple color -> #ff212121 donor
+  press, square tile corners.
+- 20.8 QSPanel.setBrightnessView: inline slider NOT attached (tile +
+  dialog per donor) - plumbing intact, one-line revert.
+- 20.9 TextAppearance.StatusBar.Expanded.Clock/.Date -> donor values
+  (32dp light white / 12dp #cccccc caps); header clock/date pill.
+- 20.10 quick_settings_tiles_default -> donor set+order (user,
+  brightness, settings, wifi, cell, battery, bt, location, rotation);
+  KitKat{Brightness,Settings,User}Tile + KitKatQSTilesModule added.
+- 20.1 (LatinIME fork) functionalTextColor -> white: ?123/ABC layout
+  keys were painting transparent (blank toggle keys).
+Verified on emulator: donor 3-col grid with 4dp gaps + #161616 flat
+tiles on gradient page, footer buttons gone, toggle keys render,
+zero FATALs.
+---
+ .../ic_notify_settings_normal.png             | Bin 0 -> 1821 bytes
+ .../ic_notify_settings_normal.png             | Bin 0 -> 1251 bytes
+ .../ic_notify_settings_normal.png             | Bin 0 -> 2568 bytes
+ .../ic_notify_settings_normal.png             | Bin 0 -> 3247 bytes
+ .../res/drawable/ic_notify_settings.xml       |  23 ++++
+ .../res/drawable/qs_tile_background.xml       |   3 +-
+ .../res/drawable/qs_tile_background_shape.xml |   3 +-
+ .../res/layout/combined_qs_header.xml         |  38 ++++---
+ packages/SystemUI/res/values/config.xml       |  10 +-
+ packages/SystemUI/res/values/dimens.xml       |   3 +-
+ packages/SystemUI/res/values/strings.xml      |   4 +
+ packages/SystemUI/res/values/styles.xml       |  22 ++--
+ .../dagger/ReferenceSystemUIModule.java       |   2 +
+ .../src/com/android/systemui/qs/QSPanel.java  |  14 ++-
+ .../qs/tiles/KitKatBrightnessTile.java        |  86 +++++++++++++++
+ .../systemui/qs/tiles/KitKatQSTilesModule.kt  |  33 ++++++
+ .../systemui/qs/tiles/KitKatSettingsTile.java |  79 ++++++++++++++
+ .../systemui/qs/tiles/KitKatUserTile.java     | 103 ++++++++++++++++++
+ .../NotificationsQSContainerController.kt     |  25 +++++
+ .../NotificationShadeDepthController.kt       |   7 +-
+ .../footer/ui/view/FooterView.java            |  10 +-
+ 21 files changed, 428 insertions(+), 37 deletions(-)
+ create mode 100644 packages/SystemUI/res/drawable-hdpi/ic_notify_settings_normal.png
+ create mode 100644 packages/SystemUI/res/drawable-mdpi/ic_notify_settings_normal.png
+ create mode 100644 packages/SystemUI/res/drawable-xhdpi/ic_notify_settings_normal.png
+ create mode 100644 packages/SystemUI/res/drawable-xxhdpi/ic_notify_settings_normal.png
+ create mode 100644 packages/SystemUI/res/drawable/ic_notify_settings.xml
+ create mode 100644 packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatBrightnessTile.java
+ create mode 100644 packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatQSTilesModule.kt
+ create mode 100644 packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatSettingsTile.java
+ create mode 100644 packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatUserTile.java
+
+diff --git a/packages/SystemUI/res/drawable-hdpi/ic_notify_settings_normal.png b/packages/SystemUI/res/drawable-hdpi/ic_notify_settings_normal.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..693abf54bdd2959a8ad7b11a4fdc38fb575090bd
+GIT binary patch
+literal 1821
+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
+
+literal 0
+HcmV?d00001
+
+diff --git a/packages/SystemUI/res/drawable-mdpi/ic_notify_settings_normal.png b/packages/SystemUI/res/drawable-mdpi/ic_notify_settings_normal.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..15340d37d9c6b04dccbe919713eff18a01719fef
+GIT binary patch
+literal 1251
+zcmZ`(dsGs36#gM%sFiupP%1_#St<thFwIpO23VSqoU+nsf*my#g+hr6YU(sM2`inI
+zk<h7pv6L1FB4x{bpeyaTtjKivAPc8<e2ika|MthuJ>UJ#{qFtF{p;R>s7TTh2b2Q<
+zU<rjxq*)oW0Jxnsvw6H}E7=|ki3kDUUa_M&0cNcsY#J#P)OD>KTbN8F(;@)itpz~v
+zJpl7oNiYh)2|NJCcmRUR06?;?HBy7E4ZEXzNJL;+2uaiJ602g*BFC_;O#T<U+fug!
+z0BxWUL!uA1)RyWmyr8?a?r1(`a`C9Fy)*{v2@{58ga!^i%1x`H6IIEp{A!rXzdB#s
+zs$f5R5-NiC6PJ00+am(0e^k1=`nVK?qK0`U{$aDWyQ$mMsaJ8!7cHIPcICurM*_P$
+zRIUh-Y_>*l@?MiMgicTVu<`~wII5+s3=@PvIe2UnjtJMwKMOl_a;zxAgF-gW&d5?4
+zeeRB!x|{mK<6=q=c@#aqGx@rA#(w71b|rTpF#hVu3nk{zhZ^pk^R@MA*f^{rGTwW@
+zZ$cu^RieJBOzXa1*s=-Y^3bKXVfAr_!`9)q_+ARnFnI_msq&7|9-E*ir0PRE{DN)y
+zfDhrr_)Z!)A3hG23#WAA_h{Hs8@2GN?v>6<w@bHCSFLN+^|jg2>6-y@IueTfI81jm
+z!;UXHQ$P9L@o{IUGCiu;{m;08LOHYggaxhvX2h>{ca7@gzh{(E-fvXHXR}O}O!4x3
+zGu>a6@A+oZz-bq28yGLAxDB<CTi_*j>?94nev8)_gi=~EC_b9@P;)!jgcUXKDKGHt
+z0E5#FNuRui9K|Qe<@@rkV6R`~bPg5u**w-Tmy7piPm;4&L!ZWF>uqk1Gbtvl+?Uc{
+zniAG~;k4mGk9NbD>)HIjRL=KrQ3a0>Bpi$WJe|@fuKY6mbJiKIc@=tbVxO;ibZ+d(
+z0LsPDuy~&@Wxg}~eAn6`=KG@i4Fwi~j4l3pNpWjp`j=&N`sLVqqw#^O(xKC{25B>e
+zDbA1G2Xng8^eI$9Yv1Di4vvbhi;!4)d)g0(+)TIq?m0ovdVYP`dBAr6Q#9G!3{eZV
+z^<r}_wdQAv*32tRtW3l?R@;;`Od=<s6YI#=_2d@vhdwqY2?&j3{|cX1796oj5m4=%
+zyDpL-Z9MWMS&FI<D`HD752_f!nykYoR3uup=3Koy4*4|Tc~N84ivGfpR{AC>^<%c<
+z1a3k$!d<B^hVIz^V92ND?N8EN(jLph7{%U{))}5iV}DJ0rsy>=Naiqed5ux;qPM}v
+zA?eiSa;<FzY$<dD#DpIV@%Kh#F-i&k*s&hY18?mPG3SP2n7RV1y~$mI6<#r#)4g`y
+zoMmM;$3jQLd21kgr{}K|%gPE7X(b#F;SWF^&67_6DNsCt45-C(7Q5jR{^)F1@JA74
+zSB~NLZwruaN$u!?^?7Hb)H<wD`;5=3<0|bT4At(#Z`MV4#>!H2PJj7PFpngyV!XqA
+zPDNYq7|RJe$YCUKm_dnIOe+C@JYge_K)~TQM-u{q`~!nFZo%QV2I2996t{x^7}7Er
+z$w@i?Z`c_i*=#kqFKpPKk;LI9WHCVqBjYF&LrF_G#-uS57&)13%!OwIC}EMry3qJ@
+F{{Wr9Eam_J
+
+literal 0
+HcmV?d00001
+
+diff --git a/packages/SystemUI/res/drawable-xhdpi/ic_notify_settings_normal.png b/packages/SystemUI/res/drawable-xhdpi/ic_notify_settings_normal.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..e3cc9b0307f6df51c843227cc931c388d4ffcbbf
+GIT binary patch
+literal 2568
+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
+a@FzME3BIwBeZ=3548U00S=5>1Q~m>;sH_11
+
+literal 0
+HcmV?d00001
+
+diff --git a/packages/SystemUI/res/drawable-xxhdpi/ic_notify_settings_normal.png b/packages/SystemUI/res/drawable-xxhdpi/ic_notify_settings_normal.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..e15981adfbf6433b93a3cdc0e9857d2de35a9712
+GIT binary patch
+literal 3247
+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
+
+literal 0
+HcmV?d00001
+
+diff --git a/packages/SystemUI/res/drawable/ic_notify_settings.xml b/packages/SystemUI/res/drawable/ic_notify_settings.xml
+new file mode 100644
+index 000000000000..9303ca4c3d60
+--- /dev/null
++++ b/packages/SystemUI/res/drawable/ic_notify_settings.xml
+@@ -0,0 +1,23 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!-- Copyright (C) 2012 The Android Open Source Project
++
++     Licensed under the Apache License, Version 2.0 (the "License");
++     you may not use this file except in compliance with the License.
++     You may obtain a copy of the License at
++
++          http://www.apache.org/licenses/LICENSE-2.0
++
++     Unless required by applicable law or agreed to in writing, software
++     distributed under the License is distributed on an "AS IS" BASIS,
++     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++     See the License for the specific language governing permissions and
++     limitations under the License.
++-->
++
++<selector xmlns:android="http://schemas.android.com/apk/res/android">
++    <item android:state_pressed="true"
++         android:drawable="@drawable/ic_notify_settings_normal" />
++    <item
++         android:drawable="@drawable/ic_notify_settings_normal" />
++</selector>
++
+diff --git a/packages/SystemUI/res/drawable/qs_tile_background.xml b/packages/SystemUI/res/drawable/qs_tile_background.xml
+index ef3c61bda15a..9a3586e7b304 100644
+--- a/packages/SystemUI/res/drawable/qs_tile_background.xml
++++ b/packages/SystemUI/res/drawable/qs_tile_background.xml
+@@ -14,8 +14,9 @@
+   ~ See the License for the specific language governing permissions and
+   ~ limitations under the License.
+   -->
++<!-- KitKat UI P20.7: donor press = flat #212121 lighten (no ripple). -->
+ <ripple xmlns:android="http://schemas.android.com/apk/res/android"
+-    android:color="@color/qs_tile_ripple_color">
++    android:color="#ff212121">
+     <item android:id="@android:id/mask"
+         android:drawable="@drawable/qs_tile_background_shape"
+         />
+diff --git a/packages/SystemUI/res/drawable/qs_tile_background_shape.xml b/packages/SystemUI/res/drawable/qs_tile_background_shape.xml
+index f6b68347124e..44ef3f3dbe1e 100644
+--- a/packages/SystemUI/res/drawable/qs_tile_background_shape.xml
++++ b/packages/SystemUI/res/drawable/qs_tile_background_shape.xml
+@@ -16,6 +16,7 @@
+   -->
+ 
+ <shape xmlns:android="http://schemas.android.com/apk/res/android">
+-    <corners android:radius="@dimen/qs_corner_radius" />
++    <!-- KitKat UI P20.7: donor tiles were square. -->
++    <corners android:radius="0dp" />
+     <solid android:color="#FFFFFF" />
+ </shape>
+\ No newline at end of file
+diff --git a/packages/SystemUI/res/layout/combined_qs_header.xml b/packages/SystemUI/res/layout/combined_qs_header.xml
+index 554f00dbb6a3..1d7dfd478b09 100644
+--- a/packages/SystemUI/res/layout/combined_qs_header.xml
++++ b/packages/SystemUI/res/layout/combined_qs_header.xml
+@@ -90,31 +90,34 @@ frame when animating QS <-> QQS transition
+         android:contentDescription="@string/shade_header_user_avatar_description"
+         android:src="@drawable/kitkat_qs_user_avatar" />
+ 
++    <!-- KitKat UI P20.9: donor header clock+date - the 4.4
++         status_bar_expanded_header put clock and date inside a
++         non-pressable ic_notify_button_bg pill (enabled=false) with the
++         donor Expanded.Clock/.Date typography. -->
+     <com.android.systemui.statusbar.policy.Clock
+         android:id="@+id/clock"
+         android:layout_width="wrap_content"
+-        android:layout_height="0dp"
++        android:layout_height="wrap_content"
+         android:gravity="start|center_vertical"
+-        android:paddingStart="@dimen/status_bar_left_clock_starting_padding"
+-        android:paddingEnd="@dimen/status_bar_left_clock_end_padding"
++        android:paddingStart="8dp"
++        android:paddingEnd="8dp"
++        android:background="@drawable/ic_notify_button_bg"
++        android:enabled="false"
+         android:singleLine="true"
+         android:textDirection="locale"
+-        android:textAppearance="@style/TextAppearance.QS.Status"
+-        android:transformPivotX="0dp"
+-        android:transformPivotY="24dp"
+-        android:scaleX="1"
+-        android:scaleY="1"
++        android:textAppearance="@style/TextAppearance.StatusBar.Expanded.Clock"
+     />
+ 
+     <com.android.systemui.statusbar.policy.VariableDateView
+         android:id="@+id/date"
+         android:layout_width="wrap_content"
+-        android:layout_height="0dp"
++        android:layout_height="wrap_content"
+         android:layout_gravity="start|center_vertical"
+         android:gravity="center_vertical"
++        android:layout_marginStart="8dp"
+         android:singleLine="true"
+         android:textDirection="locale"
+-        android:textAppearance="@style/TextAppearance.QS.Status"
++        android:textAppearance="@style/TextAppearance.StatusBar.Expanded.Date"
+         app:longDatePattern="@string/abbrev_wday_month_day_no_year_alarm"
+         app:shortDatePattern="@string/abbrev_month_day_no_year"
+     />
+@@ -188,8 +191,8 @@ frame when animating QS <-> QQS transition
+          footer button used. -->
+     <ImageButton
+         android:id="@+id/shade_header_clear_all_button"
+-        android:layout_width="@dimen/large_screen_shade_header_min_height"
+-        android:layout_height="@dimen/large_screen_shade_header_min_height"
++        android:layout_width="50dp"
++        android:layout_height="50dp"
+         android:src="@drawable/ic_notify_clear"
+         android:scaleType="center"
+         android:background="@drawable/ic_notify_button_bg"
+@@ -202,13 +205,16 @@ frame when animating QS <-> QQS transition
+           start of the privacy chip so the two never overlap; carried into the
+           qqs_header/qs_header/large_screen_shade_header constraint sets so the
+           MotionLayout transitions leave it in place. -->
++    <!-- KitKat UI P20.4: donor settings glyph (ic_notify_settings, NOT the
++         modern gear) on the donor ic_notify_button_bg press 9-patch;
++         donor 50x50dp size. Behavior unchanged (15.3: tap = flip QS). -->
+     <ImageButton
+         android:id="@+id/shade_header_settings_button"
+-        android:layout_width="@dimen/shade_header_settings_button_width"
+-        android:layout_height="@dimen/large_screen_shade_header_min_height"
+-        android:src="@drawable/ic_settings"
++        android:layout_width="50dp"
++        android:layout_height="50dp"
++        android:src="@drawable/ic_notify_settings"
+         android:scaleType="center"
+-        android:background="?android:attr/selectableItemBackgroundBorderless"
++        android:background="@drawable/ic_notify_button_bg"
+         android:contentDescription="@string/shade_header_settings_button_description"
+         app:layout_constraintEnd_toStartOf="@id/privacy_container"
+         app:layout_constraintTop_toTopOf="parent" />
+diff --git a/packages/SystemUI/res/values/config.xml b/packages/SystemUI/res/values/config.xml
+index d96391191f7f..22af5a25f566 100644
+--- a/packages/SystemUI/res/values/config.xml
++++ b/packages/SystemUI/res/values/config.xml
+@@ -97,8 +97,16 @@
+     <!-- The number of columns that the top level tiles span in the QuickSettings -->
+ 
+     <!-- The default tiles to display in QuickSettings -->
++    <!-- KitKat UI P20.10: the DONOR 4.4 phone QS tile set + order
++         (QuickSettings.setupQuickSettings: user, brightness, settings,
++         wifi, cell/rssi, battery, bluetooth, location, rotation).
++         20.8: brightness opens the donor quick_settings_brightness_
++         dialog (tile spec "brightness" -> dialog launch, no inline
++         slider). 20.7/20.6: flat #161616/#212121-press square tiles,
++         4dp gaps, 3 columns. Modern-only tiles dropped from the grid
++         per user ruling (toggles stay reachable in Settings). -->
+     <string name="quick_settings_tiles_default" translatable="false">
+-        internet,bt,flashlight,dnd,alarm,airplane,controls,wallet,rotation,battery,cast,screenrecord,mictoggle,cameratoggle,custom(com.android.permissioncontroller/.permission.service.v33.SafetyCenterQsTileService)
++        user,brightness,settings,wifi,cell,battery,bt,location,rotation
+     </string>
+ 
+     <!-- The class path of the Safety Quick Settings Tile -->
+diff --git a/packages/SystemUI/res/values/dimens.xml b/packages/SystemUI/res/values/dimens.xml
+index 529299b7ead9..12f31a8f46cc 100644
+--- a/packages/SystemUI/res/values/dimens.xml
++++ b/packages/SystemUI/res/values/dimens.xml
+@@ -662,7 +662,8 @@
+     <dimen name="qs_corner_radius">2dp</dimen>
+     <!-- KitKat UI Project (P10): 4.4 QS cell height (donor quick_settings_cell_height) -->
+     <dimen name="qs_tile_height">110dp</dimen>
+-    <dimen name="qs_tile_margin_horizontal">8dp</dimen>
++    <!-- KitKat UI P20.6: donor quick_settings_cell_gap = 4dp. -->
++    <dimen name="qs_tile_margin_horizontal">4dp</dimen>
+     <dimen name="qs_tile_margin_vertical">@dimen/qs_tile_margin_horizontal</dimen>
+     <dimen name="qs_tile_margin_top_bottom">4dp</dimen>
+     <dimen name="qs_brightness_margin_top">8dp</dimen>
+diff --git a/packages/SystemUI/res/values/strings.xml b/packages/SystemUI/res/values/strings.xml
+index 7c5bd3ba74fe..2aace12aed74 100644
+--- a/packages/SystemUI/res/values/strings.xml
++++ b/packages/SystemUI/res/values/strings.xml
+@@ -754,6 +754,10 @@
+     <string name="quick_settings_cast_no_network">No Wi\u2011Fi or Ethernet connection</string>
+     <!-- QuickSettings: Brightness dialog title [CHAR LIMIT=NONE] -->
+     <string name="quick_settings_brightness_dialog_title">Brightness</string>
++    <!-- KitKat UI P20.8/P20.10: donor 4.4 QS tile labels. -->
++    <string name="quick_settings_brightness_label">Brightness</string>
++    <string name="quick_settings_settings_label">Settings</string>
++    <string name="quick_settings_user_label">Me</string>
+     <!-- QuickSettings: Label for the toggle that controls whether display inversion is enabled. [CHAR LIMIT=NONE] -->
+     <string name="quick_settings_inversion_label">Color inversion</string>
+     <!-- QuickSettings: Label for the toggle that controls whether display color correction is enabled. [CHAR LIMIT=NONE] -->
+diff --git a/packages/SystemUI/res/values/styles.xml b/packages/SystemUI/res/values/styles.xml
+index 71f9eaaf86e5..a956366e6d3f 100644
+--- a/packages/SystemUI/res/values/styles.xml
++++ b/packages/SystemUI/res/values/styles.xml
+@@ -33,18 +33,21 @@
+         <item name="android:textColor">?android:attr/textColorTertiary</item>
+     </style>
+ 
++    <!-- KitKat UI P20.9: donor TextAppearance.StatusBar.Expanded.Clock/.Date
++         (status_bar_expanded_header.xml values) - 32dp sans-serif-light
++         white clock, 12dp #cccccc all-caps date. -->
+     <style name="TextAppearance.StatusBar.Expanded.Clock">
+-        <item name="android:textSize">@dimen/qs_time_expanded_size</item>
+-        <item name="android:fontFamily">@*android:string/config_headlineFontFamilyMedium</item>
+-        <item name="android:textColor">?android:attr/textColorPrimary</item>
++        <item name="android:textSize">32dp</item>
++        <item name="android:fontFamily">sans-serif-light</item>
+         <item name="android:textStyle">normal</item>
++        <item name="android:textColor">#ffffff</item>
+     </style>
+ 
+     <style name="TextAppearance.StatusBar.Expanded.Date">
+-        <item name="android:textSize">@dimen/qs_time_expanded_size</item>
++        <item name="android:textSize">12dp</item>
+         <item name="android:textStyle">normal</item>
+-        <item name="android:textColor">?android:attr/textColorPrimary</item>
+-        <item name="android:fontFamily">@*android:string/config_bodyFontFamily</item>
++        <item name="android:textColor">#cccccc</item>
++        <item name="android:textAllCaps">true</item>
+     </style>
+ 
+     <style name="TextAppearance.StatusBar.Expanded.AboveDateTime">
+@@ -451,10 +454,13 @@
+              states (no monet primary90 light-fill for active), and the
+              active/inactive distinction moves to white vs gray text and
+              icon tint, as on the 4.4 quick settings panel. -->
+-        <item name="shadeActive">#ff2d2d2d</item>
++        <!-- KitKat UI P20.7: donor qs_tile_background.xml - flat color
++             selector #161616 at rest / #212121 pressed (not #ff2d2d2d).
++             Active/inactive distinction stays text/icon tint (4.4). -->
++        <item name="shadeActive">#ff161616</item>
+         <item name="onShadeActive">#ffffffff</item>
+         <item name="onShadeActiveVariant">#ffb3b3b3</item>
+-        <item name="shadeInactive">#ff2d2d2d</item>
++        <item name="shadeInactive">#ff161616</item>
+         <item name="onShadeInactive">#ffb3b3b3</item>
+         <item name="onShadeInactiveVariant">#ff808080</item>
+         <item name="shadeDisabled">@color/shade_disabled</item>
+diff --git a/packages/SystemUI/src/com/android/systemui/dagger/ReferenceSystemUIModule.java b/packages/SystemUI/src/com/android/systemui/dagger/ReferenceSystemUIModule.java
+index a4011fd7718c..be504d56b690 100644
+--- a/packages/SystemUI/src/com/android/systemui/dagger/ReferenceSystemUIModule.java
++++ b/packages/SystemUI/src/com/android/systemui/dagger/ReferenceSystemUIModule.java
+@@ -26,6 +26,7 @@ import com.android.keyguard.KeyguardViewController;
+ import com.android.systemui.ScreenDecorationsModule;
+ import com.android.systemui.accessibility.SystemActionsModule;
+ import com.android.systemui.battery.BatterySaverModule;
++import com.android.systemui.qs.tiles.KitKatQSTilesModule;
+ import com.android.systemui.display.ui.viewmodel.ConnectingDisplayViewModel;
+ import com.android.systemui.dock.DockManager;
+ import com.android.systemui.dock.DockManagerImpl;
+@@ -96,6 +97,7 @@ import javax.inject.Named;
+ @Module(includes = {
+         AospPolicyModule.class,
+         BatterySaverModule.class,
++        KitKatQSTilesModule.class,
+         CollapsedStatusBarFragmentStartableModule.class,
+         ConnectingDisplayViewModel.StartableModule.class,
+         GestureModule.class,
+diff --git a/packages/SystemUI/src/com/android/systemui/qs/QSPanel.java b/packages/SystemUI/src/com/android/systemui/qs/QSPanel.java
+index a321e6a4dac2..5ae8d1c941a4 100644
+--- a/packages/SystemUI/src/com/android/systemui/qs/QSPanel.java
++++ b/packages/SystemUI/src/com/android/systemui/qs/QSPanel.java
+@@ -221,18 +221,20 @@ public class QSPanel extends LinearLayout {
+      * Used to add the brightness slider after construction.
+      */
+     public void setBrightnessView(@NonNull View view) {
++        // KitKat UI Project (P20.8): the donor phone QS had NO inline
++        // brightness slider above the grid - brightness is a TILE that
++        // opens the brightness dialog (KitKatBrightnessTile). Do not attach
++        // the slider view to the panel; keep the reference plumbing intact
++        // (QSPanelController/mirrors still function) so re-enabling is a
++        // one-line revert.
++        view.setVisibility(View.GONE);
+         if (mBrightnessView != null) {
+             removeView(mBrightnessView);
+             mChildrenLayoutTop.remove(mBrightnessView);
+             mMovableContentStartIndex--;
+         }
+-        addView(view, 0);
+-        mBrightnessView = view;
++        mBrightnessView = null;
+         mAutoBrightnessView = view.findViewById(R.id.brightness_icon);
+-
+-        setBrightnessViewMargin();
+-
+-        mMovableContentStartIndex++;
+     }
+ 
+     private void setBrightnessViewMargin() {
+diff --git a/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatBrightnessTile.java b/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatBrightnessTile.java
+new file mode 100644
+index 000000000000..4a4d9b275727
+--- /dev/null
++++ b/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatBrightnessTile.java
+@@ -0,0 +1,86 @@
++package com.android.systemui.qs.tiles;
++
++import android.content.Intent;
++import android.os.Handler;
++import android.os.Looper;
++import android.provider.Settings;
++import android.service.quicksettings.Tile;
++
++import javax.inject.Inject;
++import android.view.View;
++
++import androidx.annotation.Nullable;
++
++
++import com.android.internal.logging.MetricsLogger;
++import com.android.systemui.dagger.qualifiers.Background;
++import com.android.systemui.dagger.qualifiers.Main;
++import com.android.systemui.plugins.ActivityStarter;
++import com.android.systemui.plugins.FalsingManager;
++import com.android.systemui.plugins.qs.QSTile.BooleanState;
++import com.android.systemui.plugins.statusbar.StatusBarStateController;
++import com.android.systemui.qs.QSHost;
++import com.android.systemui.qs.QsEventLogger;
++import com.android.systemui.qs.logging.QSLogger;
++import com.android.systemui.qs.tileimpl.QSTileImpl;
++import com.android.systemui.R;
++
++/**
++ * KitKat UI Project (P20.8): donor 4.4 brightness TILE. The 4.4 phone QS
++ * (QuickSettings.setupQuickSettings) had no inline brightness slider - a
++ * tile opened the brightness dialog on tap. This tile opens the SystemUI
++ * BrightnessDialog (donor-restyled in the P4 batch).
++ */
++public class KitKatBrightnessTile extends QSTileImpl<BooleanState> {
++
++    public static final String TILE_SPEC = "brightness";
++
++    private static final Intent BRIGHTNESS_DIALOG_INTENT =
++            new Intent("com.android.systemui.settings.brightness.BrightnessDialog")
++                    .setPackage("com.android.systemui")
++                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
++
++    @Inject
++    public KitKatBrightnessTile(
++            QSHost host,
++            QsEventLogger uiEventLogger,
++            @Background Looper backgroundLooper,
++            @Main Handler mainHandler,
++            FalsingManager falsingManager,
++            MetricsLogger metricsLogger,
++            StatusBarStateController statusBarStateController,
++            ActivityStarter activityStarter,
++            QSLogger qsLogger) {
++        super(host, uiEventLogger, backgroundLooper, mainHandler, falsingManager, metricsLogger,
++                statusBarStateController, activityStarter, qsLogger);
++    }
++
++    @Override
++    public BooleanState newTileState() {
++        return new BooleanState();
++    }
++
++    @Override
++    protected void handleClick(@Nullable View view) {
++        // Donor behavior: open the brightness dialog.
++        mActivityStarter.postStartActivityDismissingKeyguard(BRIGHTNESS_DIALOG_INTENT, 0);
++    }
++
++    @Override
++    public Intent getLongClickIntent() {
++        return new Intent(Settings.ACTION_DISPLAY_SETTINGS);
++    }
++
++    @Override
++    public CharSequence getTileLabel() {
++        return mContext.getString(R.string.quick_settings_brightness_label);
++    }
++
++    @Override
++    protected void handleUpdateState(BooleanState state, Object arg) {
++        state.value = true;
++        state.state = Tile.STATE_INACTIVE;
++        state.label = mContext.getString(R.string.quick_settings_brightness_label);
++        state.icon = ResourceIcon.get(R.drawable.ic_brightness);
++    }
++}
+\ No newline at end of file
+diff --git a/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatQSTilesModule.kt b/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatQSTilesModule.kt
+new file mode 100644
+index 000000000000..0f08d65e6209
+--- /dev/null
++++ b/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatQSTilesModule.kt
+@@ -0,0 +1,33 @@
++package com.android.systemui.qs.tiles
++
++import com.android.systemui.qs.tileimpl.QSTileImpl
++import dagger.Module
++import dagger.Provides
++import dagger.multibindings.IntoMap
++import dagger.multibindings.StringKey
++
++/**
++ * KitKat UI Project (P20.8/P20.10): binds the donor 4.4 QS tiles into the
++ * tile map - brightness (opens the donor brightness dialog, P20.8),
++ * settings (opens Settings from the grid) and user (avatar tile,
++ * quick-contact on tap) - so the donor tile set + order in
++ * quick_settings_tiles_default resolves.
++ */
++@Module
++object KitKatQSTilesModule {
++
++    @Provides
++    @IntoMap
++    @StringKey(KitKatBrightnessTile.TILE_SPEC)
++    fun provideBrightnessTile(tile: KitKatBrightnessTile): QSTileImpl<*> = tile
++
++    @Provides
++    @IntoMap
++    @StringKey(KitKatSettingsTile.TILE_SPEC)
++    fun provideSettingsTile(tile: KitKatSettingsTile): QSTileImpl<*> = tile
++
++    @Provides
++    @IntoMap
++    @StringKey(KitKatUserTile.TILE_SPEC)
++    fun provideUserTile(tile: KitKatUserTile): QSTileImpl<*> = tile
++}
+\ No newline at end of file
+diff --git a/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatSettingsTile.java b/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatSettingsTile.java
+new file mode 100644
+index 000000000000..b960353f0731
+--- /dev/null
++++ b/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatSettingsTile.java
+@@ -0,0 +1,79 @@
++package com.android.systemui.qs.tiles;
++
++import android.content.Intent;
++import android.os.Handler;
++import android.os.Looper;
++import android.provider.Settings;
++import android.service.quicksettings.Tile;
++import android.view.View;
++
++import androidx.annotation.Nullable;
++
++import com.android.internal.logging.MetricsLogger;
++import com.android.systemui.dagger.qualifiers.Background;
++import com.android.systemui.dagger.qualifiers.Main;
++import com.android.systemui.plugins.ActivityStarter;
++import com.android.systemui.plugins.FalsingManager;
++import com.android.systemui.plugins.qs.QSTile.BooleanState;
++import com.android.systemui.plugins.statusbar.StatusBarStateController;
++import com.android.systemui.qs.QSHost;
++import com.android.systemui.qs.QsEventLogger;
++import com.android.systemui.qs.logging.QSLogger;
++import com.android.systemui.qs.tileimpl.QSTileImpl;
++import com.android.systemui.R;
++
++import javax.inject.Inject;
++
++/**
++ * KitKat UI Project (P20.10): donor 4.4 QS SETTINGS tile - QuickSettings
++ * added a tile that opens the Settings app from inside the grid
++ * (startSettingsActivity(Settings.ACTION_SETTINGS)).
++ */
++public class KitKatSettingsTile extends QSTileImpl<BooleanState> {
++
++    public static final String TILE_SPEC = "settings";
++
++    @Inject
++    public KitKatSettingsTile(
++            QSHost host,
++            QsEventLogger uiEventLogger,
++            @Background Looper backgroundLooper,
++            @Main Handler mainHandler,
++            FalsingManager falsingManager,
++            MetricsLogger metricsLogger,
++            StatusBarStateController statusBarStateController,
++            ActivityStarter activityStarter,
++            QSLogger qsLogger) {
++        super(host, uiEventLogger, backgroundLooper, mainHandler, falsingManager, metricsLogger,
++                statusBarStateController, activityStarter, qsLogger);
++    }
++
++    @Override
++    public BooleanState newTileState() {
++        return new BooleanState();
++    }
++
++    @Override
++    protected void handleClick(@Nullable View view) {
++        mActivityStarter.postStartActivityDismissingKeyguard(
++                new Intent(Settings.ACTION_SETTINGS), 0);
++    }
++
++    @Override
++    public Intent getLongClickIntent() {
++        return new Intent(Settings.ACTION_SETTINGS);
++    }
++
++    @Override
++    public CharSequence getTileLabel() {
++        return mContext.getString(R.string.quick_settings_settings_label);
++    }
++
++    @Override
++    protected void handleUpdateState(BooleanState state, Object arg) {
++        state.value = true;
++        state.state = Tile.STATE_INACTIVE;
++        state.label = mContext.getString(R.string.quick_settings_settings_label);
++        state.icon = ResourceIcon.get(R.drawable.ic_settings);
++    }
++}
+\ No newline at end of file
+diff --git a/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatUserTile.java b/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatUserTile.java
+new file mode 100644
+index 000000000000..d1525e8dad9d
+--- /dev/null
++++ b/packages/SystemUI/src/com/android/systemui/qs/tiles/KitKatUserTile.java
+@@ -0,0 +1,103 @@
++package com.android.systemui.qs.tiles;
++
++import android.content.Intent;
++import android.graphics.Bitmap;
++import android.graphics.drawable.BitmapDrawable;
++import android.graphics.drawable.Drawable;
++import android.os.Handler;
++import android.os.Looper;
++import android.provider.ContactsContract;
++import android.service.quicksettings.Tile;
++import android.view.View;
++
++import androidx.annotation.Nullable;
++
++import com.android.internal.logging.MetricsLogger;
++import com.android.systemui.dagger.qualifiers.Background;
++import com.android.systemui.dagger.qualifiers.Main;
++import com.android.systemui.plugins.ActivityStarter;
++import com.android.systemui.plugins.FalsingManager;
++import com.android.systemui.plugins.qs.QSTile.BooleanState;
++import com.android.systemui.plugins.statusbar.StatusBarStateController;
++import com.android.systemui.qs.QSHost;
++import com.android.systemui.qs.QsEventLogger;
++import com.android.systemui.qs.logging.QSLogger;
++import com.android.systemui.qs.tileimpl.QSTileImpl;
++import com.android.systemui.R;
++
++import javax.inject.Inject;
++
++/**
++ * KitKat UI Project (P20.10): donor 4.4 QS USER tile - QuickSettings put
++ * the user avatar/photo first in the grid; tap opens the quick-contact
++ * card for the owner profile (multi-user devices opened the user
++ * switcher; this single-user build follows the donor single-user path).
++ */
++public class KitKatUserTile extends QSTileImpl<BooleanState> {
++
++    public static final String TILE_SPEC = "user";
++
++    @Inject
++    public KitKatUserTile(
++            QSHost host,
++            QsEventLogger uiEventLogger,
++            @Background Looper backgroundLooper,
++            @Main Handler mainHandler,
++            FalsingManager falsingManager,
++            MetricsLogger metricsLogger,
++            StatusBarStateController statusBarStateController,
++            ActivityStarter activityStarter,
++            QSLogger qsLogger) {
++        super(host, uiEventLogger, backgroundLooper, mainHandler, falsingManager, metricsLogger,
++                statusBarStateController, activityStarter, qsLogger);
++    }
++
++    @Override
++    public BooleanState newTileState() {
++        return new BooleanState();
++    }
++
++    @Override
++    protected void handleClick(@Nullable View view) {
++        // Donor single-user path: quick-contact card for the owner profile.
++        final Intent intent = ContactsContract.QuickContact.composeQuickContactsIntent(
++                mContext, view != null ? view : new View(mContext),
++                ContactsContract.Profile.CONTENT_URI,
++                ContactsContract.QuickContact.MODE_LARGE, null);
++        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
++        mActivityStarter.postStartActivityDismissingKeyguard(intent, 0);
++    }
++
++    @Override
++    public Intent getLongClickIntent() {
++        return new Intent(android.provider.Settings.ACTION_USER_SETTINGS);
++    }
++
++    @Override
++    public CharSequence getTileLabel() {
++        return mContext.getString(R.string.quick_settings_user_label);
++    }
++
++    @Override
++    protected void handleUpdateState(BooleanState state, Object arg) {
++        state.value = true;
++        state.state = Tile.STATE_INACTIVE;
++        state.label = mContext.getString(R.string.quick_settings_user_label);
++        state.icon = new com.android.systemui.qs.tileimpl.QSTileImpl.DrawableIcon(getUserIcon());
++    }
++
++    private Drawable getUserIcon() {
++        try {
++            final android.os.UserManager um = mContext.getSystemService(android.os.UserManager.class);
++            final Bitmap icon = um != null ? um.getUserIcon(mContext.getUserId()) : null;
++            if (icon != null) {
++                return new BitmapDrawable(mContext.getResources(), icon);
++            }
++        } catch (Exception e) {
++            // fall through to the default avatar
++        }
++        return mContext.getResources().getDrawable(R.drawable.kitkat_qs_user_avatar,
++                mContext.getTheme());
++    }
++
++}
+\ No newline at end of file
+diff --git a/packages/SystemUI/src/com/android/systemui/shade/NotificationsQSContainerController.kt b/packages/SystemUI/src/com/android/systemui/shade/NotificationsQSContainerController.kt
+index 74151f94fe66..930baf1b4479 100644
+--- a/packages/SystemUI/src/com/android/systemui/shade/NotificationsQSContainerController.kt
++++ b/packages/SystemUI/src/com/android/systemui/shade/NotificationsQSContainerController.kt
+@@ -41,6 +41,9 @@ import com.android.systemui.plugins.statusbar.StatusBarStateController
+ import com.android.systemui.recents.OverviewProxyService
+ import com.android.systemui.recents.OverviewProxyService.OverviewProxyListener
+ import com.android.systemui.res.R
++import com.android.systemui.shade.ShadeExpansionChangeEvent
++import com.android.systemui.shade.ShadeExpansionListener
++import com.android.systemui.shade.ShadeExpansionStateManager
+ import com.android.systemui.shade.carrier.ShadeCarrierTextController
+ import com.android.systemui.shade.domain.interactor.ShadeInteractor
+ import com.android.systemui.shared.system.QuickStepContract
+@@ -74,6 +77,7 @@ class NotificationsQSContainerController @Inject constructor(
+     private val largeScreenHeaderHelperLazy: Lazy<LargeScreenHeaderHelper>,
+     private val carrierTextManagerBuilder: CarrierTextManager.Builder,
+     private val statusBarStateController: StatusBarStateController,
++    private val shadeExpansionStateManager: ShadeExpansionStateManager,
+ ) : ViewController<NotificationsQuickSettingsContainer>(view), QSContainerController {
+ 
+     // KitKat UI Project: carrier label at the bottom of the shade
+@@ -94,6 +98,25 @@ class NotificationsQSContainerController @Inject constructor(
+             }
+         }
+ 
++    // KitKat UI Project (P20.2c): donor NotificationPanelView.draw() semantics -
++    // the 4.4 white close handle was drawn GLUED TO THE BOTTOM EDGE OF THE
++    // EXPANDED AREA, tracking the finger mid-drag (offset =
++    // height - handleHeight at the current expansion). Ride the expansion
++    // fraction: at 0 the handle sits just under the status bar (collapsed
++    // grabber), rising to the panel bottom as the shade fully opens.
++    private val shadeBottomHandleExpansionListener =
++        ShadeExpansionListener { event: ShadeExpansionChangeEvent ->
++            if (statusBarStateController.state != StatusBarState.SHADE) return@ShadeExpansionListener
++            val handle = shadeBottomHandle ?: return@ShadeExpansionListener
++            if (event.fraction <= 0f) return@ShadeExpansionListener
++            val panelHeight = mView.height
++            if (panelHeight <= 0) return@ShadeExpansionListener
++            // Bottom edge of the expanded area, in container coordinates.
++            val edgeY = (panelHeight * event.fraction).toInt()
++            val parentTop = mView.top
++            handle.translationY = (parentTop + edgeY - mView.bottom).toFloat()
++        }
++
+     private var splitShadeEnabled = false
+     private var isQSDetailShowing = false
+     private var isQSCustomizing = false
+@@ -167,6 +190,7 @@ class NotificationsQSContainerController @Inject constructor(
+         overviewProxyService.addCallback(taskbarVisibilityListener)
+         statusBarStateController.addCallback(shadeBottomHandleStateListener)
+         shadeBottomHandleStateListener.onStateChanged(statusBarStateController.getState())
++        shadeExpansionStateManager.addExpansionListener(shadeBottomHandleExpansionListener)
+         mView.setInsetsChangedListener(delayedInsetSetter)
+         mView.setQSFragmentAttachedListener { qs: QS -> qs.setContainerController(this) }
+         mView.setConfigurationChangedListener { updateResources() }
+@@ -176,6 +200,7 @@ class NotificationsQSContainerController @Inject constructor(
+     override fun onViewDetached() {
+         overviewProxyService.removeCallback(taskbarVisibilityListener)
+         statusBarStateController.removeCallback(shadeBottomHandleStateListener)
++        shadeExpansionStateManager.removeExpansionListener(shadeBottomHandleExpansionListener)
+         mView.removeOnInsetsChangedListener()
+         mView.removeQSFragmentAttachedListener()
+         mView.setConfigurationChangedListener(null)
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/NotificationShadeDepthController.kt b/packages/SystemUI/src/com/android/systemui/statusbar/NotificationShadeDepthController.kt
+index 5c45f3d1bbc8..ceba80b1e095 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/NotificationShadeDepthController.kt
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/NotificationShadeDepthController.kt
+@@ -458,7 +458,12 @@ class NotificationShadeDepthController @Inject constructor(
+      */
+     private fun shouldApplyShadeBlur(): Boolean {
+         val state = statusBarStateController.state
+-        return (state == StatusBarState.SHADE || state == StatusBarState.SHADE_LOCKED) &&
++        // KitKat UI Project (P20.2): 4.4 never blurred behind the shade - the
++        // opaque panel rode the height animation over an unobscured screen.
++        // The modern blur makes the drag read as a fade; force it off in the
++        // unlocked SHADE state (the only state the donor shade existed in).
++        // Keyguard/bouncer/AOD states keep the stock blur pipeline untouched.
++        return false && (state == StatusBarState.SHADE || state == StatusBarState.SHADE_LOCKED) &&
+                 !keyguardStateController.isKeyguardFadingAway
+     }
+ 
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/view/FooterView.java b/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/view/FooterView.java
+index bda5fae6a336..a82d32c11641 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/view/FooterView.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/view/FooterView.java
+@@ -259,8 +259,14 @@ public class FooterView extends StackScrollerDecorView {
+             mClearAllButton.setVisibility(View.GONE);
+             mSeenNotifsFooterTextView.setVisibility(View.VISIBLE);
+         } else {
+-            mManageOrHistoryButton.setVisibility(View.VISIBLE);
+-            mClearAllButton.setVisibility(View.VISIBLE);
++            // KitKat UI Project (P20.3): the 4.4 shade had NO manage/
++            // clear-all footer buttons (clear-all = the header X; settings
++            // = the header gear). Keep them hidden in the normal path too -
++            // this legacy branch previously re-showed both buttons every
++            // layout pass, defeating the FooterViewModel hide. Re-enable by
++            // restoring View.VISIBLE here and in the ViewModel flip.
++            mManageOrHistoryButton.setVisibility(View.GONE);
++            mClearAllButton.setVisibility(View.GONE);
+             mSeenNotifsFooterTextView.setVisibility(View.GONE);
+         }
+     }
+-- 
+2.53.0
+

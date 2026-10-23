@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:ns0="http://schemas.android.com/apk/res/android" ns0:layout_width="match_parent" ns0:layout_height="wrap_content" ns0:layout_gravity="center_vertical" ns0:background="?android:attr/selectableItemBackground" ns0:gravity="center_vertical" ns0:orientation="vertical" ns0:paddingLeft="20dp" ns0:paddingRight="20dp">
+
+    <TextView ns0:id="@+id/time_zone" style="@style/font_family_thin" ns0:layout_width="wrap_content" ns0:layout_height="wrap_content" ns0:ellipsize="marquee" ns0:paddingTop="8dp" ns0:maxLines="2" ns0:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView ns0:id="@+id/time_offset" style="@style/font_family_thin" ns0:layout_width="wrap_content" ns0:layout_height="wrap_content" ns0:ellipsize="marquee" ns0:singleLine="true" />
+
+    <TextView ns0:id="@+id/location" style="@style/font_family_thin" ns0:layout_width="wrap_content" ns0:layout_height="wrap_content" ns0:ellipsize="marquee" ns0:paddingBottom="8dp" ns0:singleLine="true" ns0:textAppearance="?android:attr/textAppearanceSmall" />
+
+</LinearLayout>

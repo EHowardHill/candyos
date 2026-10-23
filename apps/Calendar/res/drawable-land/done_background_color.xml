@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<selector xmlns:ns0="http://schemas.android.com/apk/res/android">
+    <item ns0:state_focused="true" ns0:state_pressed="false" ns0:drawable="@color/blue_focused" />
+
+    <item ns0:state_pressed="true" ns0:drawable="@color/blue" />
+
+    <item ns0:drawable="@color/white" />
+</selector>

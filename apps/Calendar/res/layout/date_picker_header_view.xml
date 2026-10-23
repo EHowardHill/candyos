@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TextView xmlns:ns0="http://schemas.android.com/apk/res/android" ns0:id="@+id/date_picker_header" ns0:layout_width="@dimen/date_picker_component_width" ns0:layout_height="@dimen/date_picker_header_height" ns0:background="@color/calendar_header" ns0:gravity="center" ns0:includeFontPadding="false" ns0:textColor="@color/white" ns0:textSize="@dimen/date_picker_header_text_size" ns0:importantForAccessibility="no" />

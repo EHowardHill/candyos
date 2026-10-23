@@ -1,0 +1,92 @@
+From eb0f36b883ee921f2f81c359fe8ebe984212d824 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Wed, 21 Oct 2026 20:13:18 -0500
+Subject: [PATCH 14/29] KitKat UI: Phase 18 QA findings + P19 environment
+ ratifications
+
+Five new user QA items (18.1-18.5: number-keyboard label alignment,
+navbar back-arrow IME rotation, shade footer question, expanded-QS
+header gap, shade-open transition). Ratified: DeskClock verbatim port
+next (only remaining Tier 1), Messaging deferred entirely, 4.4
+reference build workspace (~/kitkat-build, outside the ROM trees),
+4.4-native playground, written pixel-diff report, hardware-only items
+document-deferred.
+---
+ TASKS.md | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 57 insertions(+), 2 deletions(-)
+
+diff --git a/TASKS.md b/TASKS.md
+index 5c2beab2f76a..99e7c9be80cb 100644
+--- a/TASKS.md
++++ b/TASKS.md
+@@ -1907,10 +1907,65 @@ the fourth-batch "unbuilt" caveats are superseded:
+   (settings put global device_provisioned/user_setup_complete = 1);
+   uiautomator dumps STALE trees on this emulator (drive by screencap
+   pixel analysis); m -j8 green repeatedly.
+-- All five pinned forks pushed (frameworks/base, Settings,
++- All pinned forks pushed (frameworks/base, Settings,
+   ExactCalculator, Recorder, Eleven, LatinIME) - repo sync safe now.
+ 
+-## Implementation notes (2026-10-21, fourth batch)
++## Phase 18 - Sixth-batch user QA findings (Pixel 3a AVD) [ ]
++
++Five new findings from the user's on-device pass, plus the ratified
++sixth-batch decisions (2026-10-21). Answered inline below; fixes are
++the next work batch.
++
++- [ ] 18.1 Number/pin keyboard labels off-center: digits sit right of
++      center and hint letters START at the digit position and run
++      right, overlapping. Root cause (source): KeyboardView.KitKat
++      ported sizes/colors but NOT the donor label-alignment geometry -
++      the modern KeyDrawParams consumes keyLabelHorizontalPadding /
++      hint off-center ratios that the donor KeyboardView.KLP set
++      differently, and on kbd_number/kbd_phone layouts the modern
++      defaults shift text. Fix: port the donor alignment paddings +
++      hint-label placement semantics into themes-kitkat.xml.
++- [ ] 18.2 Back arrow rotates while the IME is open (modern navbar
++      IME-visibility behavior: back glyph rotates 180). 4.4 NEVER
++      rotated glyphs - the back arrow pointed left, always. Fix:
++      suppress the navbar IME-rotation in 3-button mode (the KitKat
++      navbar is 3-button-only on this build anyway).
++- [?] 18.3 Shade footer "Manage"/"History" buttons: verified these
++      are 12.2 leftovers (header X covers clear-all; footer buttons
++      are a modern surface the donor did not have). OPEN QUESTION
++      (user): drop the footer rows entirely for donor fidelity?
++- [ ] 18.4 Expanded-QS gap between header and brightness bar: NOT
++      donor geometry - the 4.4 QS panel had the slider immediately
++      under the 48dp header. The 12.1 margin zeroing covered the
++      half-open state only; the expanded-panel container margins
++      (qqs_layout_* / stack padding) survive. Fix: apply the same
++      margin zeroing to the expanded QS container.
++- [ ] 18.5 Shade-open transition fades like modern (window alpha),
++      not the 4.4 opaque PanelView height ride with grab handle.
++      SCOPE WARNING: touches ScrimController/ShadeController window
++      animation paths, which couple to the keyguard window (the
++      hard-constraint area). 15.2 fixed the fling physics; this is
++      the open-animation half. Needs a careful spike.
++
++## Phase 16 ratifications + P19 environment (user decisions, 2026-10-21)
++
++- DeskClock: port VERBATIM (no modern sounds/settings UX). Theme:
++  faithful to the 4.4 actual theme choice (Holo Light + dark action
++  bar era semantics - NOT blanket dark). SCHEDULE_EXACT_ALARM
++  manifest perm + shim approved.
++- Messaging: DEFERRED ENTIRELY - no port, ship modern, the app
++  cannot be tested without a SIM. Tier 1 remainder is DeskClock only.
++- 4.4 reference build (P19): second repo workspace at ~/kitkat-build
++  (OUTSIDE ~/android/lineage, never in the ROM repos),
++  android-4.4.4_r1, sdk_phone_x86_64 emulator target; disk space
++  approved; full emulator build; needs the 4.4-era JDK toolchain.
++- 4.4-native KitKatWidgetPlayground variant to build INTO the 4.4
++  ROM (API-19 resource syntax); written pixel-diff report per
++  widget family (accept-and-document deltas).
++- Playback verification scope (user AVD): just confirm playback
++  works (Music + DeskClock alarms).
++- All touch/hardware-only items (14.11 marquee, 15.2 fling feel,
++  14.1 glow, gesture typing): DOCUMENT-DEFERRED, not open blockers.
+ 
+ ## Implementation notes (2026-10-21, fourth batch)
+ 
+-- 
+2.53.0
+

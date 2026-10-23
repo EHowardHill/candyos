@@ -1,0 +1,295 @@
+From e596f9496e3bc2dcf3b19c9c4bd7d121a711da78 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Tue, 20 Oct 2026 14:14:44 -0500
+Subject: [PATCH 07/29] KITKAT: Add TASKS.md progress tracker
+
+Phase-by-phase task list with completion markers; documents decisions,
+source-audit corrections, and implementation notes for the KitKat UI
+Project.
+---
+ TASKS.md | 273 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 273 insertions(+)
+ create mode 100644 TASKS.md
+
+diff --git a/TASKS.md b/TASKS.md
+new file mode 100644
+index 000000000000..3a5d11e2b24f
+--- /dev/null
++++ b/TASKS.md
+@@ -0,0 +1,273 @@
++# KitKat UI Project - TASKS
++
++Goal: make LineageOS 21 (Android 14) visually and behaviorally resemble
++stock Android 4.4 KitKat across all system surfaces (framework theme,
++SystemUI, Settings). Feature set stays modern; launcher decision amended
++below (replaced with the user's own KitKat Launcher3 port).
++
++Hard constraint: modern apps must keep working. All changes stay at the
++visual, resource, and UX-shell layer; nothing alters APIs or behaviors
++that apps depend on.
++
++This file lives in the frameworks/base fork and is versioned with the
++work. Phases are tracked in git as KITKAT-P<n>: commit prefixes and
++kitkat/p<n> tags. Phase 7 lives in the Settings fork.
++
++Marker legend:
++
++    [ ] - not done
++    [X] - done
++    [?] - needs questions answered
++    [/] - partially completed
++
++## Phase 0 - Infrastructure [/]
++
++- [X] Pin frameworks/base and Settings forks in .repo/local_manifests/kitkat_ui_mods.xml
++- [X] Target device: x86_64 dev testing device (Android emulator, goldfish x86_64;
++      trees already synced under device/generic, no manifest change needed)
++- [/] Replace Trebuchet with the KitKat Launcher3 port
++      (github.com/EHowardHill/Launcher3-Modern).
++      Prepared in /tmp/opencode/launcher3-modern: Android.bp registering the
++      TrebuchetQuickStep module name (what vendor/lineage common_mobile.mk
++      puts into PRODUCT_PACKAGES), uses-sdk added to the manifest
++      (min 21 / target 29, target kept pre-30 on purpose), and the five
++      support-v4 imports replaced with framework equivalents
++      (LongSparseArray, View accessibility constants, AutoScrollHelper);
++      LauncherBackupHelper stays excluded per the existing Gradle setup.
++      The privapp whitelist resolves from frameworks/base/data/etc.
++      NEXT: commit and push those 7 files to main, then uncomment the
++      Trebuchet replacement in .repo/local_manifests/kitkat_ui_mods.xml
++      and repo sync.
++- [ ] Baseline: clean build for the x86_64 emulator target, boot it, and verify
++      (can double as smoke test for the Phase 1/2 edits below)
++
++## Phase 1 - Framework theme, fonts, colors [/]
++
++All in frameworks/base/core/res unless noted.
++
++- [/] Rebase Theme.DeviceDefault onto Theme.Holo in values/themes_device_defaults.xml
++      (the Holo stack still ships: themes_holo.xml, styles_holo.xml, colors_holo.xml)
++      Implemented: 35 Material parents swapped for Holo (DeviceDefault, Light,
++      dialogs, panels, wallpaper, InputMethod, NoActionBar variants); 5 styles kept
++      on Material for lack of Holo counterparts (VoiceInteractionSession, Light.Voice,
++      Light.BaseDialog, Settings.DialogWhenLarge, Settings.Dialog.Alert).
++      Pending: baseline build + on-device verification.
++- [/] Port KitKat widget skins from AOSP tag android-4.4.4_r1: ghost-outline buttons,
++      underline text fields, switches, checkboxes, radios, thin glowing progress bars,
++      seekbars, spinners, tabs
++      Implemented: 176 Widget.DeviceDefault / TextAppearance.DeviceDefault styles
++      re-parented from Material to Holo (widgets, text appearances, action bars,
++      lists, popups, all Light variants); the Holo drawables were verified to still
++      live in-tree (97 XML selectors + 454 PNG 9-patches per density). 18 styles kept
++      on Material for lack of Holo counterparts (Notification.* styles, Toolbar,
++      Button.Colored, and the Material typography scale Body1/Title/etc., which are
++      Lollipop-era concepts that did not exist in KitKat).
++      Pending: baseline build + on-device verification.
++- [/] Replace Material You accents with Holo blue #ff33b5e5 / #ff0099cc wherever
++      colorAccent resolves
++      Implemented: DeviceDefault dark and light color palettes rewritten to
++      holo_blue_light / holo_blue_dark, plus colorControlActivated, colorEdgeEffect,
++      black statusBarColor/navigationBarColor, forceDarkAllowed=false.
++      Pending: on-device verification.
++- [/] Holo dialogs, alerts, context menus, toasts: 0dp corner radius, dark backgrounds,
++      blue title divider
++      Implemented: config_dialogCornerRadius and config_buttonCornerRadius -> 0dp;
++      dialog themes now parent Theme.Holo.Dialog*. Pending: full Holo styling arrives
++      with the widget skin port above.
++- [/] Port 4.4 window and activity animations in res/anim (old zoom/fade open-close,
++      toast and menu popup animations)
++      Implemented: 98 KitKat animation files from android-4.4.4_r1 installed over
++      their modern counterparts (activity open/close, task, dialog, toast, submenu,
++      wallpaper, input method, user switch, the full screen-rotate set, push/slide/
++      fade/grow/shrink basics); all 470 resource references verified to resolve
++      against the modern tree. Pending: on-device verification.
++- [/] KitKat dimens: status bar 25dp, navbar 48dp, legacy paddings and heights
++      Implemented: status_bar_height_portrait and status_bar_height_default
++      24dp -> 25dp; navigation_bar_height was already 48dp. Caveat: if the
++      emulator skin enables a display cutout taller than 25dp, revert to 24dp.
++      Remaining: audit legacy paddings and heights after on-device inspection.
++- [/] Add the 2013 Roboto TTFs and repoint the sans-serif family
++      Implemented: 12 TTFs from android-4.4.4_r1 installed under data/fonts as
++      Roboto2013-* (prebuilt_font modules); sans-serif and sans-serif-condensed
++      repointed in all four configs (fonts.xml, font_fallback.xml, and both cjkvf
++      variants; fonts.xml is the one that becomes /system/etc/fonts.xml). External
++      variable-font Roboto stays installed as the DroidSans symlink provider.
++      Pending: build + on-device verification.
++- [/] Pin or neutralize monet color extraction so wallpaper colors never override
++      Holo blue in SystemUI
++      Implemented: ThemeOverlayController.getNeutralColor/getAccentColor pinned
++      to 0xFF33B5E5. The fabricated neutral/accent/dynamic overlays all derive
++      from this seed, so the entire dynamic palette stays in the Holo blue family
++      and wallpaper changes no longer trigger re-evaluation. Pending: on-device
++      verification.
++
++## Phase 2 - Status bar, navigation bar, system icons [/]
++
++- [ ] Opaque black status bar (remove transparency and edge-to-edge tinting)
++      Lead: BarTransitions (MODE_OPAQUE) and PhoneStatusBarTransitions still exist
++      in SystemUI; investigate ScrimState/ScrimController defaults for the unlocked
++      shade-closed state before touching status_bar.xml directly (a plain background
++      on the bar view would also blacken keyguard/AOD).
++- [/] KitKat white status icon set: battery, wifi, signal
++      Implemented: battery perimeter squared off via
++      config_batterymeterPerimeterPath (fill mask and bolt were already
++      period-correct shapes; SettingsLib ThemedBatteryDrawable consumes the
++      framework config, no code change needed). Wifi: the ACTIVE icon set is
++      core/res ic_wifi_signal_0..4 (the new_status_bar_icons aconfig flag
++      defaults to disabled), now rewritten as 4.4 arc-fan glyphs; the
++      flag-gated SettingsLib set (ic_wifi_0..4 + _error) got the same design
++      for consistency. Signal: no change needed - the active framework
++      ic_signal_cellular family is already the classic triangle + partial
++      fill design; the SettingsLib bar icons only apply behind the disabled
++      flag. Pending: on-device verification of all three families.
++- [/] Move the clock to the right side
++      Implemented: Lineage already ships a right-hand clock (ClockController +
++      clock_right in system_icons.xml); default flipped from LEFT to RIGHT in
++      ClockController.java. Pending: on-device verification.
++- [/] Outlined navbar glyphs: triangle back, circle home, square recents
++      Implemented: ic_sysbar_back/home/recent rewritten as white stroked outlines
++      (1.8 stroke, rounded joins) in the existing 20dp vectors, singleToneColor
++      tint preserved. Pending: on-device verification.
++- [ ] KitKat immersive-mode scrim and peek behavior
++
++## Phase 3 - Notification shade and notifications [ ]
++
++- [/] Gradient scrim background
++      Implemented: shade background (rounded_bg_full, shared by the shade root,
++      volume panel, half shelf) is now flat KitKat dark #ff161616 with 2dp
++      corners - darker than the #ff252525 notification rows so they still read.
++      Remaining: the true 4.4 vertical gradient needs ScrimView/ScrimState to
++      accept a drawable (they use solid color views today); revisit with the
++      P2 opaque-bar work.
++- [/] Flat dark notification rows with square corners and Holo text styles
++      Implemented: notification_material_bg base layer -> flat #ff252525 (state
++      layer verified transparent at rest, press feedback intact);
++      notification_corner_radius 28dp -> 0dp and notification_corner_radius_small
++      4dp -> 0dp (consumed by StackScrollAlgorithm, NotificationStackScrollLayout,
++      ExpandableNotificationRow, and the media control panel, so everything
++      squares off). Holo text styles arrive via the phase 1 rebase. Pending:
++      on-device verification.
++- [ ] Shade header: date at left, settings gear at right
++- [ ] KitKat clear-all button
++- [ ] Bottom drag handle
++- [ ] Carrier label at the bottom of the shade
++      Plan: SystemUI already ships com.android.keyguard.CarrierText plus
++      CarrierTextController (used by the keyguard); the work is adding the view
++      to status_bar_expanded.xml and wiring the controller to the shade
++      lifecycle. Note: the emulator has no SIM, so this shows the no-SIM text
++      there.
++- [X] Centered empty state ("No notifications")
++      Verified already satisfied: status_bar_no_notifications.xml renders a
++      centered "No notifications" (empty_shade_text) and picks up Holo text
++      appearance through the phase 1 rebase. No change needed.
++- [ ] Implement the 4.4 ticker (scrolling status bar text). Correction after source
++      audit: Lineage 21 does NOT ship a ticker, so this is a port. Heads-up already
++      defaults to off (no seeder writes heads_up_notifications_enabled; the SystemUI
++      read falls back to HEADS_UP_OFF).
++
++## Phase 4 - Quick settings, volume dialog, power menu [ ]
++
++- [ ] Rebuild quick settings as the 4.4 panel: user avatar, brightness slider with
++      Auto checkbox, Holo toggle rows (layout restructure: code plus resources)
++- [/] Slim Holo volume panel with the link ringtone/notifications toggle
++      Implemented (partial): panel background shares rounded_bg_full (now flat
++      #ff161616, 2dp corners); volume_dialog_slider_corner_radius 21dp -> 2dp.
++      Remaining: the full KitKat slim slider (thin track plus thumb, wider
++      horizontal layout) needs layout work and on-device iteration.
++- [ ] Holo global actions (power menu)
++      Assessment: needs layout surgery - GlobalActionsGridLayout/
++      GlobalActionsLayout classes build the grid; item chrome lives in
++      control_background + control_primary_text. Plan: single-column list,
++      full-width rows with icon left and label right, flat dark background.
++
++## Phase 5 - Recents [ ]
++
++Decision (updated): the launcher is replaced with the KitKat Launcher3 port
++(EHowardHill/Launcher3-Modern), which has no Quickstep. The overview button
++therefore has no launcher-side implementation, and recents must be served by
++SystemUI - which is exactly where the 4.4 recents lived. The vertical card
++list port now happens inside frameworks/base (our fork), using the modern
++task model (RecentTasks, task snapshots) as the data source.
++
++- [X] Spike: trace the recents button path with no OverviewProxyService
++      connection. Result: RecentsImplementation is a default no-op interface;
++      the current implementation is OverviewProxyRecentsImpl (delegates to the
++      launcher proxy) and is bound through ContextComponentResolver/dagger.
++      With the KitKat launcher (no Quickstep), toggleRecentApps() does nothing.
++      The hook is clean: implement a 4.4-style RecentsImplementation (vertical
++      card list activity driven by RecentTasks + snapshots) and swap the
++      dagger binding.
++- [ ] Port the 4.4 vertical card list UI (vertically scrolling cards with
++      icon and title bar) into SystemUI, driven by the modern task model
++- [ ] Centered "No recent apps" empty state
++- [ ] Verify modern apps' recents integration still works: task snapshots,
++      multiple documents/activities, dismiss and clear-all behaviors
++- [ ] Verify modern apps' recents integration still works: task snapshots,
++      multiple documents/activities, dismiss and clear-all behaviors
++
++## Phase 6 - Lockscreen [ ]
++
++Decision: keyguard reskin only.
++
++- [/] Holo PIN pad / bouncer restyle
++      Implemented: num_pad_key_background is now a transparent ripple, so keys
++      have no chrome at rest and press feedback resolves through
++      colorControlHighlight (= colorAccent = Holo blue family via the monet
++      pin). Klondike letters (ABC/DEF/...) restored from the hidden state
++      they were left in (b/172360102). Digit and letter typography already
++      inherit Holo + 2013 Roboto from the rebase. NumPadAnimator is safely
++      skipped (instanceof GradientDrawable guard). Remaining: PIN container
++      and delete/enter button styling review. Pending: on-device
++      verification.
++- [ ] KitKat colors and typography on the keyguard
++- [/] Centered lockscreen clock in 2013 Roboto
++      Implemented: new kitkat-lock-clock font family (single face =
++      Roboto2013-Thin, all weight requests resolve to it) registered in all
++      four font configs; framework config_clockFontFamily repointed from
++      monospace; clock_default_large typeface cleaned up. TextAnimator applies
++      weight via variable-font axes, which static 2013 fonts lack, so the Thin
++      face renders regardless of the requested weight. Pending: on-device
++      verification.
++- [ ] Verify modern unlock paths stay functional (PIN, pattern, password,
++      biometrics, AOD)
++
++## Phase 7 - Settings app [ ]
++
++Lives in the Settings fork (packages/apps/Settings).
++
++- [ ] Holo dark styling (cascades partly from the phase 1 DeviceDefault work)
++- [ ] KitKat list item styles and category headers
++- [ ] KitKat-era settings icons
++- [ ] About phone page styling
++
++## Phase 8 - Sounds, wallpaper, polish [/]
++
++Decision: boot animation stays untouched.
++
++- [/] Port 4.4 UI sounds into data/sounds/effects (Lock.ogg, Unlock.ogg,
++      effect_tick.ogg, KeypressStandard.ogg, camera shutter)
++      Implemented: 13 ui-sound sources replaced (Effect_Tick, Lock, Unlock, all
++      five Keypress sounds, Dock, Undock, LowBattery, VideoRecord,
++      camera_click) in the exact files AllAudio.mk / aosp_audio.mk install to
++      /media/audio/ui/, plus their plain-name copies. Post-4.4 sounds (Trusted,
++      VideoStop, WirelessChargingStarted, camera_focus, ChargingStarted,
++      InCall, NFC set) stay modern. Donor oggs are 44.1kHz vs the modern 48kHz
++      files; SoundPool resamples, no action needed.
++- [/] KitKat default wallpaper
++      Implemented: 4.4 default_wallpaper.jpg converted to PNG for all three
++      buckets (drawable-nodpi, -sw600dp-nodpi, -sw720dp-nodpi). Pending:
++      on-device verification.
++- [ ] Hybrid emoji font: 2013 blob glyphs for every codepoint that existed in
++      KitKat, modern Noto glyphs for everything added since (new emoji and
++      sequences). Register via an emoji family entry in
++      data/fonts/font_fallback.xml with the TTF shipped under data/fonts
++      (source chain resolved: the emoji font ships from
++      external/noto-fonts/emoji-compat via font/2.042/*.ttf and its Android.bp
++      modules; the precedence spike over the runtime emoji fallback remains,
++      fallback is a small noto-fonts fork)
++- [ ] Optional: KitKat easter egg, pre-Android-12 rotation animation
++
++## Open questions
++
++1. Scope check: does "system elements" include AOSP system app UIs (Dialer,
++   Messaging, Camera), or stop at framework + SystemUI + Settings?
+-- 
+2.53.0
+

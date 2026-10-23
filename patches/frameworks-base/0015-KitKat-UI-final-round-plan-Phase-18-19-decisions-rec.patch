@@ -1,0 +1,129 @@
+From 7696a132f8a7e1433b01ca9589e2398555f8b2a2 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Wed, 21 Oct 2026 20:18:25 -0500
+Subject: [PATCH 15/29] KitKat UI: final-round plan + Phase 18/19 decisions
+ recorded
+
+18.3 footer drop decided, 18.5 full opaque-ride decided, DeskClock
+theme confirmed (Holo Light + dark AB), screenshots limited per
+user cost, governing minimize-modern-hybrids rule added, final
+work plan (6 steps to TASKS.md completion) recorded.
+---
+ TASKS.md | 80 ++++++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 66 insertions(+), 14 deletions(-)
+
+diff --git a/TASKS.md b/TASKS.md
+index 99e7c9be80cb..6a2c195ec9eb 100644
+--- a/TASKS.md
++++ b/TASKS.md
+@@ -1930,10 +1930,14 @@ the next work batch.
+       rotated glyphs - the back arrow pointed left, always. Fix:
+       suppress the navbar IME-rotation in 3-button mode (the KitKat
+       navbar is 3-button-only on this build anyway).
+-- [?] 18.3 Shade footer "Manage"/"History" buttons: verified these
+-      are 12.2 leftovers (header X covers clear-all; footer buttons
+-      are a modern surface the donor did not have). OPEN QUESTION
+-      (user): drop the footer rows entirely for donor fidelity?
++- [X] 18.3 Shade footer "Manage"/"History" buttons: DECIDED (user,
++      2026-10-21): DROP the footer rows entirely - full donor
++      fidelity ("minimize modern hybrids - either full 4.4, or
++      modern, at least in feeling"). The header X already covers
++      clear-all (12.2); the footer buttons are a modern surface the
++      donor did not have. Remove FooterViewModel/manage text/
++      footer row visibility - keep the footer dismiss pipeline for
++      the header X (they share the clearAllNotifications path).
+ - [ ] 18.4 Expanded-QS gap between header and brightness bar: NOT
+       donor geometry - the 4.4 QS panel had the slider immediately
+       under the 48dp header. The 12.1 margin zeroing covered the
+@@ -1942,30 +1946,78 @@ the next work batch.
+       margin zeroing to the expanded QS container.
+ - [ ] 18.5 Shade-open transition fades like modern (window alpha),
+       not the 4.4 opaque PanelView height ride with grab handle.
+-      SCOPE WARNING: touches ScrimController/ShadeController window
+-      animation paths, which couple to the keyguard window (the
+-      hard-constraint area). 15.2 fixed the fling physics; this is
+-      the open-animation half. Needs a careful spike.
++      DECIDED (user, 2026-10-21): FULL donor opaque-ride port (not
++      the cheap interpolator swap). SCOPE WARNING stands: touches
++      ScrimController/ShadeController window animation paths, which
++      couple to the keyguard window (hard-constraint area). 15.2
++      fixed the fling physics; this is the open-animation half.
++      Spike plan: trace the modern open transition
++      (ShadeController/ScrimController alpha path) -> graft the
++      donor PanelView semantics (opaque panel rides the height
++      animation, grab handle attached) -> verify keyguard/AOD
++      unchanged (window coupling is the risk surface) -> device
++      battery.
+ 
+ ## Phase 16 ratifications + P19 environment (user decisions, 2026-10-21)
+ 
+ - DeskClock: port VERBATIM (no modern sounds/settings UX). Theme:
+-  faithful to the 4.4 actual theme choice (Holo Light + dark action
+-  bar era semantics - NOT blanket dark). SCHEDULE_EXACT_ALARM
+-  manifest perm + shim approved.
++  CONFIRMED (user): keep the 4.4 actual theme choice - Holo Light +
++  dark action bar era semantics, NOT blanket dark.
++  SCHEDULE_EXACT_ALARM manifest perm + shim approved.
+ - Messaging: DEFERRED ENTIRELY - no port, ship modern, the app
+   cannot be tested without a SIM. Tier 1 remainder is DeskClock only.
+ - 4.4 reference build (P19): second repo workspace at ~/kitkat-build
+   (OUTSIDE ~/android/lineage, never in the ROM repos),
+   android-4.4.4_r1, sdk_phone_x86_64 emulator target; disk space
+-  approved; full emulator build; needs the 4.4-era JDK toolchain.
++  approved; full emulator build; needs the 4.4-era JDK toolchain
++  (openjdk 7/8 - modern JDKs will not build 4.4; bundle if the host
++  package is unavailable).
+ - 4.4-native KitKatWidgetPlayground variant to build INTO the 4.4
+-  ROM (API-19 resource syntax); written pixel-diff report per
+-  widget family (accept-and-document deltas).
++  ROM (API-19 resource syntax, no product_specific/soong-era attrs);
++  written pixel-diff report per widget family (accept-and-document
++  deltas). SCREENSHOTS: limited/only-when-necessary per user (AI
++  cost) - the written report is the deliverable, images only where
++  words cannot describe the delta.
+ - Playback verification scope (user AVD): just confirm playback
+   works (Music + DeskClock alarms).
+ - All touch/hardware-only items (14.11 marquee, 15.2 fling feel,
+   14.1 glow, gesture typing): DOCUMENT-DEFERRED, not open blockers.
++- GOVERNING RULE (user, 2026-10-21, refines philosophy rule 3):
++  MINIMIZE MODERN HYBRIDS. Every surface is either FULL 4.4 (ported
++  donor geometry/behavior) or honestly modern - nothing in
++  between. 18.3 (footer drop) and 18.5 (full opaque-ride) were both
++  decided under this rule; apply it to every future delta call.
++
++## Work plan - FINAL ROUND (everything needed to complete TASKS.md)
++
++User runs ONE more build + device pass before the next code batch.
++Then, in order:
++
++1. 18.1 keyboard label alignment port (LatinIME themes-kitkat.xml +
++   possibly KeyDrawParams semantics) + 18.2 navbar IME-rotation
++   suppress + 18.4 expanded-QS margin zeroing + 18.3 footer drop +
++   18.5 opaque-ride port. Build + OpenCode device battery
++   (the emulator + pixel-analysis loop is proven).
++2. DeskClock verbatim port (Music template): donor clone to
++   ~/kitkat-src/deskclock-4.4, verbatim tree at packages/apps/
++   DeskClock, module name kept, product_specific + targetSdk 29 +
++   Theme.Holo.Light-with-dark-AB swap + channels + immutable PIs +
++   SCHEDULE_EXACT_ALARM shim + exported + MODE_WORLD prefs sweep.
++   Build + battery (alarm fires; playback confirm on user AVD).
++3. P19 4.4 reference build: repo init android-4.4.4_r1 at
++   ~/kitkat-build, full emulator build, 4.4-native playground
++   baked in; boot BOTH emulators; screencap playground on both;
++   written pixel-diff report per widget family (17.6/15.4 +
++   14.12 retirement); screenshots only where necessary.
++4. Close every [/] verification line against the canonical AVD
++   battery (P1-P9 pending items, 14.x eyeballs, 15.3/15.4) or mark
++   document-deferred (hardware/touch items).
++5. Tier 2/3 spikes under the governing rule: Dialer (ship modern if
++   unsafe), Contacts standalone if Dialer no-go, Calendar, Gallery
++   JNI, Camera camera1 trial, PackageInstaller retheme check.
++   14.13 ring-hint port once P15/18.5 shade work is stable.
++6. Final TASKS.md audit: no [ ] items unowned, every accept-and-
++   document delta recorded, consolidated index empty.
+ 
+ ## Implementation notes (2026-10-21, fourth batch)
+ 
+-- 
+2.53.0
+

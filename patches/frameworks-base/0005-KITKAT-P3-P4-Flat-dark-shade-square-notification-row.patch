@@ -1,0 +1,86 @@
+From 1dcb8567e9b1d50445a655197960c3236d82727a Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Tue, 20 Oct 2026 14:14:43 -0500
+Subject: [PATCH 05/29] KITKAT-P3/P4: Flat dark shade, square notification
+ rows, squared volume slider
+
+- notification_material_bg base layer -> flat #ff252525 (state layer is
+  transparent at rest, press feedback intact)
+- rounded_bg_full (shade root, volume panel, half shelf) -> flat #ff161616
+  with 2dp corners, darker than the notification rows so they still read
+- notification_corner_radius 28dp -> 0dp, notification_corner_radius_small
+  4dp -> 0dp (feeds StackScrollAlgorithm, NotificationStackScrollLayout,
+  ExpandableNotificationRow, media control panel)
+- volume_dialog_slider_corner_radius 21dp -> 2dp
+---
+ .../SystemUI/res/drawable/notification_material_bg.xml |  2 +-
+ packages/SystemUI/res/drawable/rounded_bg_full.xml     | 10 +++++-----
+ packages/SystemUI/res/values/dimens.xml                |  6 +++---
+ 3 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/packages/SystemUI/res/drawable/notification_material_bg.xml b/packages/SystemUI/res/drawable/notification_material_bg.xml
+index 3f903aece0b5..0e36bb7d02d1 100644
+--- a/packages/SystemUI/res/drawable/notification_material_bg.xml
++++ b/packages/SystemUI/res/drawable/notification_material_bg.xml
+@@ -20,7 +20,7 @@
+         android:color="?android:attr/colorControlHighlight">
+     <item>
+         <shape>
+-            <solid android:color="?androidprv:attr/materialColorSurfaceContainerHigh" />
++            <solid android:color="#ff252525" />
+         </shape>
+     </item>
+     <item>
+diff --git a/packages/SystemUI/res/drawable/rounded_bg_full.xml b/packages/SystemUI/res/drawable/rounded_bg_full.xml
+index 967c57b0c370..3746afcd3ce7 100644
+--- a/packages/SystemUI/res/drawable/rounded_bg_full.xml
++++ b/packages/SystemUI/res/drawable/rounded_bg_full.xml
+@@ -2,11 +2,11 @@
+ <shape xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:androidprv="http://schemas.android.com/apk/prv/res/android"
+        android:shape="rectangle">
+-    <solid android:color="?androidprv:attr/colorSurface" />
++    <solid android:color="#ff161616" />
+     <corners
+-        android:bottomLeftRadius="?android:attr/dialogCornerRadius"
+-        android:topLeftRadius="?android:attr/dialogCornerRadius"
+-        android:bottomRightRadius="?android:attr/dialogCornerRadius"
+-        android:topRightRadius="?android:attr/dialogCornerRadius"
++        android:bottomLeftRadius="2dp"
++        android:topLeftRadius="2dp"
++        android:bottomRightRadius="2dp"
++        android:topRightRadius="2dp"
+         />
+ </shape>
+diff --git a/packages/SystemUI/res/values/dimens.xml b/packages/SystemUI/res/values/dimens.xml
+index 602a51bb0a36..7ec859afa0ac 100644
+--- a/packages/SystemUI/res/values/dimens.xml
++++ b/packages/SystemUI/res/values/dimens.xml
+@@ -307,13 +307,13 @@
+     <dimen name="notification_min_interaction_height">40dp</dimen>
+ 
+     <!-- Radius for notifications corners without adjacent notifications -->
+-    <dimen name="notification_corner_radius">28dp</dimen>
++    <dimen name="notification_corner_radius">0dp</dimen>
+ 
+     <!-- Distance over which notification corner animations run, near the shelf while scrolling. -->
+     <dimen name="notification_corner_animation_distance">48dp</dimen>
+ 
+     <!-- Radius for notifications corners with adjacent notifications -->
+-    <dimen name="notification_corner_radius_small">4dp</dimen>
++    <dimen name="notification_corner_radius_small">0dp</dimen>
+ 
+     <!-- the padding of the shelf icon container -->
+     <dimen name="shelf_icon_container_padding">13dp</dimen>
+@@ -578,7 +578,7 @@
+ 
+     <dimen name="volume_dialog_slider_width">42dp</dimen>
+ 
+-    <dimen name="volume_dialog_slider_corner_radius">21dp</dimen>
++    <dimen name="volume_dialog_slider_corner_radius">2dp</dimen>
+ 
+     <!-- (volume_dialog_panel_width - rounded_slider_icon_size) / 2 -->
+     <dimen name="volume_slider_icon_inset">11dp</dimen>
+-- 
+2.53.0
+

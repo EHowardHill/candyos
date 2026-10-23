@@ -1,0 +1,142 @@
+From 52e034f7160d9d5261c4500449ed9d6f46f0fb69 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Thu, 22 Oct 2026 08:33:53 -0500
+Subject: [PATCH 23/29] KitKat UI: Phase 20 audit corrected + expanded from
+ donor re-study
+
+20.4 corrected (donor gear-tap = expand QS panel = our 15.3; only
+styling deltas remain). New: 20.7 tile flat-color bg (#161616 rest /
+#212121 press, no ripple - first audit had the wrong layer), 20.8
+brightness inline-slider is a modern hybrid vs donor tile+dialog
+(decision), 20.9 header clock/date pill + typography, 20.10 QS tile
+set/order vs donor grid. 20.2 enriched: donor handle rides the drag
+edge.
+---
+ TASKS.md | 90 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 82 insertions(+), 8 deletions(-)
+
+diff --git a/TASKS.md b/TASKS.md
+index 632a7978556c..92e083a1fd7b 100644
+--- a/TASKS.md
++++ b/TASKS.md
+@@ -1856,12 +1856,16 @@ Everything still open across the file (updated 2026-10-22):
+ - P18: 18.1/18.2/18.3/18.5 closed; 18.4 SUPERSEDED by 20.5 (user pass
+   still sees excess space - the qs_footer fix was necessary but not
+   sufficient).
+-- P20 NEW (2026-10-22 user pass): six shade/QS/keyboard issues -
+-  20.1 keyboard toggle icons, 20.2 blur/unroll drag semantics (the
+-  biggest item, needs a donor-vs-approximation decision), 20.3
+-  footer row, 20.4 header button styling + behavior mapping,
+-  20.5 space above slider (supersedes 18.4), 20.6 tile gaps + solid
+-  black QS background (needs gradient-vs-flat decision).
++- P20 (2026-10-22, audited vs donor re-study): TEN items -
++  20.1 keyboard toggle icons, 20.2 blur/unroll drag (donor handle
++  rides the drag edge; clip-vs-approximate decision), 20.3 footer
++  row, 20.4 header buttons (CORRECTED: donor gear-tap = expand QS
++  panel = our 15.3; styling-only deltas), 20.5 space above slider
++  (supersedes 18.4), 20.6 tile gaps + QS page bg (layer corrected),
++  20.7 tile flat-color bg #161616/#212121 no ripple, 20.8 brightness
++  slider-vs-tile DECISION, 20.9 header clock/date pill + typography,
++  20.10 QS tile set/order vs donor. User decisions pending: 20.2,
++  20.6 pairing, 20.8, 20.10.
+ - P19: SCRAPPED (2026-10-22, user): 4.4 cannot build on this machine
+   (modern host toolchain vs 4.4's make-3.8x/JDK6 toolchain gates).
+   ~/kitkat-build workspace abandoned; verification standard revised
+@@ -2107,6 +2111,14 @@ fix plan below. Fixes are the NEXT work batch.
+       (ShadeExpansionStateManager/NSSL alpha animators), and pin the
+       shade_bottom_handle (P3 grabber) to the moving bottom edge so
+       it tracks the finger. DECISION NEEDED from user if (1) vs (2).
++      DONOR DETAIL (re-study): the 4.4 handle is the WHITE
++      status_bar_close 9-patch (36dp) drawn in
++      NotificationPanelView.draw() GLUED TO THE BOTTOM EDGE OF THE
++      EXPANDED AREA (offset = getHeight - handleHeight -
++      paddingBottom) - it TRACKS THE DRAG EDGE mid-drag, not the
++      panel bottom. Our P3 handle is pinned to the panel bottom
++      only; whichever option wins, the handle must ride the
++      expansion edge.
+       SCOPE WARNING: same keyguard-coupled area as 18.5; keyguard
+       swipe-up/AOD must stay stock (donor panel never did those).
+ - [ ] 20.3 "Manage"/"Clear all" row still visible / looks wrong.
+@@ -2122,7 +2134,27 @@ fix plan below. Fixes are the NEXT work batch.
+       container (notif_footer row) hides entirely (not just buttons)
+       - if the row persists as empty space, GONE the footer container
+       as well. Verify on device.
+-- [ ] 20.4 Header clear-all / settings buttons "don't feel right".
++- [/] 20.4 Header clear-all / settings buttons "don't feel right".
++      CORRECTION (2026-10-22 donor re-study): the donor gear TAP =
++      mSettingsButtonListener -> animateExpandSettingsPanel() - the
++      gear opens the QS SETTINGS PANEL, which is EXACTLY our 15.3
++      gear-tap=flip behavior. No behavior change needed; the earlier
++      note ("donor settings button opens Settings") was WRONG.
++      Remaining deltas are STYLING ONLY (donor
++      status_bar_expanded_header.xml):
++      - clear-all: 50dp (we pinned 48dp), ic_notify_clear art (have)
++        on ic_notify_button_bg dark press 9-patch (we use modern
++        selectableItemBackground ripple - wrong).
++      - settings: 50dp holder, ic_notify_settings glyph (we use the
++        modern ic_settings gear - wrong art), ic_notify_button_bg.
++      - clock/date sit in an ic_notify_button_bg PILL at the left,
++        enabled=false (non-pressable), donor
++        TextAppearance.StatusBar.Expanded.Clock/Date typography.
++      Fix: port donor ic_notify_settings + ic_notify_button_bg art
++        per density, re-size both header buttons to 50dp, swap the
++        ripple backgrounds, port the header clock/date pill +
++        typography. KEEP 15.3 behavior (tap=flip matches donor).
++
+       Donor header (status_bar_expanded_header.xml): clear-all is
+       ic_notify_clear inside ic_notify_button_bg (a dark rounded
+       48x48 press 9-patch), settings button is
+@@ -2151,7 +2183,49 @@ fix plan below. Fixes are the NEXT work batch.
+       (media controls in QQS per 12.1 note). Fix: measure on device
+       (screencap + geometry walk of the expanded QS) then zero/pin
+       the specific container; re-verify with the same battery.
+-- [ ] 20.6 QS tile spacing too wide; panel background not solid black.
++- [/] 20.6 QS tile spacing too wide; panel background not solid black.
++      Donor: quick_settings_cell_gap 4dp, 3 columns (110dp cells),
++      QS page background = notification_panel_bg.9.png (phone bucket,
++      opaque black 9-patch). Modern: qs_tile_margin_horizontal/
++      vertical 8dp (16dp effective) + rounded_bg_full gradient (P3).
++      Fixes: (a) tile margins -> 4dp donor cell gap, (b) port
++      notification_panel_bg.9.png as the QS page container bg;
++      the SHADE ROOT keeps the P3 gradient (donor used both: gradient
++      panel root; QS flip content on its own flat bg).
++      CORRECTION (donor re-study): first audit said tiles sit on "a
++      flat black 9-patch" - wrong layer; tiles have NO 9-patch, see
++      20.7. Gradient-vs-flat pairing decision still open.
++- [ ] 20.7 QS TILE background (missed by the first audit): donor
++      qs_tile_background.xml is a flat COLOR SELECTOR - #161616 at
++      rest, #212121 pressed (subtle lighten-press; no ripple, no
++      rounded corners, no 9-patch). Ours: modern ripple + rounded.
++      Fix: port the donor color selector verbatim, kill the tile
++      ripple; press = #212121 lighten exactly as 4.4.
++- [ ] 20.8 Brightness: INLINE SLIDER is a MODERN HYBRID, not donor.
++      Donor phone QS (QuickSettings.setupQuickSettings): brightness
++      is a TILE (ic_qs_brightness_auto_off/on) in the grid that opens
++      quick_settings_brightness_dialog on tap - NO inline slider
++      above the grid. Our P4 inline slider + Auto checkbox is a
++      user-approved hybrid (10.1 battery). DECISION NEEDED: (a) keep
++      the inline slider (documented hybrid), or (b) full donor:
++      brightness tile in the grid + port the donor brightness dialog
++      (dialog art already restyled in P4 - (b) is mostly placement).
++- [ ] 20.9 Header clock/date pill + typography (missed): donor
++      header = 48dp LinearLayout, clock+date inside a non-pressable
++      ic_notify_button_bg PILL at the left (enabled=false), donor
++      TextAppearance.StatusBar.Expanded.Clock/.Date styles. Ours:
++      modern header text appearances, no pill. Fix: port the pill +
++      donor SystemUI text appearances into combined_qs_header.
++- [ ] 20.10 QS grid content + ORDER (missed): donor grid order =
++      USER tile first, then BRIGHTNESS, then a SETTINGS tile (opens
++      Settings app from inside the grid), then wifi / rssi(cell) /
++      battery / bluetooth / location / rotation-lock (+ conditional
++      SSL/IME tiles). Ours: modern tile set and order, no user tile,
++      no in-grid settings tile. 14.5 documented the ICON hybrid; this
++      is the SET+ORDER delta. DECISION NEEDED: full donor set/order
++      (user tile wiring exists from the P4 avatar work) vs keep the
++      modern set as documented hybrid.
++
+       Donor: quick_settings_cell_gap 4dp, 3 columns (110dp cells),
+       panel background = notification_panel_bg.9.png - a BLACK opaque
+       9-patch (phone bucket), NOT a gradient. Modern tree:
+-- 
+2.53.0
+

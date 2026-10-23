@@ -1,0 +1,197 @@
+From 9acb46ec7260dc6918ed09e0759e2a7ae56390c4 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Wed, 21 Oct 2026 20:29:12 -0500
+Subject: [PATCH 16/29] KitKat UI P18: navbar IME-rotation suppress, shade
+ footer drop, QS gap, opaque scrims
+
+- 18.2 NavigationBarView.orientBackButton: 4.4 never rotated the back
+  glyph; suppress the modern IME-visibility rotation in 3-button mode
+  (animate back to 0 if set; gestural keeps stock).
+- 18.3 FooterViewModel/FooterViewBinder/FooterView: manage/history
+  footer button retired (donor shade had none); visibility flow wired,
+  re-enable is a one-line flip.
+- 18.4 qs_panel_padding_top 80dp -> 48dp (header-height clearance,
+  the 80dp reserved the removed modern big-clock header). Partial: gap
+  reduced; remainder is QS-fragment clock container margins - layout
+  trace pending.
+- 18.5 notification_scrim_transparent=true: UNLOCKED-state scrim
+  alphas zero (ScrimController mTransparentScrimBackground path) -
+  the P3 gradient panel rides the PanelView height animation fully
+  opaque, donor 4.4 behavior. Keyguard scrims untouched (state-driven).
+---
+ packages/SystemUI/res/values/bools.xml        | 10 ++++--
+ packages/SystemUI/res/values/dimens.xml       |  7 +++-
+ .../navigationbar/NavigationBarView.java      | 32 +++++++++----------
+ .../footer/ui/view/FooterView.java            | 17 ++++++++++
+ .../footer/ui/viewbinder/FooterViewBinder.kt  | 22 +++++++++++--
+ .../footer/ui/viewmodel/FooterViewModel.kt    |  6 +++-
+ 6 files changed, 72 insertions(+), 22 deletions(-)
+
+diff --git a/packages/SystemUI/res/values/bools.xml b/packages/SystemUI/res/values/bools.xml
+index 234c6df69d0b..c1de17341144 100644
+--- a/packages/SystemUI/res/values/bools.xml
++++ b/packages/SystemUI/res/values/bools.xml
+@@ -28,8 +28,14 @@
+     <!-- Whether to enable clipping on Notification Views -->
+     <bool name="notification_enable_clipping">true</bool>
+ 
+-    <!-- Whether to enable transparent background for notification scrims -->
+-    <bool name="notification_scrim_transparent">false</bool>
++    <!-- KitKat UI P18.5: the 4.4 shade panel was OPAQUE - it rode the
++         PanelView height animation at full alpha with the grab handle
++         attached; the modern scrim fade (behind/notifications scrims
++         darkening with expansion) reads as a post-4.4 fade. Pinning this
++         true zeroes the UNLOCKED-state scrim alphas (ScrimController
++         mTransparentScrimBackground path), so the P3 gradient panel is
++         fully opaque through the whole open/drag/fling - donor ride. -->
++    <bool name="notification_scrim_transparent">true</bool>
+ 
+     <!-- Control whether to force apps to give up control over the display of system bars at all
+      times regardless of System Ui Flags.
+diff --git a/packages/SystemUI/res/values/dimens.xml b/packages/SystemUI/res/values/dimens.xml
+index acbaf6757aaf..529299b7ead9 100644
+--- a/packages/SystemUI/res/values/dimens.xml
++++ b/packages/SystemUI/res/values/dimens.xml
+@@ -721,7 +721,12 @@
+     <dimen name="qs_dual_tile_padding_horizontal">6dp</dimen>
+     <dimen name="qs_panel_elevation">4dp</dimen>
+     <dimen name="qs_panel_padding_bottom">@dimen/footer_actions_height</dimen>
+-    <dimen name="qs_panel_padding_top">80dp</dimen>
++    <!-- KitKat UI P18.4: the 4.4 QS panel had the brightness slider
++         immediately under the 48dp header row. The stock 80dp reserved
++         clearance for the modern big-clock header, which P15.1 removed
++         (qs_header_height is 48dp) - that clearance is the dead gap the
++         user saw between header and slider on the expanded shade. -->
++    <dimen name="qs_panel_padding_top">48dp</dimen>
+ 
+     <dimen name="qs_data_usage_text_size">14sp</dimen>
+     <dimen name="qs_data_usage_usage_text_size">36sp</dimen>
+diff --git a/packages/SystemUI/src/com/android/systemui/navigationbar/NavigationBarView.java b/packages/SystemUI/src/com/android/systemui/navigationbar/NavigationBarView.java
+index 3b86d302ac0a..ccf117642fff 100644
+--- a/packages/SystemUI/src/com/android/systemui/navigationbar/NavigationBarView.java
++++ b/packages/SystemUI/src/com/android/systemui/navigationbar/NavigationBarView.java
+@@ -548,27 +548,27 @@ public class NavigationBarView extends FrameLayout {
+         final boolean useAltBack =
+                 (mNavigationIconHints & StatusBarManager.NAVIGATION_HINT_BACK_ALT) != 0;
+         final boolean isRtl = mConfiguration.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
+-        float degrees = useAltBack ? (isRtl ? 90 : -90) : 0;
+-        if (drawable.getRotation() == degrees) {
++        // KitKat UI P18.2: 4.4 NEVER rotated the back glyph - the arrow
++        // pointed left, always, IME open or not. Suppress the modern
++        // IME-visibility rotation entirely in 3-button mode (the KitKat
++        // navbar is 3-button-only on this build; gestural mode keeps the
++        // stock behavior below for completeness).
++        if (!isGesturalMode(mNavBarMode)) {
++            if (drawable.getRotation() != 0f) {
++                ObjectAnimator.ofPropertyValuesHolder(drawable,
++                        PropertyValuesHolder.ofFloat(KeyButtonDrawable.KEY_DRAWABLE_ROTATE, 0f),
++                        PropertyValuesHolder.ofFloat(KeyButtonDrawable.KEY_DRAWABLE_TRANSLATE_Y,
++                                0f))
++                        .setDuration(200).start();
++            }
+             return;
+         }
+-
+-        if (isGesturalMode(mNavBarMode)) {
+-            drawable.setRotation(degrees);
++        float degrees = useAltBack ? (isRtl ? 90 : -90) : 0;
++        if (drawable.getRotation() == degrees) {
+             return;
+         }
+ 
+-        // Animate the back button's rotation to the new degrees and only in portrait move up the
+-        // back button to line up with the other buttons
+-        float targetY = !mShowSwipeUpUi && !mIsVertical && useAltBack
+-                ? - getResources().getDimension(R.dimen.navbar_back_button_ime_offset)
+-                : 0;
+-        ObjectAnimator navBarAnimator = ObjectAnimator.ofPropertyValuesHolder(drawable,
+-                PropertyValuesHolder.ofFloat(KeyButtonDrawable.KEY_DRAWABLE_ROTATE, degrees),
+-                PropertyValuesHolder.ofFloat(KeyButtonDrawable.KEY_DRAWABLE_TRANSLATE_Y, targetY));
+-        navBarAnimator.setInterpolator(Interpolators.FAST_OUT_SLOW_IN);
+-        navBarAnimator.setDuration(200);
+-        navBarAnimator.start();
++        drawable.setRotation(degrees);
+     }
+ 
+     private void orientHomeButton(KeyButtonDrawable drawable) {
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/view/FooterView.java b/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/view/FooterView.java
+index 96eaaa9f31ea..bda5fae6a336 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/view/FooterView.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/view/FooterView.java
+@@ -265,6 +265,23 @@ public class FooterView extends StackScrollerDecorView {
+         }
+     }
+ 
++    /**
++     * KitKat UI P18.3: donor fidelity - the manage/history footer button is
++     * retired (the 4.4 shade had no such button; clear-all lives in the
++     * header X). Plain GONE; re-enabling is the FooterViewModel flip.
++     */
++    public void setManageButtonVisible(boolean visible, boolean animate) {
++        setManageButtonVisible(visible, animate, null);
++    }
++
++    public void setManageButtonVisible(boolean visible, boolean animate,
++            Consumer<Boolean> onAnimationEnded) {
++        mManageOrHistoryButton.setVisibility(visible ? View.VISIBLE : View.GONE);
++        if (onAnimationEnded != null) {
++            onAnimationEnded.accept(visible);
++        }
++    }
++
+     /** Set onClickListener for the manage/history button. */
+     public void setManageButtonClickListener(OnClickListener listener) {
+         mManageOrHistoryButton.setOnClickListener(listener);
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/viewbinder/FooterViewBinder.kt b/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/viewbinder/FooterViewBinder.kt
+index 65ab4fdeb77b..75bc4717bd42 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/viewbinder/FooterViewBinder.kt
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/viewbinder/FooterViewBinder.kt
+@@ -141,8 +141,26 @@ object FooterViewBinder {
+             }
+         }
+ 
+-        // NOTE: The manage/history button is always visible as long as the footer is visible, no
+-        //  need to update the visibility here.
++        launch {
++            // KitKat UI P18.3: donor fidelity - the manage/history button is
++            // hidden (FooterViewModel pins isVisible false); wire the
++            // visibility flow so the flip back on is a one-line change.
++            viewModel.manageOrHistoryButton.isVisible.collect { isVisible ->
++                if (isVisible.isAnimating) {
++                    footer.setManageButtonVisible(
++                        isVisible.value,
++                        /* animate = */ true,
++                    ) { _ ->
++                        isVisible.stopAnimating()
++                    }
++                } else {
++                    footer.setManageButtonVisible(
++                        isVisible.value,
++                        /* animate = */ false,
++                    )
++                }
++            }
++        }
+     }
+ 
+     private suspend fun bindMessage(
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/viewmodel/FooterViewModel.kt b/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/viewmodel/FooterViewModel.kt
+index 4c5af0afc5ea..5c9afdd6ffd4 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/viewmodel/FooterViewModel.kt
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/notification/footer/ui/viewmodel/FooterViewModel.kt
+@@ -67,7 +67,11 @@ class FooterViewModel(
+         FooterButtonViewModel(
+             labelId = manageOrHistoryButtonText,
+             accessibilityDescriptionId = manageOrHistoryButtonText,
+-            isVisible = flowOf(AnimatedValue.NotAnimating(true)),
++            // KitKat UI P18.3: the donor shade had NO manage/history footer
++            // button (clear-all lives in the header X, ShadeHeaderController).
++            // Full-donor-fidelity ruling: footer row hidden; the binder keeps
++            // wiring the click/label paths so re-enabling is a one-line flip.
++            isVisible = flowOf(AnimatedValue.NotAnimating(false)),
+         )
+ 
+     val message: FooterMessageViewModel =
+-- 
+2.53.0
+

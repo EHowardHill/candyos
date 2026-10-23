@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<com.android.datetimepicker.date.AccessibleDateAnimator xmlns:ns0="http://schemas.android.com/apk/res/android" ns0:id="@+id/animator" ns0:layout_width="@dimen/date_picker_component_width" ns0:layout_height="@dimen/date_picker_view_animator_height" ns0:gravity="center" ns0:background="@color/date_picker_view_animator" />

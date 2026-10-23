@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout xmlns:ns0="http://schemas.android.com/apk/res/android" ns0:layout_width="match_parent" ns0:layout_height="wrap_content" ns0:minHeight="48dip" ns0:orientation="horizontal" ns0:gravity="center_vertical" ns0:background="?android:attr/activatedBackgroundIndicator">
+    <LinearLayout ns0:layout_width="0dip" ns0:layout_height="wrap_content" ns0:gravity="center_vertical" ns0:orientation="vertical" ns0:layout_weight="1">
+        <TextView ns0:id="@android:id/title" ns0:textColor="@drawable/list_item_font_primary" ns0:textSize="18sp" ns0:layout_width="wrap_content" ns0:layout_height="wrap_content" ns0:paddingLeft="8dip" ns0:singleLine="true" ns0:ellipsize="end" />
+        <TextView ns0:id="@android:id/text1" ns0:textColor="@drawable/list_item_font_secondary" ns0:textSize="14sp" ns0:layout_width="wrap_content" ns0:layout_height="wrap_content" ns0:paddingLeft="16dip" ns0:singleLine="true" ns0:ellipsize="end" ns0:layout_marginTop="-4dip" />
+    </LinearLayout>
+    <ImageView ns0:id="@android:id/icon" ns0:layout_width="48dip" ns0:layout_height="48dip" ns0:layout_marginLeft="12dip" ns0:src="@drawable/ic_contact_picture" ns0:cropToPadding="true" ns0:scaleType="centerCrop" />
+</LinearLayout>
