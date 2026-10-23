@@ -43,8 +43,12 @@ fastmirror/close server helps). Subsequent syncs are incremental.
 
 ## Build
 
+`envsetup.sh` finds the tree root from your current directory, so always
+`cd` into the tree before sourcing it:
+
 ```
-source ~/android/lineage/build/envsetup.sh
+cd ~/android/lineage
+source build/envsetup.sh
 lunch lineage_sdk_phone_x86_64-ap2a-userdebug
 m -j$(nproc)
 ```
@@ -58,7 +62,8 @@ The emulator ships with the tree; the important flags are the Pixel 3a
 geometry and software rendering (the UI was QA'd on SwiftShader):
 
 ```
-source ~/android/lineage/build/envsetup.sh
+cd ~/android/lineage
+source build/envsetup.sh
 lunch lineage_sdk_phone_x86_64-ap2a-userdebug
 emulator -gpu swiftshader_indirect -no-snapshot -no-audio \
          -skin 1080x2220 -dpi-device 440

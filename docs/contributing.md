@@ -20,7 +20,8 @@ CandyOS repo** or your changes will be wiped on the next sync.
 ```
 # edit ~/android/candyos/apps/DeskClock/...
 ~/android/candyos/scripts/candyos-sync.sh ~/android/lineage   # refresh the tree slot
-source ~/android/lineage/build/envsetup.sh
+cd ~/android/lineage
+source build/envsetup.sh
 lunch lineage_sdk_phone_x86_64-ap2a-userdebug && m -j$(nproc)  # build + test
 # then: git commit + push + PR, as with any repo
 ```

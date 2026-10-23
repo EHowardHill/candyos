@@ -6,10 +6,14 @@
 git clone https://github.com/EHowardHill/candyos ~/android/candyos
 ~/android/candyos/scripts/candyos-init.sh  ~/android/lineage
 ~/android/candyos/scripts/candyos-sync.sh ~/android/lineage
-source ~/android/lineage/build/envsetup.sh
+cd ~/android/lineage
+source build/envsetup.sh
 lunch lineage_sdk_phone_x86_64-ap2a-userdebug
 m -j$(nproc)
 ```
+
+(`envsetup.sh` finds the tree root from your current directory — source it
+from inside the tree, never from elsewhere.)
 
 Prerequisites (disk, RAM, packages, repo tool) and emulator instructions are in
 [docs/getting-started.md](docs/getting-started.md).
