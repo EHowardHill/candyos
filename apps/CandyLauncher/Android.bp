@@ -20,8 +20,23 @@ android_app_import {
 
     apk: "CandyLauncher.apk",
     presigned: true,
+    // targetSdk >= 30 requires v2 signing; preprocessed keeps the build
+    // system from reprocessing (and thereby wrecking) the signature. The
+    // APK ships already zipaligned.
+    preprocessed: true,
 
     system_ext_specific: true,
+
+    // The APK manifest declares androidx.window.extensions/sidecar as
+    // optional <uses-library> tags (the window-manager Jetpack interfaces,
+    // defined in frameworks/base/libs/WindowManager/Jetpack). The import
+    // must declare the same set or manifest_check fails the build on the
+    // build-system/manifest mismatch.
+    optional_uses_libs: [
+        "androidx.window.extensions",
+        "androidx.window.sidecar",
+    ],
+
     overrides: [
         "Home",
         "Launcher2",

@@ -60,18 +60,55 @@ a typical dev machine; incremental rebuilds are much faster.
 
 ## Run it on the emulator
 
-The emulator ships with the tree:
+The bundled launcher, `scripts/candyos-emulator.sh`, does the whole loop —
+clean boot, launch, and wait:
 
 ```
-cd ~/android/lineage
-source build/envsetup.sh
-lunch lineage_sdk_phone_x86_64-ap2a-userdebug
-emulator -gpu swiftshader_indirect -no-snapshot -no-audio \
-         -skin 1080x2220 -dpi-device 440
+~/android/candyos/scripts/candyos-emulator.sh ~/android/lineage
 ```
 
-First boot takes several minutes on SwiftShader — the window freezes while
-Android boots. Watch progress with:
+(The `<lineage-tree>` argument can be dropped when `$CANDYOS_ANDROID_TREE`
+is exported — all candyos-* scripts accept that default.)
+
+What it does:
+
+* Wipes the AVD `userdata`/`cache`/FBE-key images in
+  `out/target/product/emu64x/` first, so every launch is a clean first
+  boot — lock-screen PINs and other `/data` state from a previous run
+  never survive a relaunch (snapshots are disabled too).
+* Launches the emulator with the lunch environment wired in, on the
+  canonical QA device geometry (Pixel 3a-sized: 1080x2220 skin @ 440dpi,
+  SwiftShader rendering, window on `DISPLAY=:0`).
+* Waits until Android reports `sys.boot_completed` — up to 5 minutes for
+  the device to register with adb, then 20 minutes for the boot itself.
+  First boot takes several minutes on SwiftShader; the window freezes
+  while Android boots, which is normal.
+
+To stop the emulator (no `<lineage-tree>` needed):
+
+```
+~/android/candyos/scripts/candyos-emulator.sh --kill
+```
+
+Details and fallbacks:
+
+* The launch log is `/tmp/opencode/emulator.log`.
+* The emulator binary runs from a scratch copy in
+  `/tmp/opencode/android-emulator` because the tree's
+  `prebuilts/android-emulator` checkout is intermittently unavailable on
+  this machine; the script refreshes the copy from the tree when it is
+  missing.
+* Launching by hand works too — the emulator ships with the tree:
+
+  ```
+  cd ~/android/lineage
+  source build/envsetup.sh
+  lunch lineage_sdk_phone_x86_64-ap2a-userdebug
+  emulator -gpu swiftshader_indirect -no-snapshot -no-audio \
+           -skin 1080x2220 -dpi-device 440
+  ```
+
+Watch progress with:
 
 ```
 adb shell getprop sys.boot_completed   # 1 when booted
@@ -80,7 +117,7 @@ adb shell getprop sys.boot_completed   # 1 when booted
 Notes from QA (see docs/phases/TASKS.md): module-only rebuilds do not always
 reach a booted emulator image — re-run a full `m -j$(nproc)` before relaunching
 to regenerate `system-qemu.img`, and wipe `userdata-qemu.img*` for a clean
-profile.
+profile (the launcher script does the wipe for you).
 
 ## Keeping the tree current
 

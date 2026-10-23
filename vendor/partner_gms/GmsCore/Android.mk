@@ -50,6 +50,8 @@ LOCAL_CERTIFICATE := PRESIGNED
 LOCAL_OVERRIDES_PACKAGES := com.qualcomm.location
 LOCAL_REQUIRED_MODULES := privapp-permissions-com.google.android.gms.xml default-permissions-com.google.android.gms.xml sysconfig-com.google.android.gms.xml microg.xml
 LOCAL_USES_LIBRARIES := com.android.location.provider
-LOCAL_OPTIONAL_USES_LIBRARIES := androidx.window.extensions androidx.window.sidecar
+# Must mirror the APK manifest exactly (manifest_check enforces coherence):
+# it also declares org.apache.http.legacy as optional.
+LOCAL_OPTIONAL_USES_LIBRARIES := org.apache.http.legacy androidx.window.extensions androidx.window.sidecar
 LOCAL_DEX_PREOPT := false
 include $(BUILD_PREBUILT)

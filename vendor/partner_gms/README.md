@@ -74,6 +74,14 @@ To move to newer versions: update the pins in `scripts/candyos-fetch-apps.sh`,
 delete the old APKs under this directory, re-run the fetch script, and
 commit the updated pins.
 
+A new APK version can change the `<uses-library>` tags in its manifest —
+the build's `manifest_check` then fails until the app's `Android.mk`
+(`LOCAL_USES_LIBRARIES` / `LOCAL_OPTIONAL_USES_LIBRARIES`) declares
+exactly the same set. Dump the tags of a fetched APK with
+`aapt2 dump badging <apk> | grep uses-library` (the build tree's aapt2 is
+`out/host/linux-x86/bin/aapt2`) and mirror any difference in the module
+definition.
+
 ## Updating the microG configuration defaults
 
 `GmsCore/microg.xml` (/product/etc/microg.xml) ships microG's default

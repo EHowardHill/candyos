@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Stub manifest for the empty launcher-aosp-tapl android_library declared
+     in Android.bp: soong requires an AndroidManifest.xml next to every
+     android_library, even a resource-less stub. The old Launcher3-Modern
+     source tree supplied one implicitly; the prebuilt CandyLauncher drop
+     does not, which broke the soong bootstrap. Package mirrors the upstream
+     TAPL library name; nothing installs or consumes it. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.android.launcher3.tapl" />

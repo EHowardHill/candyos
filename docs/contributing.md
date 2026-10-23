@@ -23,6 +23,7 @@ CandyOS repo** or your changes will be wiped on the next sync.
 cd ~/android/lineage
 source build/envsetup.sh
 lunch lineage_sdk_phone_x86_64-ap2a-userdebug && m -j$(nproc)  # build + test
+~/android/candyos/scripts/candyos-emulator.sh ~/android/lineage   # boot it for QA
 # then: git commit + push + PR, as with any repo
 ```
 
@@ -49,7 +50,9 @@ series. CandyOS then re-serializes your commits into `patches/`.
 
    This regenerates `patches/<series>/` (including BASE) from everything
    currently ahead of upstream in that project — your new commit included.
-4. **Build and test**, then run
+4. **Build and test** (boot the image with
+   `~/android/candyos/scripts/candyos-emulator.sh ~/android/lineage` —
+   see docs/getting-started.md), then run
    `~/android/candyos/scripts/candyos-verify.sh ~/android/lineage` as a
    final sanity check.
 5. **Commit the refreshed patches** in the CandyOS repo (add the new/changed
