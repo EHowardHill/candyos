@@ -1,10 +1,5 @@
 # CandyOS architecture
 
-CandyOS turns a stock LineageOS 21 tree into a KitKat-styled ROM. It does so
-without maintaining any LineageOS forks: everything CandyOS touches arrives
-in one repo, via two mechanisms chosen by how disconnected the change is
-from upstream code.
-
 ## The two mechanisms
 
 **1. Patch series** — for repos upstream actively develops (frameworks/base,
