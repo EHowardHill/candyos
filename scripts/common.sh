@@ -56,6 +56,7 @@ guard_project() {
         [ "$ahead" -gt "$expected" ] &&
             die "$path has $ahead local commits but only $expected are saved in CandyOS — run candyos-save.sh first"
     fi
+    return 0
 }
 
 # Put a patched project onto the plain upstream revision, discarding CandyOS
