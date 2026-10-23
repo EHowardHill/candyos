@@ -26,7 +26,7 @@ CandyOS modifies LineageOS in exactly two ways:
   develops (frameworks/base, Settings, LatinIME) are stored as ordered
   `git am` series and replayed on top of the stock upstream checkouts after
   every sync.
-* **Vendored apps** (`apps/`) — self-contained KitKat-era app ports
+* **Vendored apps** (`apps/`) — self-contained apps and KitKat-era app ports
   (Launcher, Calculator, SoundRecorder, Music, DeskClock, Calendar) are kept
   whole in this repo and copied into the corresponding LineageOS app slots,
   which are removed from the repo manifest so stock versions never return.
