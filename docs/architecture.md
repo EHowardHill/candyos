@@ -35,7 +35,7 @@ LineageOS 21.
 | `patches/settings/` | `packages/apps/Settings` | 2-patch series | Holo reskin: layouts, icons, styling. |
 | `patches/latinime/` | `packages/inputmethods/LatinIME` | 3-patch series | Forces the KitKat Holo keyboard theme, key-text-size attrs, flat key colors, donor label geometry. |
 | `patches/vendor-lineage/` | `vendor/lineage` | 1-patch series | Sets `WITH_GMS := true` so `vendor/partner_gms` is inherited (P22). Everything else in vendor/lineage stays stock. |
-| `apps/Launcher3-Modern/` | `packages/apps/Trebuchet` | vendored | KitKat Launcher3 port; registers as `TrebuchetQuickStep`, the module name `vendor/lineage` expects. |
+| `apps/CandyLauncher/` | `packages/apps/Trebuchet` | vendored | Prebuilt CandyLauncher APK (Flutter launcher, `com.example.thelauncher`); imported as `TrebuchetQuickStep`, the module name `vendor/lineage` expects. Non-privileged install: no privapp whitelist ships for it. |
 | `apps/Calculator/` | `packages/apps/ExactCalculator` | vendored | 4.4.4_r1 Calculator with modernized soong build, module name kept. |
 | `apps/SoundRecorder/` | `packages/apps/Recorder` | vendored | 4.4.4 SoundRecorder port, scoped storage, module name kept. |
 | `apps/Music/` | `packages/apps/Eleven` | vendored | 4.4.4 Music (`com.android.music`), module name kept. |

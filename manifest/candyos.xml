@@ -19,7 +19,7 @@
       Eleven, DeskClock, Etar, LatinIME) so vendor/lineage product config
       keeps resolving without changes:
 
-      packages/apps/Trebuchet      <- apps/Launcher3-Modern (KitKat Launcher3 port)
+      packages/apps/Trebuchet      <- apps/CandyLauncher (prebuilt CandyLauncher.apk)
       packages/apps/ExactCalculator<- apps/Calculator     (4.4.4_r1 Calculator)
       packages/apps/Recorder       <- apps/SoundRecorder   (4.4.4_r1 SoundRecorder)
       packages/apps/Eleven         <- apps/Music           (4.4.4_r1 Music)

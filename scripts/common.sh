@@ -19,7 +19,7 @@ CANDYOS_PATCHED=(
 # LineageOS tree>". The stock project is removed from the manifest (see
 # manifest/candyos.xml) and the slot is populated from apps/ after every sync.
 CANDYOS_VENDORED=(
-    "Launcher3-Modern   packages/apps/Trebuchet"
+    "CandyLauncher      packages/apps/Trebuchet"
     "Calculator         packages/apps/ExactCalculator"
     "SoundRecorder      packages/apps/Recorder"
     "Music              packages/apps/Eleven"

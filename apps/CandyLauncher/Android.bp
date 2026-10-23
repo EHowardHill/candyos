@@ -1,0 +1,44 @@
+// KitKat UI Project: CandyLauncher, the Flutter launcher (package
+// com.example.thelauncher), vendored as a prebuilt signed APK.
+//
+// Registers under the TrebuchetQuickStep name because
+// vendor/lineage/config/common_mobile.mk adds that module to
+// PRODUCT_PACKAGES for non-Go products, so the prebuilt drops into the same
+// slot Trebuchet used to occupy with zero product-config changes.
+//
+// Installed non-privileged on purpose: the APK requests privileged
+// permissions (DUMP etc.) but ships no privapp-permissions whitelist, and
+// vendor/lineage fails the build on any privileged permission a priv-app
+// requests that no whitelist grants. As a regular system_ext app those
+// permissions simply don't get granted.
+//
+// Recents stays SystemUI-side (see TASKS.md, Phase 5): no overview or gesture
+// integration here either, so dropping the KitKat Launcher3 port loses
+// nothing but its in-tree sources.
+android_app_import {
+    name: "TrebuchetQuickStep",
+
+    apk: "CandyLauncher.apk",
+    presigned: true,
+
+    system_ext_specific: true,
+    overrides: [
+        "Home",
+        "Launcher2",
+        "Launcher3",
+        "Launcher3QuickStep",
+        "QuickSearchBox",
+    ],
+}
+
+// KitKat UI Project: Trebuchet used to provide the TAPL (Test Automation
+// Programming Library) module that platform_testing (flicker, launcher-helper)
+// links against. CandyLauncher is a prebuilt and has no TAPL sources, but the
+// module name must exist for soong dependency resolution. The test consumers
+// are not part of the system image, so an empty library is sufficient.
+android_library {
+    name: "launcher-aosp-tapl",
+    srcs: [],
+    resource_dirs: [],
+    sdk_version: "current",
+}
