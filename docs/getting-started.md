@@ -22,17 +22,23 @@ scripts manage the tree for you:
 
 ```
 git clone https://github.com/EHowardHill/candyos ~/android/candyos
+~/android/candyos/scripts/candyos-fetch-apps.sh
 ~/android/candyos/scripts/candyos-init.sh  ~/android/lineage
 ~/android/candyos/scripts/candyos-sync.sh ~/android/lineage
 ```
 
+* `candyos-fetch-apps.sh` downloads the pinned microG and Aurora Store
+  release APKs into `vendor/partner_gms/` (they are not committed to the
+  repo). Run it once after cloning, and again whenever the pins change.
 * `candyos-init.sh` runs `repo init` against the LineageOS manifest (branch
   `lineage-21.0`) and installs `manifest/candyos.xml` as a local manifest.
   If the tree was already initialized, it only refreshes the manifest.
 * `candyos-sync.sh` runs `repo sync`, then replays the CandyOS patch series
-  onto frameworks/base, Settings, and LatinIME, then fills the six vendored
-  app slots from `apps/`. **Always sync with this script** — a bare `repo sync`
-  would rebase away the patches and leave stale vendored apps behind.
+  onto frameworks/base, Settings, LatinIME, and vendor/lineage, then fills
+  the six vendored app slots from `apps/` and copies the `vendor/`
+  overlays (bundled microG + Aurora Store) into the tree. **Always sync
+  with this script** — a bare `repo sync` would rebase away the patches
+  and leave stale vendored apps behind.
 
 The first sync downloads the whole LineageOS tree and takes a while (a
 fastmirror/close server helps). Subsequent syncs are incremental.
@@ -82,11 +88,13 @@ profile.
 ~/android/candyos/scripts/candyos-sync.sh ~/android/lineage
 ```
 
-That's the whole update story: it re-syncs, re-applies the patch series, and
-re-vendores the apps. If LineageOS upstream changed code the patches touch,
-`git am -3` usually resolves it; when it can't, the script stops with exact
-recovery instructions (resolve by hand, then run `candyos-save.sh` to refresh
-the stored series and push it).
+That's the whole update story: it re-syncs, re-applies the patch series,
+re-vendores the apps and overlays, and warns if the bundled microG/Aurora
+APKs are missing (fix: re-run `candyos-fetch-apps.sh`). If LineageOS
+upstream changed code the patches touch, `git am -3` usually resolves it;
+when it can't, the script stops with exact recovery instructions (resolve
+by hand, then run `candyos-save.sh` to refresh the stored series and
+push it).
 
 To check that the series still applies without a full sync round-trip:
 
@@ -105,3 +113,6 @@ To check that the series still applies without a full sync round-trip:
 * **Vendored app edits vanish after syncing** — by design: the tree slots are
   generated from `apps/`. Edit the copy in the CandyOS repo instead (see
   docs/contributing.md).
+* **`candyos: WARNING: vendor/partner_gms/... is missing!`** — the bundled
+  microG/Aurora APKs have not been fetched. Run
+  `~/android/candyos/scripts/candyos-fetch-apps.sh` and re-sync.

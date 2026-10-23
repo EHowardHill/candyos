@@ -1,18 +1,31 @@
 # CandyOS architecture
 
-## The two mechanisms
+## The three mechanisms
 
 **1. Patch series** — for repos upstream actively develops (frameworks/base,
-Settings, LatinIME). The repos stay as *stock* LineageOS checkouts in the
-manifest; after every sync, `candyos-sync.sh` resets each one to the plain
-upstream revision and replays an ordered `git format-patch` series with
-`git am -3`. Patches are plain files in this repo, so they review, diff, and
-merge like any other change.
+Settings, LatinIME, vendor/lineage). The repos stay as *stock* LineageOS
+checkouts in the manifest; after every sync, `candyos-sync.sh` resets each
+one to the plain upstream revision and replays an ordered `git format-patch`
+series with `git am -3`. Patches are plain files in this repo, so they
+review, diff, and merge like any other change.
 
 **2. Vendored apps** — for self-contained KitKat-era app ports that share no
 history with the app they replace. These live whole under `apps/` and are
 copied into their slots after every sync. The stock project is removed from
 the manifest (`manifest/candyos.xml`) so `repo sync` never resurrects it.
+
+**3. Vendor overlays** — for content that is added to the tree without
+replacing any stock project. Directories under `vendor/` are copied
+verbatim into the tree after every sync (same reset-and-copy discipline as
+the vendored apps, but into otherwise-unoccupied paths). Currently:
+`vendor/partner_gms` (microG Services, microG Companion/FakeStore, Aurora
+Store plus their privapp-permissions/sysconfig XMLs), which plugs into the
+*stock* LineageOS `WITH_GMS` hook in `vendor/lineage/config/common.mk`
+(the flag itself is set by the `patches/vendor-lineage/` series). The APKs
+inside are pinned downloads managed by `scripts/candyos-fetch-apps.sh`,
+not committed blobs; see `vendor/partner_gms/README.md` for the details,
+including why no signature-spoofing framework patch is needed on
+LineageOS 21.
 
 ## Change map
 
@@ -21,12 +34,14 @@ the manifest (`manifest/candyos.xml`) so `repo sync` never resurrects it.
 | `patches/frameworks-base/` | `frameworks/base` | 29-patch series | Holo theme, 2013 Roboto + hybrid emoji fonts, SystemUI (status bar, navbar, volume, power menu, recents, keyguard), 4.4 UI sounds, monet pinning. The notification shade and quick settings stay **stock** (rolled back in P21). |
 | `patches/settings/` | `packages/apps/Settings` | 2-patch series | Holo reskin: layouts, icons, styling. |
 | `patches/latinime/` | `packages/inputmethods/LatinIME` | 3-patch series | Forces the KitKat Holo keyboard theme, key-text-size attrs, flat key colors, donor label geometry. |
+| `patches/vendor-lineage/` | `vendor/lineage` | 1-patch series | Sets `WITH_GMS := true` so `vendor/partner_gms` is inherited (P22). Everything else in vendor/lineage stays stock. |
 | `apps/Launcher3-Modern/` | `packages/apps/Trebuchet` | vendored | KitKat Launcher3 port; registers as `TrebuchetQuickStep`, the module name `vendor/lineage` expects. |
-| `apps/Calculator/` | `packages/apps/ExactCalculator` | vendored | `android-4.4.4_r1` Calculator with modernized soong build, module name kept. |
+| `apps/Calculator/` | `packages/apps/ExactCalculator` | vendored | 4.4.4_r1 Calculator with modernized soong build, module name kept. |
 | `apps/SoundRecorder/` | `packages/apps/Recorder` | vendored | 4.4.4 SoundRecorder port, scoped storage, module name kept. |
 | `apps/Music/` | `packages/apps/Eleven` | vendored | 4.4.4 Music (`com.android.music`), module name kept. |
 | `apps/DeskClock/` | `packages/apps/DeskClock` | vendored | 4.4.4 DeskClock, datetimepicker vendored in-tree, module name kept. |
 | `apps/Calendar/` | `packages/apps/Etar` | vendored | 4.4.4 Calendar with picker libs vendored in-tree, module name kept. |
+| `vendor/partner_gms/` | `vendor/partner_gms` | vendor overlay | microG Services + microG Companion (privileged product apps) and Aurora Store, with privapp/sysconfig XMLs; picked up by the stock `WITH_GMS` hook (P22). |
 
 Keeping the stock module names is deliberate: `vendor/lineage` product config
 references them (`PRODUCT_PACKAGES`), so the build wires the vendored apps in
@@ -69,4 +84,6 @@ lives in this repo.
   revision) plus the CandyOS patch commits on top. Never keep personal
   branches checked out in these projects — `candyos-sync.sh` resets them.
 * Vendored slots: plain directories (no `.git`), exact copies of `apps/`.
+* Overlay paths (e.g. `vendor/partner_gms`): plain directories (no `.git`),
+  exact copies of `vendor/`.
 * Everything else: untouched stock LineageOS.
