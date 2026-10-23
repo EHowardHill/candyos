@@ -13,6 +13,7 @@ CANDYOS_PATCHED=(
     "settings           packages/apps/Settings"
     "latinime           packages/inputmethods/LatinIME"
     "vendor-lineage     vendor/lineage"
+    "lineage-sdk        lineage-sdk"
 )
 
 # Self-contained app ports vendored wholesale: "<apps/ directory> <slot in the
@@ -32,6 +33,7 @@ CANDYOS_VENDORED=(
 # tree>". The tree copy is regenerated from this repo after every sync.
 CANDYOS_VENDOR_TREES=(
     "partner_gms        vendor/partner_gms"
+    "testing            vendor/testing"
 )
 
 die() {

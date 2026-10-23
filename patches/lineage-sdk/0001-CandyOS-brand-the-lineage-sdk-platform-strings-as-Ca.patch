@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Fri, 23 Oct 2026 17:39:03 -0500
+Subject: [PATCH] CandyOS: brand the lineage-sdk platform strings as CandyOS
+
+Rename the user-visible platform labels (system label, version,
+updates, API level) from LineageOS to CandyOS.
+
+Change-Id: I2c96f022f6a869361c00273ecb981b1374050f14
+---
+ lineage/res/res/values/strings.xml | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/lineage/res/res/values/strings.xml b/lineage/res/res/values/strings.xml
+index fbb62349..703f4b35 100644
+--- a/lineage/res/res/values/strings.xml
++++ b/lineage/res/res/values/strings.xml
+@@ -17,7 +17,7 @@
+ -->
+ <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+     <!-- Label for the LineageOS system components when they are shown to the user. -->
+-    <string name="lineageos_system_label">LineageOS System</string>
++    <string name="lineageos_system_label">CandyOS System</string>
+ 
+     <!-- Labels for the MODIFY_PROFILES permission. -->
+     <string name="permlab_modifyProfiles">modify system profiles</string>
+@@ -90,11 +90,11 @@
+     <!-- About device screen, build date -->
+     <string name="build_date">Build date</string>
+     <!-- About device screen, LineageOS API Level -->
+-    <string name="lineage_api_level">LineageOS API level</string>
++    <string name="lineage_api_level">CandyOS API level</string>
+     <!-- About device screen, LineageOS updates -->
+-    <string name="lineage_updates">LineageOS updates</string>
++    <string name="lineage_updates">CandyOS updates</string>
+     <!-- About device screen, LineageOS version -->
+-    <string name="lineage_version">LineageOS version</string>
++    <string name="lineage_version">CandyOS version</string>
+     <!-- About device screen, vendor security patch -->
+     <string name="lineage_vendor_security_patch">Vendor security patch level</string>
+ 
+-- 
+2.53.0
+

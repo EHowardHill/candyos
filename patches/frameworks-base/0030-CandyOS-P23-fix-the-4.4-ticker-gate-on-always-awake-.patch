@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Fri, 23 Oct 2026 15:52:37 -0500
+Subject: [PATCH 30/30] CandyOS P23: fix the 4.4 ticker gate on always-awake
+ boots (emulator)
+
+Change-Id: I624479394ff2a0feb188cd8bc87d7ec744b36420
+---
+ .../systemui/statusbar/phone/CentralSurfacesImpl.java     | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/CentralSurfacesImpl.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/CentralSurfacesImpl.java
+index fde5abb0a890..6e0733c19ed9 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/CentralSurfacesImpl.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/CentralSurfacesImpl.java
+@@ -1228,7 +1228,13 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
+                     // text through the status bar (see Ticker).
+                     if (mTicker == null) {
+                         mTicker = new Ticker(statusBarView.getContext(), statusBarView,
+-                                mShadeExpansionStateManager, () -> mDeviceInteractive);
++                                // KitKat UI Project (P23 fix): gate on the LIVE power
++                                // state, not mDeviceInteractive - that field only
++                                // flips on wakefulness transitions and stays false
++                                // on displays that are awake from boot (the
++                                // emulator), silently queueing every tick forever.
++                                mShadeExpansionStateManager,
++                                () -> mPowerManager.isInteractive());
+                         mNotificationListener.addNotificationHandler(
+                                 new com.android.systemui.statusbar.NotificationListener
+                                         .NotificationHandler() {
+-- 
+2.53.0
+

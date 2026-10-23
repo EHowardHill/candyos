@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Thu, 22 Oct 2026 08:00:56 -0500
-Subject: [PATCH 21/29] KitKat UI: flip stale Tier 1 markers (DeskClock done,
+Subject: [PATCH 21/30] KitKat UI: flip stale Tier 1 markers (DeskClock done,
  Messaging decided-no-port)
 
 ---

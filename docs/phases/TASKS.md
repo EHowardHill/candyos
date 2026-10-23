@@ -2013,3 +2013,82 @@ macOS; build/runtime verification on the Linux build host is the first
 user test. Script logic (fetch idempotency + checksum pins) and patch
 application context verified locally against the upstream
 lineage-21.0 vendor/lineage checkout.
+
+## Phase 23 - The Testing app (KitKat test bench) [/]
+
+Goal: a single bundled app that exercises every CandyOS-specific
+surface for on-device verification, styled by the system itself
+(Theme.DeviceDefault == Holo via the P1 rebase, so the app doubles as
+a live test of the theme cascade).
+
+Mechanism (same overlay class as partner_gms, P22): the app lives whole
+in vendor/testing/ in the CandyOS repo -> tree vendor/testing via
+CANDYOS_VENDOR_TREES (scripts/common.sh); the products include is one
+line in the patches/vendor-lineage series (-include
+vendor/testing/testing.mk -> PRODUCT_PACKAGES += Testing). Product-
+partition install (product_specific: true) - the sdk_phone emulator
+target enforces the AOSP generic-system artifact-path requirement, which
+forbids new files under system/ (learned the hard way; the partner_gms
+apps already sat on /product for the same reason). Plain unprivileged
+app, public framework APIs only (sdk_version: current, no androidx
+dependency), framework Notification.Builder + channel (targetSdk 34).
+
+Test matrix (all in the app):
+- Ticker: long post (both rows marquee), short, burst of 3 (queue
+  chaining), group child + summary (summary must NOT tick - P3 polish
+  filter), ongoing, cancel-all.
+- Holo widget skins: ghost button (also the click-sound path), switch,
+  checkbox, radios, seekbar, horizontal determinate + indeterminate +
+  circular progress, spinner, text field (typing also exercises the
+  ported 4.4 keypress sounds).
+- Roboto 2013: thin/light/regular/bold/italic/condensed samples.
+- Hybrid emoji: KitKat-era row renders the 2013 blobs
+  (NotoColorEmoji2013 family precedence, P1/P10); modern-only row falls
+  through to current Noto.
+- Holo dialog and toast; holo_blue_light accent pin swatch.
+- System surfaces: second activity (4.4 activity-open animation + a
+  card for KitKatRecentsActivity; finish plays the close animation),
+  volume panel, immersive toggle (status bar peek), orientation toggle
+  (pre-12 rotation animation), Holo dark/light theme flip
+  (survives recreate).
+
+Status: implemented; m Testing green on emu64x (product/app/Testing);
+candyos-verify.sh pass after the series regeneration. Ticker verified
+on device 2026-10-23 (see below); the rest of the matrix awaits the
+user's on-device pass - file results per item.
+
+FOUND ON DEVICE (first boot, 2026-10-23): the notification buttons
+produced NOTHING - no shade entries, no ticker. Root cause: targetSdk
+34 + no POST_NOTIFICATIONS runtime permission -> NMS ranks the app
+IMPORTANCE_NONE (PermissionHelper.getPackageImportance), and
+NotificationManagerService.prepareNotifyPostedLocked skips
+listener-invisible records entirely, so SystemUI's NotificationListener
+(and with it the 4.4 ticker) never sees the posts either - one missing
+permission silences both surfaces. Fix: declare POST_NOTIFICATIONS in
+the manifest + a runtime request guard on every posting path
+(ensureNotifPermission); the KitKat/Holo permission dialog itself
+becomes another test surface.
+
+FOUND ON DEVICE 2 (same session): even with the manifest + request
+guard, a FRESH (wiped) emulator boot cannot bootstrap the permission:
+the runtime permission dialog is suppressed while device provisioning
+is incomplete (setup wizard never finished), so requestPermissions()
+silently denies. Fix: default-permissions-com.candyos.testing.xml
+shipped via a prebuilt_etc module (the partner_gms pattern) pre-grants
+POST_NOTIFICATIONS at boot (fixed=false: revocable in Settings, where
+the in-app request guard and the Holo permission dialog take over).
+
+VERIFIED ON DEVICE (2026-10-23, adb-driven, screencap pixel standard):
+after granting POST_NOTIFICATIONS, tapping "Post long (marquee)" made
+the status-bar band jump from 429 bright samples (idle) to 1760 during
+the tick, with glyph runs spanning to x~917/1080 - the 4.4 ticker
+marquees end to end; dumpsys notification shows the app record
+(importance DEFAULT, channel ticker_tests). The guard's denied-path
+Toast also pixel-confirmed. The default-permissions pre-grant then
+VERIFIED on two fresh (wiped, unprovisioned) boots: POST_NOTIFICATIONS
+granted=true at boot with zero manual steps, and tap-to-ticker works
+out of the box (1631/1760 band samples on the two checks). NOTE: the
+first iteration of the prebuilt_etc module installed the XML without
+its .xml extension (soong names outputs after the module) - the
+package manager picked it up anyway, but the file now ships under the
+conventional *.xml name via the filename: property.

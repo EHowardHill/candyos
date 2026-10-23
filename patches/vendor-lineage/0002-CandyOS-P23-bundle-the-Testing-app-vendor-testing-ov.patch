@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Fri, 23 Oct 2026 14:59:53 -0500
+Subject: [PATCH 2/2] CandyOS P23: bundle the Testing app (vendor/testing
+ overlay)
+
+Change-Id: I5b407e05edfc9bc3c501f18f793a8f2271ff4e77
+---
+ config/common.mk | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/config/common.mk b/config/common.mk
+index 79eb79be..a5c800d1 100644
+--- a/config/common.mk
++++ b/config/common.mk
+@@ -267,4 +267,7 @@ include vendor/lineage/config/version.mk
+ # CandyOS: bundle microG and Aurora Store from vendor/partner_gms
+ WITH_GMS := true
+ 
++# CandyOS: bundle the Testing app (vendor/testing overlay)
++-include vendor/testing/testing.mk
++
+ -include vendor/lineage/config/partner_gms.mk
+-- 
+2.53.0
+

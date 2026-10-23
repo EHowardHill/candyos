@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Thu, 22 Oct 2026 13:21:14 -0500
-Subject: [PATCH 27/29] KitKat UI: P16 Tier 2-5 closure + P17 header flip
+Subject: [PATCH 27/30] KitKat UI: P16 Tier 2-5 closure + P17 header flip
 
 Calendar port DONE+VERIFIED+FORKED+PINNED (full framework-lib dependency
 set vendored; Holo-Light 4.4 look verified on device, zero FATALs).

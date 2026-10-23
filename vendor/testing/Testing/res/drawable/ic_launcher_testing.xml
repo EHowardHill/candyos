@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Launcher icon: Holo blue rounded square with a white T. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <path
+        android:fillColor="#ff33b5e5"
+        android:pathData="M10,2 h28 a8,8 0 0 1 8,8 v28 a8,8 0 0 1 -8,8 h-28 a8,8 0 0 1 -8,-8 v-28 a8,8 0 0 1 8,-8 z" />
+    <path
+        android:fillColor="#ffffffff"
+        android:pathData="M12,12 h24 v6.5 h-8.5 v19 h-7 v-19 h-8.5 z" />
+</vector>

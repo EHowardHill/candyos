@@ -49,4 +49,4 @@ vendor_trees
 check_partner_gms_apks
 
 echo "candyos: sync complete — tree is ready to build:"
-echo "  cd $TREE && source build/envsetup.sh && lunch lineage_sdk_phone_x86_64-ap2a-userdebug && m -j\$(nproc)"
+echo "  cd $TREE && source build/envsetup.sh && lunch lineage_sdk_phone_x86_64-ap2a-userdebug && m -j8"

@@ -10,7 +10,7 @@ git clone https://github.com/EHowardHill/candyos ~/android/candyos
 cd ~/android/lineage
 source build/envsetup.sh
 lunch lineage_sdk_phone_x86_64-ap2a-userdebug
-m -j$(nproc)
+m -j8
 ~/android/candyos/scripts/candyos-emulator.sh ~/android/lineage
 ```
 
@@ -37,7 +37,10 @@ CandyOS modifies LineageOS in exactly three ways:
   whitelists) is copied into the tree and enabled through the stock
   LineageOS `WITH_GMS` hook, giving users Play-like app access without
   Google. The APKs themselves are pinned downloads fetched by
-  `scripts/candyos-fetch-apps.sh`.
+  `scripts/candyos-fetch-apps.sh`. `vendor/testing` carries the bundled
+  **Testing** app — a KitKat-styled test bench that exercises every
+  CandyOS surface (ticker, Holo widgets, fonts, emoji, dialogs,
+  immersive/recents/rotation).
 
 `manifest/candyos.xml` holds the manifest surgery, `scripts/` holds the
 init/sync/save/verify/emulator workflow, and `docs/` explains all of it.

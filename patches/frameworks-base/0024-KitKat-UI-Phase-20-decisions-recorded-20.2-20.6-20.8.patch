@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Thu, 22 Oct 2026 08:39:06 -0500
-Subject: [PATCH 24/29] KitKat UI: Phase 20 decisions recorded
+Subject: [PATCH 24/30] KitKat UI: Phase 20 decisions recorded
  (20.2/20.6/20.8/20.10) + rule hardened
 
 20.2 = approximation (risk-ruled: donor clip is keyguard-coupled

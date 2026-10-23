@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Thu, 22 Oct 2026 14:46:46 -0500
-Subject: [PATCH 29/29] KitKat UI P21: roll back the notification shade and
+Subject: [PATCH 29/30] KitKat UI P21: roll back the notification shade and
  quick settings to stock
 
 User direction 2026-10-22: the shade/QS port did not feel good; both

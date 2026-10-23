@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Testing</string>
+    <string name="second_name">Testing — Second</string>
+    <string name="channel_name">Ticker tests</string>
+
+    <!-- Section headers -->
+    <string name="sec_notif">Notifications / 4.4 ticker</string>
+    <string name="sec_widgets">Holo widget skins</string>
+    <string name="sec_fonts">Roboto 2013</string>
+    <string name="sec_emoji">Hybrid emoji</string>
+    <string name="sec_dialogs">Dialogs and toasts</string>
+    <string name="sec_system">System surfaces</string>
+
+    <!-- Ticker test posts -->
+    <string name="btn_notif_long">Post long (marquee)</string>
+    <string name="ticker_long_title">CandyOS Testing — ticker notification with a deliberately very long title that has to scroll (marquee) all the way across the status bar</string>
+    <string name="ticker_long_text">This post exercises the 4.4 ticker port end to end: the status bar contents crossfade out, the title above and this text marquee through the bar for six seconds each, opening the shade cancels the tick immediately, and further posts chain through the queue one entry at a time. The text is intentionally long enough to overflow the bar so the marquee actually has something to do.</string>
+    <string name="btn_notif_short">Post short</string>
+    <string name="ticker_short_title">Short tick</string>
+    <string name="ticker_short_text">Fits on one line — no marquee needed.</string>
+    <string name="btn_notif_burst">Post burst of 3 (chaining)</string>
+    <string name="chain1_title">Ticker chain 1/3</string>
+    <string name="chain1_text">First of three rapid posts; each entry ticks briefly before the next.</string>
+    <string name="chain2_title">Ticker chain 2/3</string>
+    <string name="chain2_text">Second entry; the queue advances only after the current tick ends.</string>
+    <string name="chain3_title">Ticker chain 3/3</string>
+    <string name="chain3_text">Third entry; afterwards the status bar contents crossfade back in.</string>
+    <string name="btn_notif_group">Post group (summary must not tick)</string>
+    <string name="group_child_title">Group child</string>
+    <string name="group_child_text">Part of a notification group — this child SHOULD tick.</string>
+    <string name="group_summary_title">Group summary</string>
+    <string name="group_summary_text">The group summary post — the ticker must skip it (FLAG_GROUP_SUMMARY filter).</string>
+    <string name="btn_notif_ongoing">Post ongoing</string>
+    <string name="ongoing_title">Ongoing notification</string>
+    <string name="ongoing_text">Sticky test post; clears with Cancel all, not by tapping.</string>
+    <string name="btn_notif_cancel">Cancel all posted</string>
+    <string name="perm_needed">Notifications are blocked for Testing — allow them in the permission dialog (or Settings > Apps > Testing), then tap the button again.</string>
+
+    <!-- Widget samples -->
+    <string name="ghost_btn">Ghost button (plays click sound)</string>
+    <string name="switch_label">Switch</string>
+    <string name="checkbox_label">Checkbox</string>
+    <string name="radio_a">Radio A</string>
+    <string name="radio_b">Radio B</string>
+    <string name="seek_label">Seekbar (40/100)</string>
+    <string name="progress_determinate_label">Determinate progress (65/100)</string>
+    <string name="progress_indeterminate_label">Indeterminate progress (thin glow)</string>
+    <string name="progress_circular_label">Circular progress</string>
+    <string name="spinner_label">Spinner (Holo dropdown)</string>
+    <string name="edit_hint">Type here (4.4 keypress sounds)</string>
+    <string-array name="spinner_entries">
+        <item>Alpha</item>
+        <item>Beta</item>
+        <item>KitKat</item>
+        <item>Lollipop</item>
+    </string-array>
+
+    <!-- Roboto 2013 samples -->
+    <string name="font_thin">Roboto 2013 — Thin 22sp</string>
+    <string name="font_light">Roboto 2013 — Light 18sp</string>
+    <string name="font_regular">Roboto 2013 — Regular 16sp</string>
+    <string name="font_bold">Roboto 2013 — Bold 16sp</string>
+    <string name="font_italic">Roboto 2013 — Italic 16sp</string>
+    <string name="font_condensed">Roboto 2013 Condensed Bold 16sp</string>
+
+    <!-- Hybrid emoji: KitKat-era codepoints render the 2013 blob glyphs
+         (NotoColorEmoji2013 sits ahead of modern Noto in the fallback
+         chain); post-KitKat codepoints fall through to modern Noto. -->
+    <string name="emoji_kitkat">KitKat-era (expect 2013 blobs):\n😀 😃 😄 😁 😆 😅 😂 😍 😎 😢 😭 👍 👏 ❤ ☀ ☕ 🍭</string>
+    <string name="emoji_modern">Post-KitKat (expect modern Noto):\n🦄 🌮 🥑 🤖 🧟 🥳 🦖 🏳️‍🌈</string>
+    <string name="holo_blue_sample">holo_blue_light #ff33b5e5 (accent pin check)</string>
+
+    <!-- Dialogs and toasts -->
+    <string name="btn_dialog">Show Holo dialog</string>
+    <string name="dialog_title">Holo dialog</string>
+    <string name="dialog_msg">A framework AlertDialog on the DeviceDefault (= Holo) cascade: flat dark panel, square corners and the blue title divider, exactly as in 4.4.</string>
+    <string name="btn_toast">Show toast</string>
+    <string name="toast_msg">A KitKat-era toast — plain, quick and square.</string>
+
+    <!-- System surfaces -->
+    <string name="btn_second">Launch second activity (4.4 transition + recents card)</string>
+    <string name="btn_volume">Show volume panel (Holo slider)</string>
+    <string name="btn_immersive">Toggle immersive (status bar peek)</string>
+    <string name="btn_rotate">Toggle orientation (4.4 rotation anim)</string>
+    <string name="btn_theme">Toggle Holo dark / light</string>
+
+    <!-- Second activity -->
+    <string name="second_title">Second Activity</string>
+    <string name="second_explanation">The transition that opened this activity used the ported 4.4 activity-open animation. Press RECENTS now to see the KitKat vertical card list — this activity appears as a card with its icon and title; dismissing the card and tapping back exercise the donor behaviors. Finishing plays the 4.4 close animation.</string>
+    <string name="btn_finish">Finish (4.4 close animation)</string>
+</resources>

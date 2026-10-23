@@ -14,6 +14,11 @@
   ```
   and make sure `~/.local/bin` is on your `PATH`.
 * git configured (`user.name` / `user.email`).
+* **git-lfs**, installed AND activated (`sudo apt install git-lfs` then
+  `git lfs install`) **before** the first sync — LineageOS stores the
+  WebView prebuilt APKs as LFS objects. Without it the sync checks out
+  134-byte pointer stubs and the build dies late with
+  "webview.apk: not a valid zip file" (see Troubleshooting).
 
 ## Bootstrap the tree
 
@@ -52,7 +57,7 @@ fastmirror/close server helps). Subsequent syncs are incremental.
 cd ~/android/lineage
 source build/envsetup.sh
 lunch lineage_sdk_phone_x86_64-ap2a-userdebug
-m -j$(nproc)
+m -j8
 ```
 
 The build output lands in `out/target/product/emu64x/`. Expect a few hours on
@@ -115,7 +120,7 @@ adb shell getprop sys.boot_completed   # 1 when booted
 ```
 
 Notes from QA (see docs/phases/TASKS.md): module-only rebuilds do not always
-reach a booted emulator image — re-run a full `m -j$(nproc)` before relaunching
+reach a booted emulator image — re-run a full `m -j8` before relaunching
 to regenerate `system-qemu.img`, and wipe `userdata-qemu.img*` for a clean
 profile (the launcher script does the wipe for you).
 
@@ -153,3 +158,12 @@ To check that the series still applies without a full sync round-trip:
 * **`candyos: WARNING: vendor/partner_gms/... is missing!`** — the bundled
   microG/Aurora APKs have not been fetched. Run
   `~/android/candyos/scripts/candyos-fetch-apps.sh` and re-sync.
+* **`webview.apk: zip2zip: not a valid zip file`** (late in a full build) —
+  the WebView prebuilt is a 134-byte git-lfs pointer instead of the real
+  ~342 MB APK: the blob was never fetched. Fix it with:
+  ```
+  git -C ~/android/lineage/external/chromium-webview/prebuilt/x86_64 lfs pull
+  ```
+  (the other `prebuilt/<arch>/` dirs hold pointers too — pull them the
+  same way if you ever build for those architectures). Once pulled, the
+  blob is cached in the local LFS store and survives future syncs.

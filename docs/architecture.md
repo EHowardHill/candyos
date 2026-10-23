@@ -21,8 +21,11 @@ the vendored apps, but into otherwise-unoccupied paths). Currently:
 `vendor/partner_gms` (microG Services, microG Companion/FakeStore, Aurora
 Store plus their privapp-permissions/sysconfig XMLs), which plugs into the
 *stock* LineageOS `WITH_GMS` hook in `vendor/lineage/config/common.mk`
-(the flag itself is set by the `patches/vendor-lineage/` series). The APKs
-inside are pinned downloads managed by `scripts/candyos-fetch-apps.sh`,
+(the flag itself is set by the `patches/vendor-lineage/` series), and
+`vendor/testing` (the bundled Testing app, a KitKat-styled test bench for
+the CandyOS surfaces, installed through `PRODUCT_PACKAGES` via an include
+in the same series — see `docs/phases/TASKS.md`, Phase 23). The partner_gms
+APKs are pinned downloads managed by `scripts/candyos-fetch-apps.sh`,
 not committed blobs; see `vendor/partner_gms/README.md` for the details,
 including why no signature-spoofing framework patch is needed on
 LineageOS 21.
@@ -34,7 +37,8 @@ LineageOS 21.
 | `patches/frameworks-base/` | `frameworks/base` | 29-patch series | Holo theme, 2013 Roboto + hybrid emoji fonts, SystemUI (status bar, navbar, volume, power menu, recents, keyguard), 4.4 UI sounds, monet pinning. The notification shade and quick settings stay **stock** (rolled back in P21). |
 | `patches/settings/` | `packages/apps/Settings` | 2-patch series | Holo reskin: layouts, icons, styling. |
 | `patches/latinime/` | `packages/inputmethods/LatinIME` | 3-patch series | Forces the KitKat Holo keyboard theme, key-text-size attrs, flat key colors, donor label geometry. |
-| `patches/vendor-lineage/` | `vendor/lineage` | 1-patch series | Sets `WITH_GMS := true` so `vendor/partner_gms` is inherited (P22). Everything else in vendor/lineage stays stock. |
+| `patches/vendor-lineage/` | `vendor/lineage` | 2-patch series | P22: sets `WITH_GMS := true` so `vendor/partner_gms` is inherited. P23: `-include vendor/testing/testing.mk` bundles the Testing app. Everything else in vendor/lineage stays stock. |
+| `patches/lineage-sdk/` | `lineage-sdk` | 1-patch series | Brands the `lineageos.platform` strings (system label, version, updates, API level) as CandyOS. |
 | `apps/CandyLauncher/` | `packages/apps/Trebuchet` | vendored | Prebuilt CandyLauncher APK (Flutter launcher, `com.example.thelauncher`); imported as `TrebuchetQuickStep`, the module name `vendor/lineage` expects. Non-privileged install: no privapp whitelist ships for it. |
 | `apps/Calculator/` | `packages/apps/ExactCalculator` | vendored | 4.4.4_r1 Calculator with modernized soong build, module name kept. |
 | `apps/SoundRecorder/` | `packages/apps/Recorder` | vendored | 4.4.4 SoundRecorder port, scoped storage, module name kept. |
@@ -42,6 +46,7 @@ LineageOS 21.
 | `apps/DeskClock/` | `packages/apps/DeskClock` | vendored | 4.4.4 DeskClock, datetimepicker vendored in-tree, module name kept. |
 | `apps/Calendar/` | `packages/apps/Etar` | vendored | 4.4.4 Calendar with picker libs vendored in-tree, module name kept. |
 | `vendor/partner_gms/` | `vendor/partner_gms` | vendor overlay | microG Services + microG Companion (privileged product apps) and Aurora Store, with privapp/sysconfig XMLs; picked up by the stock `WITH_GMS` hook (P22). |
+| `vendor/testing/` | `vendor/testing` | vendor overlay | The Testing app (`product_specific`, public APIs only): KitKat-styled test bench for the CandyOS surfaces — 4.4 ticker posts (long/short/burst/group/ongoing), Holo widget gallery, Roboto 2013 and hybrid-emoji samples, Holo dialog/toast, volume panel, immersive, rotation, second activity for the 4.4 transitions and KitKatRecentsActivity. Wired in by the vendor-lineage series (P23). |
 
 Keeping the stock module names is deliberate: `vendor/lineage` product config
 references them (`PRODUCT_PACKAGES`), so the build wires the vendored apps in

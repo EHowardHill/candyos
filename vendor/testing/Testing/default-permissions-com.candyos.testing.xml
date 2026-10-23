@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    CandyOS: pre-grant the notification runtime permission for the bundled
+    Testing app. The test bench posts notifications to exercise the 4.4
+    ticker, but targetSdk 34 ranks the app IMPORTANCE_NONE without
+    POST_NOTIFICATIONS (no shade entries, and the SystemUI notification
+    listener - hence the ticker - never sees the posts). A runtime request
+    cannot bootstrap itself on a fresh emulator boot: the permission
+    dialog is suppressed while device provisioning is incomplete, so
+    tap-then-grant would be a dead end during QA. Pre-grant instead
+    (fixed="false": revocable in Settings, where the request guard in the
+    app takes over and the KitKat/Holo permission dialog is exercised).
+-->
+<exceptions>
+    <exception package="com.candyos.testing">
+        <!-- Notifications -->
+        <permission name="android.permission.POST_NOTIFICATIONS" fixed="false" />
+    </exception>
+</exceptions>
