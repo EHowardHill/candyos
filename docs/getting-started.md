@@ -1,9 +1,5 @@
 # Getting started with CandyOS
 
-This walkthrough takes a bare machine to a bootable CandyOS emulator image.
-Everything is scripted; the only manual steps are installing build deps and
-the repo tool.
-
 ## Prerequisites
 
 * A Linux machine (Ubuntu 20.04+ recommended) with **~200 GB free disk** and
@@ -21,7 +17,7 @@ the repo tool.
 
 ## Bootstrap the tree
 
-CandyOS is an overlay — you clone it next to the LineageOS tree, and its
+CandyOS is an overlay. You clone it next to the LineageOS tree, and its
 scripts manage the tree for you:
 
 ```
