@@ -58,8 +58,7 @@ a typical dev machine; incremental rebuilds are much faster.
 
 ## Run it on the emulator
 
-The emulator ships with the tree; the important flags are the Pixel 3a
-geometry and software rendering (the UI was QA'd on SwiftShader):
+The emulator ships with the tree:
 
 ```
 cd ~/android/lineage
