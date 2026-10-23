@@ -1962,3 +1962,54 @@ DELTA NOTE (accept-and-document, rule 5): the stock shade now
 renders over the KitKat theme cascade (25dp opaque bar, Holo
 accents where the framework feeds SystemUI), so it reads
 LineageOS-modern, not pure 4.4 - exactly as intended by "stock".
+
+## Phase 22 - Bundled microG + Aurora Store [X]
+
+Goal (user direction 2026-10-23): give users built-in Play-like access -
+microG for the services layer, Aurora Store as the storefront - without
+shipping anything Google-signed.
+
+Mechanism (deliberately zero new framework patching):
+
+* LineageOS 21 already supports restricted signature spoofing natively
+  (ComputerEngine.isMicrogSigned): com.google.android.gms /
+  com.android.vending, signed with the official microG key, may present
+  the Google platform signature on debuggable builds. CandyOS builds
+  userdebug, so no frameworks/base change is needed; official microG
+  release APKs (NOT F-Droid builds, which are signed differently) are
+  therefore mandatory.
+* LineageOS 21 already ships the WITH_GMS hook: vendor/lineage/config/
+  common.mk -includes partner_gms.mk, which inherits
+  vendor/partner_gms/products/gms.mk when WITH_GMS is true. A one-line
+  patch series (patches/vendor-lineage/) sets the flag; vendor/lineage
+  is otherwise stock, so it joins CANDYOS_PATCHED and gets the normal
+  guard/reset/replay/save treatment.
+* vendor/partner_gms/ is a new overlay class (CANDYOS_VENDOR_TREES in
+  scripts/common.sh, copied by candyos-sync.sh like vendored apps, but
+  into an otherwise-unoccupied path - nothing to remove from the
+  manifest). Modeled on lineageos4microg/android_vendor_partner_gms:
+  GmsCore + FakeStore as PRESIGNED privileged product apps with
+  privapp/default/sysconfig XMLs (FAKE_PACKAGE_SIGNATURE dropped -
+  stock LOS has no such permission and does not need it), microg.xml
+  system-defaults, AuroraStore as a plain PRESIGNED product app.
+
+APKs: not committed (binary blobs). scripts/candyos-fetch-apps.sh pins
+exact versions + SHA-256 (microG Services v0.3.17.252432, microG
+Companion v0.3.17.252432, Aurora Store 4.8.4/F-Droid v76); sync warns
+if they are missing.
+
+Shipped defaults: microG check-in/GCM off, Mozilla location services
+on, vending licensing/billing on (vendor/partner_gms/GmsCore/microg.xml);
+everything user-overridable in the microG settings app on-device.
+
+DELTA NOTE (accept-and-document, rule 5): signature spoofing - and with
+it Play-signature-dependent checks - only works on debuggable builds.
+If CandyOS ever builds `user`, restricted spoofing silently goes away;
+the unrestricted-spoofing patches from lineageos4microg would then be
+required (out of scope, documented in vendor/partner_gms/README.md).
+
+Verification standard (rule 6): code authored and reviewed off-tree on
+macOS; build/runtime verification on the Linux build host is the first
+user test. Script logic (fetch idempotency + checksum pins) and patch
+application context verified locally against the upstream
+lineage-21.0 vendor/lineage checkout.

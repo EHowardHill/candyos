@@ -12,6 +12,7 @@ CANDYOS_PATCHED=(
     "frameworks-base    frameworks/base"
     "settings           packages/apps/Settings"
     "latinime           packages/inputmethods/LatinIME"
+    "vendor-lineage     vendor/lineage"
 )
 
 # Self-contained app ports vendored wholesale: "<apps/ directory> <slot in the
@@ -24,6 +25,13 @@ CANDYOS_VENDORED=(
     "Music              packages/apps/Eleven"
     "DeskClock          packages/apps/DeskClock"
     "Calendar           packages/apps/Etar"
+)
+
+# Overlay directories vendored into the tree without replacing a stock
+# project: "<directory under this repo's vendor/> <path in the LineageOS
+# tree>". The tree copy is regenerated from this repo after every sync.
+CANDYOS_VENDOR_TREES=(
+    "partner_gms        vendor/partner_gms"
 )
 
 die() {
@@ -102,4 +110,34 @@ vendor_apps() {
         rsync -a "$CANDYOS_ROOT/apps/$name/" "$TREE/$slot/"
         echo "candyos: vendored apps/$name -> $slot"
     done
+}
+
+# Copy every overlay directory into its place in the LineageOS tree.
+vendor_trees() {
+    local name slot
+    for pair in "${CANDYOS_VENDOR_TREES[@]}"; do
+        name="${pair%%[[:space:]]*}"
+        slot="${pair##*[[:space:]]}"
+        rm -rf "$TREE/$slot"
+        rsync -a "$CANDYOS_ROOT/vendor/$name/" "$TREE/$slot/"
+        echo "candyos: vendored vendor/$name -> $slot"
+    done
+}
+
+# Warn (loudly, but do not fail) about bundled-app APKs that are missing or
+# stale in the candyos repo - candyos-fetch-apps.sh is the fix.
+check_partner_gms_apks() {
+    local apk missing=0
+    for apk in GmsCore/GmsCore.apk FakeStore/FakeStore.apk AuroraStore/AuroraStore.apk; do
+        if [ ! -s "$CANDYOS_ROOT/vendor/partner_gms/$apk" ]; then
+            echo "candyos: WARNING: vendor/partner_gms/$apk is missing!" >&2
+            missing=1
+        fi
+    done
+    [ "$missing" -eq 0 ] && return 0
+    echo "candyos: the microG/Aurora packages cannot build without it/them. Run:" >&2
+    echo "  $CANDYOS_ROOT/scripts/candyos-fetch-apps.sh" >&2
+    echo "candyos: (the APKs are pinned downloads, not committed files - see" >&2
+    echo "  vendor/partner_gms/README.md)" >&2
+    return 0
 }

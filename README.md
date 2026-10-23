@@ -4,6 +4,7 @@
 
 ```
 git clone https://github.com/EHowardHill/candyos ~/android/candyos
+~/android/candyos/scripts/candyos-fetch-apps.sh
 ~/android/candyos/scripts/candyos-init.sh  ~/android/lineage
 ~/android/candyos/scripts/candyos-sync.sh ~/android/lineage
 cd ~/android/lineage
@@ -20,16 +21,22 @@ Prerequisites (disk, RAM, packages, repo tool) and emulator instructions are in
 
 ## How it works
 
-CandyOS modifies LineageOS in exactly two ways:
+CandyOS modifies LineageOS in exactly three ways:
 
 * **Patch series** (`patches/`) — changes to repos that upstream actively
-  develops (frameworks/base, Settings, LatinIME) are stored as ordered
-  `git am` series and replayed on top of the stock upstream checkouts after
-  every sync.
+  develops (frameworks/base, Settings, LatinIME, vendor/lineage) are stored
+  as ordered `git am` series and replayed on top of the stock upstream
+  checkouts after every sync.
 * **Vendored apps** (`apps/`) — self-contained apps and KitKat-era app ports
   (Launcher, Calculator, SoundRecorder, Music, DeskClock, Calendar) are kept
   whole in this repo and copied into the corresponding LineageOS app slots,
   which are removed from the repo manifest so stock versions never return.
+* **Vendor overlays** (`vendor/`) — `vendor/partner_gms` (microG Services,
+  microG Companion, Aurora Store, with their privileged-permission
+  whitelists) is copied into the tree and enabled through the stock
+  LineageOS `WITH_GMS` hook, giving users Play-like app access without
+  Google. The APKs themselves are pinned downloads fetched by
+  `scripts/candyos-fetch-apps.sh`.
 
 `manifest/candyos.xml` holds the manifest surgery, `scripts/` holds the
 init/sync/save/verify workflow, and `docs/` explains all of it.
@@ -41,8 +48,11 @@ init/sync/save/verify workflow, and `docs/` explains all of it.
 * [docs/architecture.md](docs/architecture.md) — mechanisms, slot/module map,
   patch policy
 * [docs/contributing.md](docs/contributing.md) — how to make and submit changes
-* [docs/phases/TASKS.md](docs/phases/TASKS.md) — the phase tracker (P1–P21 done,
+* [docs/phases/TASKS.md](docs/phases/TASKS.md) — the phase tracker (P1–P22 done,
   open phases live on)
+* [vendor/partner_gms/README.md](vendor/partner_gms/README.md) — the bundled
+  microG + Aurora Store setup, signature-spoofing notes, and how to bump the
+  pinned APK versions
 
 ## Credits
 

@@ -41,8 +41,12 @@ for pair in "${CANDYOS_PATCHED[@]}"; do
     apply_series "$TREE/$path" "$series"
 done
 
-# 4. Refresh the vendored app slots.
+# 4. Refresh the vendored app slots and the vendor/ overlays.
 vendor_apps
+vendor_trees
+
+# 5. Make sure the bundled microG/Aurora APKs were fetched.
+check_partner_gms_apks
 
 echo "candyos: sync complete — tree is ready to build:"
 echo "  cd $TREE && source build/envsetup.sh && lunch lineage_sdk_phone_x86_64-ap2a-userdebug && m -j\$(nproc)"
