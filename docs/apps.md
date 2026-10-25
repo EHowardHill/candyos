@@ -1,17 +1,25 @@
-## Built-In Applications:
+## Mandatory Applications:
+
+- Phone
+- Messenger
+- Camera
+- Settings
+- CandyOS Experience
+
+## Optional (in its own menu)
 
 - Aurora Store
+
+## Optional Apps:
+
 - Calculator
 - Calendar
+- Voice memos
+- Reminders 
+- Contacts 
+- Files
+- Gallery
+- Notes
 - Clock
-- Music
-- Sound Recorder
-- Camera
-- Phone
-- Messaging
-- File Manager
-
-## Apps that can be installed during the OTE:
-
 - OSM Maps
 - Web Browser
