@@ -9,7 +9,9 @@
 - Camera
 - Phone
 - Messaging
+- File Manager
 
 ## Apps that can be installed during the OTE:
 
 - OSM Maps
+- Web Browser
