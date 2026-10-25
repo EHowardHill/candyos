@@ -6,6 +6,9 @@
 - Clock
 - Music
 - Sound Recorder
+- Camera
+- Phone
+- Messaging
 
 ## Apps that can be installed during the OTE:
 
