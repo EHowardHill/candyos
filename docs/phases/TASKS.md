@@ -2092,3 +2092,51 @@ first iteration of the prebuilt_etc module installed the XML without
 its .xml extension (soong names outputs after the module) - the
 package manager picked it up anyway, but the file now ships under the
 conventional *.xml name via the filename: property.
+
+## Phase 24 - WebUSB installation on devices [/]
+
+Goal (user direction 2026-10-26): WebUSB is the most straightforward way
+to install CandyOS on mobile devices - verify the system supports it and
+document it.
+
+Finding: WebUSB installability is INHERITED, not implemented. The flasher
+is Lineage Flash Tools (flash.lineageos.org), the base project's official
+WebUSB utility (ADB-sideload and Fastboot tabs, Chromium-family browsers;
+Chrome/Edge-class - WebUSB shipped in Chromium 61, no Firefox). It works
+with CandyOS builds precisely because CandyOS changes nothing the install
+chain depends on. Audit (2026-10-26, all five patch series + overlays):
+
+* No patch touches the USB stack, adbd, fastbootd, LineageOS Recovery, or
+  OTA packaging - the series are theme/UI-layer work. (grep for
+  usb/adbd/fastboot/recovery/sideload/payload across patches/ matches only
+  "statusbar" substrings, Music-app "USB storage" strings, and binary
+  wallpaper patch data.)
+* Device builds are stock LOS 21 builds: `brunch <device>` defaults to
+  userdebug (required anyway - P22 signature spoofing needs debuggable)
+  and emits the standard lineage-21.0-<date>-UNOFFICIAL-<device>.zip plus
+  the per-partition images each device's install guide references - the
+  exact artifact shapes the web flasher consumes.
+* The overlay is device-agnostic: every LOS-21-supported device with an
+  unlockable bootloader is installable. Device-specific steps (A/B,
+  dynamic partitions, unlock variants, firmware prerequisites) stay on the
+  device's LineageOS wiki install page - the web tool replaces the host
+  tools, not the wiki steps.
+
+Landed: docs/install-webusb.md (full walkthrough - requirements, browser
+and udev notes, device build, unlock/recovery/sideload via the web tool,
+relocking and troubleshooting notes, runtime-vs-install WebUSB
+distinction); README.md "Install on a device" section + doc index entry;
+docs/getting-started.md pointer section. No code or patch changes
+required - that is the finding (support = do not break the stock chain).
+
+- [X] 24.1 Audit: the install chain is stock (above)
+- [X] 24.2 Docs: WebUSB install walkthrough wired into README,
+      getting-started, and the doc index
+- [ ] 24.3 First on-device install pass: build for a real device, flash
+      via flash.lineageos.org, boot, file deltas here - rides the hardware
+      pass backlog with every other [/] item (rule 6: AVD-only until real
+      hardware exists; deferred, not cancelled)
+- [ ] 24.4 (optional, later) CandyOS-hosted installer page on the
+      kdrag0n/fastboot.js + android-webinstall pattern (the GrapheneOS
+      web-installer model) once device releases exist - polish, not a gap:
+      Lineage Flash Tools needs no CandyOS infrastructure

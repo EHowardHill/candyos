@@ -11,5 +11,6 @@ their messages refer to this file.
 * Phases 1–20 are complete (their record lives in TASKS.md).
 * Phase 21 (shade/QS rollback) is complete; the notification shade and
   quick settings intentionally stay stock LineageOS.
-* Open phases (P16 Tier 2+ app ports, P11+ QA backlog, ...) live in
-  TASKS.md — pick one up, and record progress there as you go.
+* Open phases (P16 Tier 2+ app ports, P11+ QA backlog, P24 device-install
+  pass, ...) live in TASKS.md — pick one up, and record progress there as
+  you go.

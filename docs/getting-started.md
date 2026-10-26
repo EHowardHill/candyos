@@ -124,6 +124,24 @@ reach a booted emulator image — re-run a full `m -j8` before relaunching
 to regenerate `system-qemu.img`, and wipe `userdata-qemu.img*` for a clean
 profile (the launcher script does the wipe for you).
 
+## Install it on a device (WebUSB)
+
+The same synced tree builds for any LineageOS 21-supported device, and the
+install runs from a browser — no adb/fastboot on the host:
+
+```
+cd ~/android/lineage
+source build/envsetup.sh
+breakfast <device>
+brunch <device>     # flashable zip in out/target/product/<device>/
+```
+
+Flash the result over WebUSB with Lineage Flash Tools
+(<https://flash.lineageos.org>). Requirements, browser/udev setup, the
+unlock-recovery-sideload walkthrough, and the record of what CandyOS
+guarantees on the install chain are in
+[docs/install-webusb.md](install-webusb.md).
+
 ## Keeping the tree current
 
 ```

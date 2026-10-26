@@ -20,6 +20,17 @@ from inside the tree, never from elsewhere.)
 Prerequisites (disk, RAM, packages, repo tool) and emulator instructions are in
 [docs/getting-started.md](docs/getting-started.md).
 
+## Install on a device
+
+CandyOS installs on physical devices over **WebUSB**: flash from a
+Chromium-family browser with
+[Lineage Flash Tools](https://flash.lineageos.org) — no adb/fastboot on
+the host. Build for any LineageOS 21-supported device
+(`breakfast <device> && brunch <device>`) and follow
+[docs/install-webusb.md](docs/install-webusb.md), which also records why
+the WebUSB path is supported (the overlay never touches the USB, recovery,
+or packaging chain).
+
 ## How it works
 
 CandyOS modifies LineageOS in exactly three ways:
@@ -49,6 +60,9 @@ init/sync/save/verify/emulator workflow, and `docs/` explains all of it.
 
 * [docs/getting-started.md](docs/getting-started.md) — full bootstrap, build,
   and emulator walkthrough
+* [docs/install-webusb.md](docs/install-webusb.md) — installing CandyOS on a
+  supported phone from the browser (WebUSB): requirements, device build,
+  flashing with Lineage Flash Tools
 * [docs/architecture.md](docs/architecture.md) — mechanisms, slot/module map,
   patch policy
 * [docs/contributing.md](docs/contributing.md) — how to make and submit changes
