@@ -51,8 +51,9 @@ brunch <device>
 ```
 
 * `brunch` = `breakfast` + `mka bacon` and defaults to a `userdebug`
-  build. Keep it that way: the bundled microG Play-signature spoofing only
-  works on debuggable builds
+  build. With MindTheGapps the Google apps carry real signatures, so
+  unlike the old microG setup nothing depends on the build being
+  debuggable — but keep `userdebug` for development anyway
   (see [vendor/partner_gms/README.md](../vendor/partner_gms/README.md)).
 * Artifacts land in `out/target/product/<device>/`:
   * `lineage-21.0-<date>-UNOFFICIAL-<device>.zip` — the flashable package,
@@ -120,6 +121,6 @@ command. In shape:
   today that is polish, not a gap.
 * **WebUSB on CandyOS itself.** WebUSB in the installed OS is a
   browser-app capability — Chromium-family browsers support it and can
-  be installed through the bundled Aurora Store; the framework's USB host
+  be installed through the bundled Play Store; the framework's USB host
   stack is unmodified stock LineageOS. The install flow above is
   independent of this: it runs entirely in the host browser.

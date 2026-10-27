@@ -8,7 +8,7 @@
 
 ## Optional (in its own menu)
 
-- Aurora Store
+- Play Store (bundled Google services)
 
 ## Optional Apps:
 

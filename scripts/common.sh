@@ -133,20 +133,26 @@ vendor_trees() {
     done
 }
 
-# Warn (loudly, but do not fail) about bundled-app APKs that are missing or
+# Warn (loudly, but do not fail) about bundled-app blobs that are missing or
 # stale in the candyos repo - candyos-fetch-apps.sh is the fix.
 check_partner_gms_apks() {
-    local apk missing=0
-    for apk in GmsCore/GmsCore.apk FakeStore/FakeStore.apk AuroraStore/AuroraStore.apk; do
+    local missing=0 apk arch
+    for apk in OrganicMaps/OrganicMaps.apk; do
         if [ ! -s "$CANDYOS_ROOT/vendor/partner_gms/$apk" ]; then
             echo "candyos: WARNING: vendor/partner_gms/$apk is missing!" >&2
             missing=1
         fi
     done
+    for arch in arm arm64; do
+        if [ ! -s "$CANDYOS_ROOT/vendor/partner_gms/gapps-$arch/Android.mk" ]; then
+            echo "candyos: WARNING: vendor/partner_gms/gapps-$arch is not extracted!" >&2
+            missing=1
+        fi
+    done
     [ "$missing" -eq 0 ] && return 0
-    echo "candyos: the microG/Aurora packages cannot build without it/them. Run:" >&2
+    echo "candyos: the Google-services/Maps packages cannot build without them. Run:" >&2
     echo "  $CANDYOS_ROOT/scripts/candyos-fetch-apps.sh" >&2
-    echo "candyos: (the APKs are pinned downloads, not committed files - see" >&2
-    echo "  vendor/partner_gms/README.md)" >&2
+    echo "candyos: (the MindTheGapps trees and APKs are pinned downloads," >&2
+    echo "  not committed files - see vendor/partner_gms/README.md)" >&2
     return 0
 }

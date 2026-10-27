@@ -25,7 +25,7 @@ index 79eb79be..758ce354 100644
 +    CandyNotes \
 +    CandyReminders
 +
- # CandyOS: bundle microG and Aurora Store from vendor/partner_gms
+ # CandyOS: bundle MindTheGapps GApps and Organic Maps from vendor/partner_gms
  WITH_GMS := true
  
 -- 

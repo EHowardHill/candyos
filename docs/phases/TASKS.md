@@ -2355,3 +2355,50 @@ and the part1 loop wrap (534 -> 180).
       wordmark now renders at ~75% of the screen width, centered, with
       ~12% margins per side. Verified distortion-free (frames and desc
       quad both exactly 6:1; 1080/1440/720/2160 divide cleanly).
+
+## Phase 27 - Bundled MindTheGapps: real Google services [/]
+
+Goal (user direction 2026-10-27): swap microG out for the real Google
+services, baked into the ROM zip so the person flashing has nothing
+extra to sideload - MindTheGapps, the LineageOS wiki's recommended
+GApps package for LOS 21 / Android 14 (<https://wiki.lineageos.org/gapps/>).
+
+Deltas from P22:
+
+* Aurora Store is gone (Play Store makes it redundant); Organic Maps
+  stays (unchanged fetch path, plain product app).
+* No signature spoofing anywhere: the blobs carry Google's real
+  signatures, so the P22 userdebug requirement dies (kept for
+  development) and `user` builds would work too.
+* MindTheGapps ships arm/arm64 only - no x86/x86_64. The include is
+  arch-conditional (products/gms.mk filters TARGET_ARCH), and each
+  gapps-<arch>/Android.mk is guarded to its own arch, so both trees can
+  sit in the tree copy at once. The emulator QA images therefore build
+  WITHOUT GApps by design; the Google surfaces are only testable on
+  arm/arm64 hardware (documented in vendor/partner_gms/README.md).
+* Fetch flow: candyos-fetch-apps.sh downloads the pinned zips
+  (14.0.0-arm64 20250203_200051, 14.0.0-arm 20250203_195950, SHA-256
+  pinned from the upstream .sha256sum assets), extracts system/ into
+  vendor/partner_gms/gapps-<arch>/, then runs the new
+  scripts/candyos-gen-gapps-mk.py to generate Android.mk (one
+  BUILD_PREBUILT per APK/XML, PRESIGNED, verbatim install via
+  LOCAL_REPLACE_PREBUILT_APK_INSTALLED so the v2/v3 signatures are not
+  repacked away) and gapps-packages.mk (PRODUCT_PACKAGES +
+  PRODUCT_ARTIFACT_PATH_REQUIREMENT_ALLOWED_LIST), included by
+  products/gms.mk per arch. Pass-through args (arm64|arm|none) keep the
+  emulator workflow at a zero-GApps download cost.
+* uses-library mirroring: the generator runs the build tree's aapt2
+  ($CANDYOS_ANDROID_TREE/out/host/linux-x86/bin/aapt2 when present) to
+  copy each APK manifest's <uses-library> set into
+  LOCAL_USES_LIBRARIES / LOCAL_OPTIONAL_USES_LIBRARIES - manifest_check
+  requires coherence. Without an aapt2 the modules generate tagless with
+  a warning; regenerate after the first build if the check complains.
+
+- [X] 27.1 Pins + generator authored; old GmsCore/FakeStore/AuroraStore
+      modules and microG XMLs deleted; .gitignore covers gapps-*/.
+- [X] 27.2 Docs swept: vendor/partner_gms/README.md rewritten;
+      README.md, docs/architecture.md, docs/getting-started.md,
+      docs/install-webusb.md (userdebug rationale), docs/apps.md.
+- [ ] 27.3 Full arm64 device build with the fetched MindTheGapps tree:
+      manifest_check / artifact-path pass on the generated modules, then
+      on-device QA (Play Store login + app install).

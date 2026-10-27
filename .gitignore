@@ -3,3 +3,5 @@
 *~
 .DS_Store
 vendor/partner_gms/**/*.apk
+vendor/partner_gms/gapps-arm/
+vendor/partner_gms/gapps-arm64/

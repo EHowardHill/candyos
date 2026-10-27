@@ -45,7 +45,7 @@ done
 vendor_apps
 vendor_trees
 
-# 5. Make sure the bundled microG/Aurora APKs were fetched.
+# 5. Make sure the bundled GApps/Maps blobs were fetched.
 check_partner_gms_apks
 
 echo "candyos: sync complete — tree is ready to build:"
