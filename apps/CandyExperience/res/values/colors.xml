@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="candy_accent">#33B5E5</color>
+    <color name="candy_accent_dark">#0099CC</color>
+    <color name="setup_bg">#1C1C1C</color>
+    <color name="setup_text">#FFFFFFFF</color>
+    <color name="setup_text_dim">#B3FFFFFF</color>
+    <color name="about_bg">#FFFFFFFF</color>
+    <color name="about_text">#FF161616</color>
+    <color name="about_text_dim">#FF808080</color>
+    <color name="holo_text_primary">#000000</color>
+    <color name="holo_text_secondary">#808080</color>
+    <color name="ic_launcher_background">#33B5E5</color>
+</resources>

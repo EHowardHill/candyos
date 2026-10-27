@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- CandyOS Testing: the second activity. Opened through the ported 4.4
-     activity-open animation; shows up as a card in KitKatRecentsActivity;
-     finishing plays the 4.4 close animation. -->
+<!-- CandyOS Experience: the Testing second activity (ported from the
+     sunset vendor/testing app). Opened through the ported 4.4
+     activity-open animation; shows up as a card in
+     KitKatRecentsActivity; finishing plays the 4.4 close animation. -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -19,20 +20,19 @@
             android:layout_marginTop="24dp"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:text="@string/second_title" />
+            android:text="@string/test_second_title" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/second_explanation" />
+            android:text="@string/test_second_explanation" />
 
         <Button
-            android:id="@+id/btn_finish"
+            android:id="@+id/test_second_finish"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:onClick="onClick"
-            android:text="@string/btn_finish" />
+            android:text="@string/test_second_finish" />
     </LinearLayout>
 </ScrollView>

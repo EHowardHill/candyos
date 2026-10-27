@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- CandyOS Testing: every section exercises a CandyOS surface. The whole
-     layout renders on Theme.DeviceDefault (== Holo after the P1 rebase),
-     so the app itself is a live test of the theme cascade: section headers
-     use the Holo list-separator style, buttons are ghost outlines, toggles
-     carry the KitKat skins, and typing in the text field plays the ported
-     4.4 keypress sounds. -->
+<!-- CandyOS Experience: the Testing bench (ported from the sunset
+     vendor/testing app, P23 -> P25). Every section exercises a
+     CandyOS surface. The activity runs on Theme.DeviceDefault
+     (== Holo via the P1 series), so the widget gallery doubles as a
+     theme-cascade test: section headers use the Holo list-separator
+     style, buttons are ghost outlines, toggles carry the KitKat skins,
+     and typing in the text field plays the ported 4.4 keypress
+     sounds. -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -20,50 +22,44 @@
             style="?android:attr/listSeparatorTextViewStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/sec_notif" />
+            android:text="@string/test_sec_notif" />
 
         <Button
-            android:id="@+id/btn_notif_long"
+            android:id="@+id/test_notif_long"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:onClick="onClick"
-            android:text="@string/btn_notif_long" />
+            android:text="@string/test_notif_long" />
 
         <Button
-            android:id="@+id/btn_notif_short"
+            android:id="@+id/test_notif_short"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onClick"
-            android:text="@string/btn_notif_short" />
+            android:text="@string/test_notif_short" />
 
         <Button
-            android:id="@+id/btn_notif_burst"
+            android:id="@+id/test_notif_burst"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onClick"
-            android:text="@string/btn_notif_burst" />
+            android:text="@string/test_notif_burst" />
 
         <Button
-            android:id="@+id/btn_notif_group"
+            android:id="@+id/test_notif_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onClick"
-            android:text="@string/btn_notif_group" />
+            android:text="@string/test_notif_group" />
 
         <Button
-            android:id="@+id/btn_notif_ongoing"
+            android:id="@+id/test_notif_ongoing"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onClick"
-            android:text="@string/btn_notif_ongoing" />
+            android:text="@string/test_notif_ongoing" />
 
         <Button
-            android:id="@+id/btn_notif_cancel"
+            android:id="@+id/test_notif_cancel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onClick"
-            android:text="@string/btn_notif_cancel" />
+            android:text="@string/test_notif_cancel" />
 
         <!-- ===== Holo widget skins ===== -->
         <TextView
@@ -71,24 +67,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/sec_widgets" />
+            android:text="@string/test_sec_widgets" />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@string/ghost_btn" />
+            android:text="@string/test_ghost_btn" />
 
         <Switch
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="@string/switch_label" />
+            android:text="@string/test_switch_label" />
 
         <CheckBox
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/checkbox_label" />
+            android:text="@string/test_checkbox_label" />
 
         <RadioGroup
             android:layout_width="match_parent"
@@ -98,19 +94,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/radio_a" />
+                android:text="@string/test_radio_a" />
             <RadioButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/radio_b" />
+                android:text="@string/test_radio_b" />
         </RadioGroup>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="@string/seek_label" />
+            android:text="@string/test_seek_label" />
 
         <SeekBar
             android:layout_width="match_parent"
@@ -122,7 +118,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="@string/progress_determinate_label" />
+            android:text="@string/test_progress_determinate_label" />
 
         <ProgressBar
             style="?android:attr/progressBarStyleHorizontal"
@@ -135,7 +131,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="@string/progress_indeterminate_label" />
+            android:text="@string/test_progress_indeterminate_label" />
 
         <ProgressBar
             style="?android:attr/progressBarStyleHorizontal"
@@ -159,17 +155,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="@string/progress_circular_label" />
+                android:text="@string/test_progress_circular_label" />
         </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="@string/spinner_label" />
+            android:text="@string/test_spinner_label" />
 
         <Spinner
-            android:id="@+id/spinner"
+            android:id="@+id/test_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -177,7 +173,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:hint="@string/edit_hint"
+            android:hint="@string/test_edit_hint"
             android:inputType="text"
             android:singleLine="true" />
 
@@ -187,7 +183,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/sec_fonts" />
+            android:text="@string/test_sec_fonts" />
 
         <TextView
             android:layout_width="match_parent"
@@ -195,21 +191,21 @@
             android:layout_marginTop="8dp"
             android:fontFamily="sans-serif-thin"
             android:textSize="22sp"
-            android:text="@string/font_thin" />
+            android:text="@string/test_font_thin" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-light"
             android:textSize="18sp"
-            android:text="@string/font_light" />
+            android:text="@string/test_font_light" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
             android:textSize="16sp"
-            android:text="@string/font_regular" />
+            android:text="@string/test_font_regular" />
 
         <TextView
             android:layout_width="match_parent"
@@ -217,7 +213,7 @@
             android:fontFamily="sans-serif"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:text="@string/font_bold" />
+            android:text="@string/test_font_bold" />
 
         <TextView
             android:layout_width="match_parent"
@@ -225,7 +221,7 @@
             android:fontFamily="sans-serif"
             android:textSize="16sp"
             android:textStyle="italic"
-            android:text="@string/font_italic" />
+            android:text="@string/test_font_italic" />
 
         <TextView
             android:layout_width="match_parent"
@@ -233,7 +229,7 @@
             android:fontFamily="sans-serif-condensed"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:text="@string/font_condensed" />
+            android:text="@string/test_font_condensed" />
 
         <!-- ===== Hybrid emoji ===== -->
         <TextView
@@ -241,28 +237,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/sec_emoji" />
+            android:text="@string/test_sec_emoji" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textSize="20sp"
-            android:text="@string/emoji_kitkat" />
+            android:text="@string/test_emoji_kitkat" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textSize="20sp"
-            android:text="@string/emoji_modern" />
+            android:text="@string/test_emoji_modern" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textColor="#ff33b5e5"
-            android:text="@string/holo_blue_sample" />
+            android:text="@string/test_holo_blue_sample" />
 
         <!-- ===== Dialogs and toasts ===== -->
         <TextView
@@ -270,22 +266,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/sec_dialogs" />
+            android:text="@string/test_sec_dialogs" />
 
         <Button
-            android:id="@+id/btn_dialog"
+            android:id="@+id/test_dialog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:onClick="onClick"
-            android:text="@string/btn_dialog" />
+            android:text="@string/test_dialog" />
 
         <Button
-            android:id="@+id/btn_toast"
+            android:id="@+id/test_toast"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onClick"
-            android:text="@string/btn_toast" />
+            android:text="@string/test_toast" />
 
         <!-- ===== System surfaces ===== -->
         <TextView
@@ -293,42 +287,37 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/sec_system" />
+            android:text="@string/test_sec_system" />
 
         <Button
-            android:id="@+id/btn_second"
+            android:id="@+id/test_second"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:onClick="onClick"
-            android:text="@string/btn_second" />
+            android:text="@string/test_second" />
 
         <Button
-            android:id="@+id/btn_volume"
+            android:id="@+id/test_volume"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onClick"
-            android:text="@string/btn_volume" />
+            android:text="@string/test_volume" />
 
         <Button
-            android:id="@+id/btn_immersive"
+            android:id="@+id/test_immersive"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onClick"
-            android:text="@string/btn_immersive" />
+            android:text="@string/test_immersive" />
 
         <Button
-            android:id="@+id/btn_rotate"
+            android:id="@+id/test_rotate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onClick"
-            android:text="@string/btn_rotate" />
+            android:text="@string/test_rotate" />
 
         <Button
-            android:id="@+id/btn_theme"
+            android:id="@+id/test_theme"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onClick"
-            android:text="@string/btn_theme" />
+            android:text="@string/test_theme" />
     </LinearLayout>
 </ScrollView>

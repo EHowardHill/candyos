@@ -1,0 +1,61 @@
+// KitKat UI Project: the CandyOS Experience app - the CandyOS first-run
+// onboarding and the "about the system" app that keeps living in the
+// drawer afterwards (see docs/phases/TASKS.md, Phase 25).
+//
+// Replaces LineageSetupWizard in its slot (packages/apps/SetupWizard, removed
+// from the manifest), keeping the stock module name so vendor/lineage
+// product config (PRODUCT_PACKAGES += LineageSetupWizard in config/common.mk)
+// resolves with zero product-config changes - same discipline as the other
+// vendored apps.
+//
+// Privileged system_ext app signed with the platform certificate: the setup
+// steps need signature-level permissions (WRITE_SECURE_SETTINGS for the
+// provisioning flags and navigation_mode, CHANGE_COMPONENT_ENABLED_STATE for
+// the optional-app choices - a DISABLED_USER state, which is exactly what
+// Settings "disable" uses and what "pm uninstall --user 0" leaves behind:
+// reversible from the same screen later). The privapp whitelist below
+// declares both, or the LineageOS build fails on the unchecked request.
+//
+// No androidx dependency: the app runs on the framework Holo themes, which
+// the frameworks/base P1 series re-based onto the KitKat donor styles, so
+// Theme.Holo *is* the 4.4 KitKat look here.
+android_app {
+    name: "LineageSetupWizard",
+
+    srcs: ["src/**/*.kt"],
+    resource_dirs: ["res"],
+
+    certificate: "platform",
+    privileged: true,
+    system_ext_specific: true,
+    platform_apis: true,
+
+    overrides: ["Provision"],
+
+    required: ["privapp_whitelist_org.candyos.experience"],
+}
+
+prebuilt_etc {
+    name: "privapp_whitelist_org.candyos.experience",
+    system_ext_specific: true,
+    src: "privapp_whitelist_org.candyos.experience.xml",
+    sub_dir: "permissions",
+    filename_from_src: true,
+}
+
+// Pre-grant the notification runtime permission the Testing bench needs
+// (ported from the sunset vendor/testing app): without POST_NOTIFICATIONS
+// the NMS ranks the app IMPORTANCE_NONE - no shade entries, and the 4.4
+// ticker never sees the posts. fixed="false", so it stays revocable in
+// Settings, where the runtime request guard in the app takes over.
+// Same mechanism as the partner_gms default-permissions files: scanned by
+// the package manager at boot.
+prebuilt_etc {
+    name: "default-permissions-org.candyos.experience",
+    system_ext_specific: true,
+    relative_install_path: "default-permissions",
+    // The package manager only scans *.xml in default-permissions/, but
+    // soong names the output after the module - keep the extension.
+    filename: "default-permissions-org.candyos.experience.xml",
+    src: "default-permissions-org.candyos.experience.xml",
+}

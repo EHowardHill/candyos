@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<permissions>
+    <privapp-permissions package="org.candyos.experience">
+        <permission name="android.permission.WRITE_SECURE_SETTINGS" />
+        <permission name="android.permission.CHANGE_COMPONENT_ENABLED_STATE" />
+    </privapp-permissions>
+</permissions>

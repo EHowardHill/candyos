@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/whiteassetyellow.png" alt="CandyOS">
+</p>
+
 # CandyOS
 
 ## Quickstart
@@ -40,7 +44,10 @@ CandyOS modifies LineageOS in exactly three ways:
   as ordered `git am` series and replayed on top of the stock upstream
   checkouts after every sync.
 * **Vendored apps** (`apps/`) — self-contained apps and KitKat-era app ports
-  (Launcher, Calculator, SoundRecorder, Music, DeskClock, Calendar) are kept
+  (Launcher, Calculator, SoundRecorder, Music, DeskClock, Calendar, plus the
+  **CandyOS Experience** app: first-run onboarding, the About and Testing
+  menus that live on in the drawer, and the test bench ported from the
+  sunset `vendor/testing` overlay) are kept
   whole in this repo and copied into the corresponding LineageOS app slots,
   which are removed from the repo manifest so stock versions never return.
 * **Vendor overlays** (`vendor/`) — `vendor/partner_gms` (microG Services,
@@ -48,10 +55,9 @@ CandyOS modifies LineageOS in exactly three ways:
   whitelists) is copied into the tree and enabled through the stock
   LineageOS `WITH_GMS` hook, giving users Play-like app access without
   Google. The APKs themselves are pinned downloads fetched by
-  `scripts/candyos-fetch-apps.sh`. `vendor/testing` carries the bundled
-  **Testing** app — a KitKat-styled test bench that exercises every
-  CandyOS surface (ticker, Holo widgets, fonts, emoji, dialogs,
-  immersive/recents/rotation).
+  `scripts/candyos-fetch-apps.sh`. (The `vendor/testing` overlay was sunset
+  2026-10-26 — its test bench lives on in the CandyOS Experience app's
+  Testing menu.)
 
 `manifest/candyos.xml` holds the manifest surgery, `scripts/` holds the
 init/sync/save/verify/emulator workflow, and `docs/` explains all of it.
@@ -73,6 +79,17 @@ init/sync/save/verify/emulator workflow, and `docs/` explains all of it.
   pinned APK versions
 
 ## Credits
+
+CandyOS is maintained by:
+
+- **Undefined** — Lead Designer
+  ([GitHub](https://github.com/UndefinedYouTube) ·
+  [YouTube](https://www.youtube.com/@Undefined.100))
+- **Cinemint** — Project Engineer
+  ([GitHub](https://github.com/EHowardHill/) ·
+  [YouTube](https://www.youtube.com/@cinemint-tech))
+- **Lex** — Launcher Engineer
+  ([GitHub](https://github.com/LecSUSOff))
 
 Based on [LineageOS](https://www.lineageos.org) and AOSP. KitKat-era app
 sources are derived from `android-4.4.4_r1`. Licensed under the Apache License

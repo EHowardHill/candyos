@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CandyOS Experience</string>
+
+    <!-- ===== Menu ===== -->
+    <string name="menu_title">@string/app_name</string>
+    <string name="menu_entry_about">About</string>
+    <string name="menu_entry_testing">Testing</string>
+
+    <!-- ===== Setup wizard ===== -->
+    <string name="setup_welcome_title">Welcome to CandyOS</string>
+    <string name="setup_welcome_body">A few quick choices and your device is ready.</string>
+
+    <string name="setup_network_title">Get online</string>
+    <string name="setup_network_connected">Connected to %1$s</string>
+    <string name="setup_network_not_connected">Not connected</string>
+    <string name="setup_network_pick">Choose Wi-Fi network</string>
+
+    <string name="setup_apps_title">Default apps</string>
+    <string name="setup_apps_body">Deselect to remove an app. You can bring any of them back later.</string>
+
+    <string name="setup_nav_title">Navigation</string>
+    <string name="setup_nav_three">Three-button</string>
+    <string name="setup_nav_three_body">Back, Home and Overview buttons at the bottom of the screen.</string>
+    <string name="setup_nav_gesture">Gesture</string>
+    <string name="setup_nav_gesture_body">Swipe from the edges to go Back, Home and Overview.</string>
+
+    <string name="setup_finish_title">All set</string>
+    <string name="setup_finish_body">Enjoy your CandyOS device.</string>
+
+    <string name="back_label">Back</string>
+    <string name="next_label">Next</string>
+    <string name="start_label">Start</string>
+
+    <!-- ===== About ===== -->
+    <string name="about_title">About CandyOS</string>
+    <string name="about_section_system">System</string>
+    <string name="about_section_maintainers">Maintainers</string>
+    <string name="about_candy_version">CandyOS version</string>
+    <string name="about_android_version">Android version</string>
+    <string name="about_patch_level">Security patch level</string>
+    <string name="about_build_date">Build date</string>
+    <string name="about_unknown">Unknown</string>
+    <string name="about_maintainer_undefined">Undefined — Lead Designer\ngithub.com/UndefinedYouTube · youtube.com/@Undefined.100</string>
+    <string name="about_maintainer_cinemint">Cinemint — Project Engineer\ngithub.com/EHowardHill · youtube.com/@cinemint-tech</string>
+    <string name="about_maintainer_lex">Lex — Launcher Engineer\ngithub.com/LecSUSOff</string>
+
+    <!-- ===== Testing bench (ported from the sunset vendor/testing app) ===== -->
+    <string name="testing_title">Testing</string>
+    <string name="test_second_name">Testing — Second</string>
+    <string name="test_channel_name">Ticker tests</string>
+
+    <!-- Section headers -->
+    <string name="test_sec_notif">Notifications / 4.4 ticker</string>
+    <string name="test_sec_widgets">Holo widget skins</string>
+    <string name="test_sec_fonts">Roboto 2013</string>
+    <string name="test_sec_emoji">Hybrid emoji</string>
+    <string name="test_sec_dialogs">Dialogs and toasts</string>
+    <string name="test_sec_system">System surfaces</string>
+
+    <!-- Ticker test posts -->
+    <string name="test_notif_long">Post long (marquee)</string>
+    <string name="test_ticker_long_title">CandyOS Testing — ticker notification with a deliberately very long title that has to scroll (marquee) all the way across the status bar</string>
+    <string name="test_ticker_long_text">This post exercises the 4.4 ticker port end to end: the status bar contents crossfade out, the title above and this text marquee through the bar for six seconds each, opening the shade cancels the tick immediately, and further posts chain through the queue one entry at a time. The text is intentionally long enough to overflow the bar so the marquee actually has something to do.</string>
+    <string name="test_notif_short">Post short</string>
+    <string name="test_ticker_short_title">Short tick</string>
+    <string name="test_ticker_short_text">Fits on one line — no marquee needed.</string>
+    <string name="test_notif_burst">Post burst of 3 (chaining)</string>
+    <string name="test_chain1_title">Ticker chain 1/3</string>
+    <string name="test_chain1_text">First of three rapid posts; each entry ticks briefly before the next.</string>
+    <string name="test_chain2_title">Ticker chain 2/3</string>
+    <string name="test_chain2_text">Second entry; the queue advances only after the current tick ends.</string>
+    <string name="test_chain3_title">Ticker chain 3/3</string>
+    <string name="test_chain3_text">Third entry; afterwards the status bar contents crossfade back in.</string>
+    <string name="test_notif_group">Post group (summary must not tick)</string>
+    <string name="test_group_child_title">Group child</string>
+    <string name="test_group_child_text">Part of a notification group — this child SHOULD tick.</string>
+    <string name="test_group_summary_title">Group summary</string>
+    <string name="test_group_summary_text">The group summary post — the ticker must skip it (FLAG_GROUP_SUMMARY filter).</string>
+    <string name="test_notif_ongoing">Post ongoing</string>
+    <string name="test_ongoing_title">Ongoing notification</string>
+    <string name="test_ongoing_text">Sticky test post; clears with Cancel all, not by tapping.</string>
+    <string name="test_notif_cancel">Cancel all posted</string>
+    <string name="test_perm_needed">Notifications are blocked for CandyOS Experience — allow them in the permission dialog (or Settings > Apps), then tap the button again.</string>
+
+    <!-- Widget samples -->
+    <string name="test_ghost_btn">Ghost button (plays click sound)</string>
+    <string name="test_switch_label">Switch</string>
+    <string name="test_checkbox_label">Checkbox</string>
+    <string name="test_radio_a">Radio A</string>
+    <string name="test_radio_b">Radio B</string>
+    <string name="test_seek_label">Seekbar (40/100)</string>
+    <string name="test_progress_determinate_label">Determinate progress (65/100)</string>
+    <string name="test_progress_indeterminate_label">Indeterminate progress (thin glow)</string>
+    <string name="test_progress_circular_label">Circular progress</string>
+    <string name="test_spinner_label">Spinner (Holo dropdown)</string>
+    <string name="test_edit_hint">Type here (4.4 keypress sounds)</string>
+    <string-array name="test_spinner_entries">
+        <item>Alpha</item>
+        <item>Beta</item>
+        <item>KitKat</item>
+        <item>Lollipop</item>
+    </string-array>
+
+    <!-- Roboto 2013 samples -->
+    <string name="test_font_thin">Roboto 2013 — Thin 22sp</string>
+    <string name="test_font_light">Roboto 2013 — Light 18sp</string>
+    <string name="test_font_regular">Roboto 2013 — Regular 16sp</string>
+    <string name="test_font_bold">Roboto 2013 — Bold 16sp</string>
+    <string name="test_font_italic">Roboto 2013 — Italic 16sp</string>
+    <string name="test_font_condensed">Roboto 2013 Condensed Bold 16sp</string>
+
+    <!-- Hybrid emoji: KitKat-era codepoints render the 2013 blob glyphs
+         (NotoColorEmoji2013 sits ahead of modern Noto in the fallback
+         chain); post-KitKat codepoints fall through to modern Noto. -->
+    <string name="test_emoji_kitkat">KitKat-era (expect 2013 blobs):\n😀 😃 😄 😁 😆 😅 😂 😍 😎 😢 😭 👍 👏 ❤ ☀ ☕ 🍭</string>
+    <string name="test_emoji_modern">Post-KitKat (expect modern Noto):\n🦄 🌮 🥑 🤖 🧟 🥳 🦖 🏳️‍🌈</string>
+    <string name="test_holo_blue_sample">holo_blue_light #ff33b5e5 (accent pin check)</string>
+
+    <!-- Dialogs and toasts -->
+    <string name="test_dialog">Show Holo dialog</string>
+    <string name="test_dialog_title">Holo dialog</string>
+    <string name="test_dialog_msg">A framework AlertDialog on the DeviceDefault (= Holo) cascade: flat dark panel, square corners and the blue title divider, exactly as in 4.4.</string>
+    <string name="test_toast">Show toast</string>
+    <string name="test_toast_msg">A KitKat-era toast — plain, quick and square.</string>
+
+    <!-- System surfaces -->
+    <string name="test_second">Launch second activity (4.4 transition + recents card)</string>
+    <string name="test_volume">Show volume panel (Holo slider)</string>
+    <string name="test_immersive">Toggle immersive (status bar peek)</string>
+    <string name="test_rotate">Toggle orientation (4.4 rotation anim)</string>
+    <string name="test_theme">Toggle Holo dark / light</string>
+
+    <!-- Second activity -->
+    <string name="test_second_title">Second Activity</string>
+    <string name="test_second_explanation">The transition that opened this activity used the ported 4.4 activity-open animation. Press RECENTS now to see the KitKat vertical card list — this activity appears as a card with its icon and title; dismissing the card and tapping back exercise the donor behaviors. Finishing plays the 4.4 close animation.</string>
+    <string name="test_second_finish">Finish (4.4 close animation)</string>
+</resources>

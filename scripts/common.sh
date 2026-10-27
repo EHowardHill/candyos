@@ -24,8 +24,9 @@ CANDYOS_VENDORED=(
     "Calculator         packages/apps/ExactCalculator"
     "SoundRecorder      packages/apps/Recorder"
     "Music              packages/apps/Eleven"
-    "DeskClock          packages/apps/DeskClock"
-    "Calendar           packages/apps/Etar"
+    "DeskClock         packages/apps/DeskClock"
+    "Calendar          packages/apps/Etar"
+    "CandyExperience   packages/apps/SetupWizard"
 )
 
 # Overlay directories vendored into the tree without replacing a stock
@@ -33,7 +34,6 @@ CANDYOS_VENDORED=(
 # tree>". The tree copy is regenerated from this repo after every sync.
 CANDYOS_VENDOR_TREES=(
     "partner_gms        vendor/partner_gms"
-    "testing            vendor/testing"
 )
 
 die() {

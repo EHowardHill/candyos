@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            style="@style/AboutSection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/about_section_system" />
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <TableRow>
+                <TextView style="@style/AboutLabel" android:text="@string/about_candy_version" />
+                <TextView style="@style/AboutValue" android:id="@+id/candy_version" android:paddingStart="12dp" />
+            </TableRow>
+
+            <TableRow>
+                <TextView style="@style/AboutLabel" android:text="@string/about_android_version" />
+                <TextView style="@style/AboutValue" android:id="@+id/android_version" android:paddingStart="12dp" />
+            </TableRow>
+
+            <TableRow>
+                <TextView style="@style/AboutLabel" android:text="@string/about_patch_level" />
+                <TextView style="@style/AboutValue" android:id="@+id/patch_level" android:paddingStart="12dp" />
+            </TableRow>
+
+            <TableRow>
+                <TextView style="@style/AboutLabel" android:text="@string/about_build_date" />
+                <TextView style="@style/AboutValue" android:id="@+id/build_date" android:paddingStart="12dp" />
+            </TableRow>
+        </TableLayout>
+
+        <TextView
+            style="@style/AboutSection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/about_section_maintainers" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/about_maintainer_undefined" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/about_maintainer_cinemint" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/about_maintainer_lex" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="16dp" />
+    </LinearLayout>
+</ScrollView>

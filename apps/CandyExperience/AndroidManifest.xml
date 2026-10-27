@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.candyos.experience">
+
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
+    <uses-permission android:name="android.permission.CHANGE_COMPONENT_ENABLED_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- API 34 package visibility: the apps list below enumerates other
+         packages, which the default filtering hides entirely (that is why
+         the Default apps list came up empty on first QA). -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <!-- Testing bench: without this runtime grant the NMS ranks the app
+         IMPORTANCE_NONE (no shade entries, and the 4.4 ticker listener
+         never sees the posts). Pre-granted by the default-permissions XML
+         (fixed="false") and requested at runtime as fallback. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:theme="@style/Theme.CandyAbout">
+
+        <activity
+            android:name=".SetupActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.CandySetup"
+            android:launchMode="singleTask"
+            android:clearTaskOnLaunch="true"
+            android:exported="true"
+            android:immersive="true"
+            android:configChanges="keyboard|keyboardHidden|mcc|mnc|orientation|screenSize|screenLayout"
+            android:windowSoftInputMode="stateAlwaysHidden">
+            <intent-filter android:priority="9">
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.DEVICE_INITIALIZATION_WIZARD" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".MenuActivity"
+            android:label="@string/app_name"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".AboutActivity"
+            android:label="@string/about_title"
+            android:exported="false" />
+
+        <activity
+            android:name=".TestingActivity"
+            android:label="@string/testing_title"
+            android:theme="@android:style/Theme.DeviceDefault"
+            android:exported="false" />
+
+        <activity
+            android:name=".TestSecondActivity"
+            android:label="@string/test_second_name"
+            android:theme="@android:style/Theme.DeviceDefault"
+            android:exported="false" />
+    </application>
+</manifest>

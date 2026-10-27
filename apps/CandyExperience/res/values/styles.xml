@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The setup wizard: KitKat dark, full-screen, no action bar - the
+         classic SUW look (dark panel, white text, blue accent). Every
+         text color is explicit so nothing falls through to a
+         white-on-white default. -->
+    <style name="Theme.CandySetup" parent="@android:style/Theme.Holo">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@color/setup_bg</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:textColor">@color/setup_text</item>
+        <item name="android:textColorPrimary">@color/setup_text</item>
+        <item name="android:textColorSecondary">@color/setup_text_dim</item>
+        <item name="android:colorAccent">@color/candy_accent</item>
+    </style>
+
+    <!-- The in-drawer app: KitKat Settings look - Holo Light content on
+         white with the dark action bar. MenuActivity and AboutActivity
+         both run here; the setup wizard overrides with Theme.CandySetup. -->
+    <style name="Theme.CandyAbout" parent="@android:style/Theme.Holo.Light.DarkActionBar">
+        <item name="android:windowBackground">@color/about_bg</item>
+        <item name="android:textColorPrimary">@color/about_text</item>
+        <item name="android:textColorSecondary">@color/about_text_dim</item>
+        <item name="android:colorAccent">@color/candy_accent_dark</item>
+    </style>
+
+    <style name="SetupTitle">
+        <item name="android:textSize">32sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/setup_text</item>
+    </style>
+
+    <style name="SetupBody">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/setup_text_dim</item>
+        <item name="android:lineSpacingMultiplier">1.2</item>
+    </style>
+
+    <style name="AboutSection">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/candy_accent_dark</item>
+    </style>
+
+    <style name="AboutLabel">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/about_text_dim</item>
+    </style>
+
+    <style name="AboutValue">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/about_text</item>
+    </style>
+</resources>

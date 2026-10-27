@@ -2014,7 +2014,15 @@ user test. Script logic (fetch idempotency + checksum pins) and patch
 application context verified locally against the upstream
 lineage-21.0 vendor/lineage checkout.
 
-## Phase 23 - The Testing app (KitKat test bench) [/]
+## Phase 23 - The Testing app (KitKat test bench) [X]
+
+SUNSET 2026-10-26 (user direction): the standalone Testing app is gone.
+Its whole test bench was ported into the CandyOS Experience app's Testing
+menu (see Phase 25) - vendor/testing/ deleted, the
+patches/vendor-lineage P23 include dropped (series is 1 patch again),
+and CANDYOS_VENDOR_TREES no longer carries the overlay. Trees that ran
+an older candyos-sync keep a stale (unwired) vendor/testing/ until wiped.
+Everything below is the historical record of the standalone app.
 
 Goal: a single bundled app that exercises every CandyOS-specific
 surface for on-device verification, styled by the system itself
@@ -2140,3 +2148,125 @@ required - that is the finding (support = do not break the stock chain).
       kdrag0n/fastboot.js + android-webinstall pattern (the GrapheneOS
       web-installer model) once device releases exist - polish, not a gap:
       Lineage Flash Tools needs no CandyOS infrastructure
+
+## Phase 25 - CandyOS Experience (first-run onboarding + about app) [/]
+
+Goal (user direction 2026-10-26): replace the LineageOS first-run SetupWizard
+with the CandyOS Experience app - Kotlin, CandyOS branding, KitKat styling -
+covering only getting-started tasks: network, optional default apps, and
+navigation style. The app keeps living in the app drawer as an informational
+"about the system" app, where every setup choice can be revisited.
+
+Design (see docs/architecture.md change map row):
+
+* Vendored into the SetupWizard slot (packages/apps/SetupWizard removed
+  from manifest/candyos.xml, apps/CandyExperience copied in by
+  candyos-sync.sh), module name LineageSetupWizard kept so
+  vendor/lineage/config/common.mk PRODUCT_PACKAGES resolves unchanged -
+  same discipline as the other vendored apps.
+* First-run trigger: SetupActivity answers ACTION_MAIN +
+  ACTION_DEVICE_INITIALIZATION_WIZARD with CATEGORY_HOME (same intent
+  filter as the stock SUW), so it is picked as the HOME resolver while
+  DEVICE_PROVISIONED=0. Finishing writes DEVICE_PROVISIONED=1 and
+  USER_SETUP_COMPLETE=1 (what stock SetupWizardUtils.finishSetupWizard
+  does) and hands off to AboutActivity.
+* Network step: current-connection status plus a button into the stock
+  Settings Wi-Fi picker; status re-read on resume.
+* Optional default apps: the removable CandyOS system apps (Calculator,
+  Calendar, DeskClock/Clock, Music, SoundRecorder) plus Aurora Store,
+  checkboxes reflecting current state via setApplicationEnabledSetting
+  (DISABLED_USER = exactly what Settings "disable" and
+  `pm uninstall --user 0` leave behind) - reversible, no image surgery.
+* Navigation: Settings.Global.NAVIGATION_MODE (stock SystemUI
+  NavigationModeController constants: 0 = three-button, 2 = fully
+  gestural) - no frameworks/base patch needed, SystemUI rebuilds live.
+* AboutActivity (the LAUNCHER app, Holo.Light.DarkActionBar - the KitKat
+  Settings look): CandyOS/Android versions, security patch, build date,
+  device/memory/storage/display facts, and the feature list - plus the
+  same apps checkboxes and navigation radios with an Apply button.
+* Privileged system_ext app on the platform certificate (WRITE_SECURE_SETTINGS
+  and CHANGE_COMPONENT_ENABLED_STATE are signature-level), platform_apis for
+  Settings.Global.NAVIGATION_MODE / SystemProperties, own privapp whitelist
+  (privapp_whitelist_org.candyos.experience.xml) - the LineageOS build fails
+  on any privileged request no whitelist grants, so the file is required.
+* No androidx: Theme.Holo *is* the KitKat look here (the P1 series re-based
+  DeviceDefault/Holo onto the 4.4 donor styles), so plain framework views
+  keep the app era-correct.
+
+- [X] 25.1 App implemented (apps/CandyExperience: Android.bp, manifest,
+      privapp whitelist, res, Kotlin sources)
+- [X] 25.2 Slot registered: manifest remove-project, CANDYOS_VENDORED in
+      scripts/common.sh, docs updated (architecture.md change map, this
+      phase)
+- [ ] 25.3 First full build + on-device QA: fresh (wiped, unprovisioned)
+      boot lands in SetupActivity, Wi-Fi pick returns, apps
+      disable/restore round-trips, three-button <-> gesture switches live,
+      AboutActivity shows the facts - rides the emulator QA pass
+
+Fix pass (user QA 2026-10-26), two bugs + visual polish:
+
+* BUG (empty Default apps list): API 34 package-visibility filtering hid
+  every other package from the wizard - getApplicationInfo threw
+  NameNotFoundException across the board, so the optional-apps list came up
+  empty. Fix: QUERY_ALL_PACKAGES (platform app) on the manifest plus
+  MATCH_UNINSTALLED_PACKAGES on the lookup so already-removed apps still
+  list (they have to, to be restorable).
+* BUG (wizard reopens right after completion): the setup activity kept its
+  CATEGORY_HOME/DEVICE_INITIALIZATION_WIZARD filter after provisioning, so
+  Home re-resolved into the finished wizard. Fix: finishSetup() disables the
+  setup activity component (COMPONENT_ENABLED_STATE_DISABLED +
+  DONT_KILL_APP - what the stock SUWs do post-provisioning), plus a
+  provisioned guard in onCreate that bounces straight to AboutActivity if
+  the wizard is ever reached after DEVICE_PROVISIONED=1. The CandyLauncher
+  (com.example.thelauncher) is the system launcher and never was in the
+  optional list - it is not a choice, per user direction.
+* Visual pass (user direction: less text, more elements): Wi-Fi status is
+  now a large icon (ic_wifi_on accent / ic_wifi_off slashed, swapped live
+  in updateNetworkStatus), step indicator is a dot strip instead of the
+  "Step x of y" label, the navigation step carries inline illustrations
+  (ic_nav_three three-glyph navbar, ic_nav_gesture pill + edge arcs) on the
+  radios with a live one-line hint, app rows show each app's own icon, and
+  the step copy was cut to one line each. All vectors, Holo-era styling
+  intact, still no androidx.
+
+- [X] 25.4 Fix pass: package visibility, wizard self-disable, icon-first
+      step layouts (build verified: m LineageSetupWizard clean)
+
+- [X] 25.5 Testing-app sunset + menu restructure (user direction
+      2026-10-26): the drawer entry is now a KitKat Settings-style list
+      menu (MenuActivity, plain Holo ListView), entries About and
+      Testing, data-driven so more can come later. TestingActivity and
+      TestSecondActivity are the ported vendor/testing bench (layouts
+      near-verbatim, Java->Kotlin, strings under test_*, ic_stat_testing
+      copied over); the POST_NOTIFICATIONS pre-grant moved in as
+      default-permissions-org.candyos.experience.xml (fixed="false",
+      system_ext). Setup now finishes to the Launcher - the Experience
+      menus are only reached by opening the app explicitly. The
+      standalone app's teardown is recorded under Phase 23 (sunset).
+
+- [X] 25.6 Cleanup pass (user QA 2026-10-26, "looks bad - cluttered icons,
+      white on white, cut-off labels"): the Default-apps list is now real
+      KitKat Settings rows (app_row.xml) - 40dp FIT_CENTER icon box (every
+      icon renders at one consistent size instead of intrinsic-scaled
+      compound drawables), single-line ellipsized title (no wrap/cut-off),
+      checkbox on the end, whole row toggles; themes are explicit per
+      screen now (dark Theme.CandySetup on the wizard only, Holo Light
+      DarkActionBar Theme.CandyAbout on Menu/About) with explicit
+      textColorPrimary/Secondary + windowBackground in both, and the About
+      value/label pairs carry proper styles (AboutValue/AboutLabel), so
+      nothing falls through to a theme default. Build green.
+
+- [X] 25.7 Nav radio polish (user QA): dropped the ic_nav_three/ic_nav_gesture
+      inline illustrations from the setup radios (they squished the labels);
+      the one-line hint under the group carries the explanation now.
+
+- [X] 25.8 About slim-down (user direction 2026-10-26): the About screen
+      now shows only System facts (version, patch level, build date),
+      What's inside, and the new Maintainers credits (Undefined - Lead
+      Designer, Cinemint - Project Engineer, Lex - Launcher Engineer).
+      Device / Default apps / Navigation / Apply dropped - those live in
+      the OTE wizard and Settings. The unused SysInfo helpers went with
+      them. README Credits section lists the same maintainers.
+
+- [X] 25.9 About trim (user direction): What's inside section dropped from
+      About - System facts and Maintainers only.

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    CandyOS Experience: pre-grant the notification runtime permission the
+    Testing bench needs. The bench posts notifications to exercise the 4.4
+    ticker, but targetSdk 34 ranks the app IMPORTANCE_NONE without
+    POST_NOTIFICATIONS (no shade entries, and the SystemUI notification
+    listener - hence the ticker - never sees the posts). A runtime request
+    could bootstrap itself fine now that the bench is only reachable after
+    setup completes, but pre-granting keeps the first QA tap working out of
+    the box (fixed="false": revocable in Settings, where the request guard
+    in the app takes over and the KitKat/Holo permission dialog is
+    exercised). Ported from the sunset vendor/testing default-permissions
+    file.
+-->
+<exceptions>
+    <exception package="org.candyos.experience">
+        <!-- Notifications -->
+        <permission name="android.permission.POST_NOTIFICATIONS" fixed="false" />
+    </exception>
+</exceptions>
