@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Mon, 26 Oct 2026 20:27:45 -0500
-Subject: [PATCH 2/2] CandyOS P24: ship the CandyOS-original Notes and
+Subject: [PATCH 2/3] CandyOS P24: ship the CandyOS-original Notes and
  Reminders apps (Maps moves to the prebuilt Organic Maps APK)
 
 Change-Id: I5cd79aac96fb3fbeef2af329269fac67f00115d5

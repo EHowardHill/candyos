@@ -2270,3 +2270,88 @@ Fix pass (user QA 2026-10-26), two bugs + visual polish:
 
 - [X] 25.9 About trim (user direction): What's inside section dropped from
       About - System facts and Maintainers only.
+
+## Phase 26 - Boot animation: the spinning candy wordmark [/]
+
+Goal (user direction 2026-10-27): replace the LineageOS boot animation with
+the CandyOS wordmark from assets/CandyOSwordswhite.svg - the candy disc and
+the "CandyOS" text centered on screen - with the candy spinning while the
+text stays static, fading in when the animation starts and fading out as
+the boot completes. (First draft was the 3dcandy.png disc alone; superseded
+by this wordmark before any build shipped it.)
+
+Mechanism (patches/vendor-lineage, P26): LineageOS generates
+product/media/bootanimation.zip at build time from
+vendor/lineage/bootanimation/bootanimation.tar + desc.txt (frames resized
+per device with mogrify, zipped stored via soong_zip). CandyOS swaps that
+content and reworks the movie geometry for the wordmark:
+
+* bootanimation.tar: 90 frames rendered from the SVG with the Roboto 2013
+  family the ROM pins (bundled in assets/fonts/, Apache-2.0, from
+  frameworks/base/data/fonts) - "Candy" regular, "OS" bold with its SVG
+  gradient, applied directly since cairosvg cannot resolve the inherited
+  gradient stops. The candy content is a clean circle (0.998 disc-mask IoU
+  vs the author's raster export), so rotating it in its bounding square is
+  lossless. Regenerate deterministically with
+  scripts/candyos-gen-bootanimation.py (python3 + Pillow + cairosvg at
+  generation time; renders through a private fontconfig, no system font
+  install). The canvas is the wordmark content box padded to 6:1 - the
+  padding becomes on-screen margin (the movie quad spans the full screen
+  width, and the first 9:2 draft filled it edge to edge; user QA on the
+  emulator found that too tight, so the wordmark now renders centered at
+  ~75% of the width with ~12% margins per side).
+* desc.txt: "c 1 0 part0" then "f 0 0 part1 30". part0 = 30 frames, the
+  whole wordmark fades in from black while the candy starts to spin,
+  plays once and always completes; part1 = 60 frames = one full
+  revolution at full alpha, loops until the system flags boot complete,
+  then the renderer fades it out over 30 frames while the spin continues
+  (the desc 'f' FADE field - see
+  frameworks/base/cmds/bootanimation/FORMAT.md).
+* Android.mk: IMAGESCALEHEIGHT/IMAGEHEIGHT = width / 6 (the 6:1 wordmark
+  movie - 6 divides 720/1080/1440/2160 exactly, and the canvas is built
+  to exactly 6:1 so the desc quad never stretches the frames; the
+  renderer draws the desc W x H quad centered on any screen). mogrify
+  drops "-colors 256": the frames ship pre-quantized from the generator,
+  and per-frame palette re-quantization made the static text edges
+  shimmer (each frame's palette is optimized for that frame's spinning
+  disc, so shared text pixels remapped slightly differently). Fully
+  transparent pixels are zeroed to black in the generator so the
+  build-time resize antialiases the glyphs against the black part
+  background uniformly.
+
+Motion: 60 fps, 6 degrees per frame - one revolution per second,
+clockwise, continuous across the part0 -> part1 seam (174 -> 180 degrees)
+and the part1 loop wrap (534 -> 180).
+
+- [X] 26.1 desc.txt semantics verified against
+      frameworks/base/cmds/bootanimation (parseAnimationDesc: 'c' plays
+      to completion, 'f' fades N frames on exit; shouldStopPlayingPart
+      stops once fully faded; the shader multiplies alpha by
+      1 - faded/framesToFade, so the fade lands on the black part
+      background).
+
+- [X] 26.2 Text/font fidelity: the Roboto 2013 render matches the
+      author's raster export at 0.82 glyph-mask IoU (font-version
+      nuances; 2013 is the on-ROM brand font), and the candy render
+      matches at 0.998. part1 text pixels are identical across all 60
+      frames pre- and post-resize; part1/030 (360 degrees) equals the
+      unrotated composition to within 1/255 per channel.
+
+- [X] 26.3 Build-recipe simulation (emulator 1080x1920, tree mogrify):
+      tar extracts, frames mogrify to 1080x180 exactly (canvas and desc
+      both 6:1, content aspect 4.52 preserved - no squashing), desc reads
+      "1080 180 60" + the two part lines, zip stores every entry sorted;
+      the wordmark renders 814px wide with 133px margins per side, part0
+      mean alpha ramps 3% -> 100% over its 30 frames, part1 holds full
+      alpha, text zone stays pixel-identical after the -colors removal.
+      A full ROM build + emulator QA pass is still pending (rides the
+      next build).
+
+- [X] 26.4 Sizing revision (user QA 2026-10-27, "a bit too large,
+      touching the edges, looks squashed"): the first wordmark draft
+      padded the content box to 9:2 by growing the height, so the
+      content still spanned 100% of the movie width - and the movie quad
+      is always the full screen width. Rebuilt with a 6:1 canvas: the
+      wordmark now renders at ~75% of the screen width, centered, with
+      ~12% margins per side. Verified distortion-free (frames and desc
+      quad both exactly 6:1; 1080/1440/720/2160 divide cleanly).
