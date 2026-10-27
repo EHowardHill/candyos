@@ -45,6 +45,20 @@
     <string name="about_maintainer_cinemint">Cinemint — Project Engineer\ngithub.com/EHowardHill · youtube.com/@cinemint-tech</string>
     <string name="about_maintainer_lex">Lex — Launcher Engineer\ngithub.com/LecSUSOff</string>
 
+    <!-- ===== Updates (GitHub release updater) ===== -->
+    <string name="updates_title">Updates</string>
+    <string name="updates_channel_name">App updates</string>
+    <string name="updates_check_now">Check now</string>
+    <string name="updates_checking">Checking GitHub releases…</string>
+    <string name="updates_last_check">Last check: %1$s</string>
+    <string name="updates_never_checked">CandyOS checks for app updates once a day over Wi-Fi.</string>
+    <string name="updates_row_current">Up to date (installed: %1$s)</string>
+    <string name="updates_row_installed">Updated to %1$s</string>
+    <string name="updates_row_failed">Update failed: %1$s</string>
+    <string name="updates_row_missing">Not installed on this device</string>
+    <string name="updates_notif_installed_title">%1$d CandyOS app(s) updated</string>
+    <string name="updates_notif_failed_title">CandyOS app update failed</string>
+
     <!-- ===== Testing bench (ported from the sunset vendor/testing app) ===== -->
     <string name="testing_title">Testing</string>
     <string name="test_second_name">Testing — Second</string>

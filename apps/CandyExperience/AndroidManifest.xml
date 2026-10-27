@@ -15,6 +15,16 @@
          (fixed="false") and requested at runtime as fallback. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- ===== GitHub release updater (daily check + silent install of
+         bundled-in APKs; see docs/updater.md) ===== -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Platform-signed privileged system_ext app: the whitelist entry in
+         privapp_whitelist_org.candyos.experience.xml makes the install
+         session commit without user confirmation. -->
+    <uses-permission android:name="android.permission.INSTALL_PACKAGES" />
+    <!-- Persisted JobScheduler jobs re-register at boot through this. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher"
@@ -64,6 +74,16 @@
             android:name=".TestSecondActivity"
             android:label="@string/test_second_name"
             android:theme="@android:style/Theme.DeviceDefault"
+            android:exported="false" />
+
+        <activity
+            android:name=".UpdatesActivity"
+            android:label="@string/updates_title"
+            android:exported="false" />
+
+        <service
+            android:name=".updates.UpdateJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
             android:exported="false" />
     </application>
 </manifest>

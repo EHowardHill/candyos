@@ -18,12 +18,17 @@ class MenuActivity : Activity() {
 
     private val entries = listOf(
         Entry("About", AboutActivity::class.java),
+        Entry("Updates", UpdatesActivity::class.java),
         Entry("Testing", TestingActivity::class.java),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.menu_activity)
+        // The daily release-updater job (see updates/) is periodic and
+        // persisted, but re-assert the schedule whenever the drawer app
+        // opens so a dropped job never stays dropped.
+        org.candyos.experience.updates.UpdatesScheduler.ensureScheduled(this)
 
         val labels = entries.map { it.label }
         val list = requireViewById<ListView>(android.R.id.list)

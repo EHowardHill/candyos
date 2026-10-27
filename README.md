@@ -73,6 +73,9 @@ and `docs/` explains all of it.
   flashing with Lineage Flash Tools
 * [docs/architecture.md](docs/architecture.md) — mechanisms, slot/module map,
   patch policy
+* [docs/updater.md](docs/updater.md) — the bundled-app GitHub release updater
+  in CandyOS Experience: daily check, silent install, how to track a new
+  bundled app
 * [docs/contributing.md](docs/contributing.md) — how to make and submit changes
 * [docs/phases/TASKS.md](docs/phases/TASKS.md) — the phase tracker (P1–P22 done,
   open phases live on)

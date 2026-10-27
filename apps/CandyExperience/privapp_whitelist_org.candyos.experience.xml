@@ -3,5 +3,8 @@
     <privapp-permissions package="org.candyos.experience">
         <permission name="android.permission.WRITE_SECURE_SETTINGS" />
         <permission name="android.permission.CHANGE_COMPONENT_ENABLED_STATE" />
+        <!-- Release updater: lets the daily PackageInstaller session commit
+             without user action (see docs/updater.md). -->
+        <permission name="android.permission.INSTALL_PACKAGES" />
     </privapp-permissions>
 </permissions>
