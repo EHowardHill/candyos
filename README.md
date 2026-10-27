@@ -60,12 +60,13 @@ CandyOS modifies LineageOS in exactly three ways:
   Testing menu.)
 
 `manifest/candyos.xml` holds the manifest surgery, `scripts/` holds the
-init/sync/save/verify/emulator workflow, and `docs/` explains all of it.
+init/sync/save/verify/emulator workflow plus the arm64 Mac share bundle,
+and `docs/` explains all of it.
 
 ## Documentation
 
 * [docs/getting-started.md](docs/getting-started.md) — full bootstrap, build,
-  and emulator walkthrough
+  emulator, and share-a-bundle walkthrough
 * [docs/install-webusb.md](docs/install-webusb.md) — installing CandyOS on a
   supported phone from the browser (WebUSB): requirements, device build,
   flashing with Lineage Flash Tools

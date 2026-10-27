@@ -124,6 +124,39 @@ reach a booted emulator image — re-run a full `m -j8` before relaunching
 to regenerate `system-qemu.img`, and wipe `userdata-qemu.img*` for a clean
 profile (the launcher script does the wipe for you).
 
+## Share it with a friend (Apple Silicon Mac)
+
+`scripts/candyos-build-arm64-mac.sh` packages the whole emulator
+experience for a non-technical Mac user — one zip, and nothing to install
+on her side (no Android Studio, Java, or adb; unzipping is the install):
+
+```
+~/android/candyos/scripts/candyos-build-arm64-mac.sh ~/android/lineage
+```
+
+It verifies the arm64 WebView LFS blob (pulling it if needed), builds
+`lineage_sdk_phone_arm64-ap2a-userdebug` (images in
+`out/target/product/emu64a/`), downloads Google's darwin-arm64 emulator
+package (cached in `out/candyos-mac-bundle/cache/`), and assembles
+`out/candyos-mac-bundle/CandyOS-macOS-Apple-Silicon.zip` (~3 GB): the
+emulator images under SDK system-image naming, the emulator, `Run
+CandyOS.command` and `Reset CandyOS.command` double-click launchers (her
+data persists between launches; Reset wipes back to a clean first boot),
+and a README for her. `--skip-build` repackages without rebuilding.
+Share the zip via Google Drive/Dropbox.
+
+Caveats:
+
+* The arm64 image cannot boot on this x86_64 machine — the emulator
+  refuses cross-arch guests — so the bundle's first boot happens on her
+  Mac (same synced tree, patch series, and apps as the QA'd `emu64x`
+  build; only the architecture differs).
+* `out/` is wiped by a clean build — move the finished zip somewhere
+  safe before any `m clean`.
+* Gatekeeper asks her to approve the launchers on first run
+  (right-click → Open, or System Settings → Privacy & Security →
+  "Open Anyway"); the bundled README walks her through it.
+
 ## Install it on a device (WebUSB)
 
 The same synced tree builds for any LineageOS 21-supported device, and the
