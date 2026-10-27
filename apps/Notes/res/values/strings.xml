@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Notes</string>
+    <string name="title_edit">Note</string>
+    <string name="menu_add">Add</string>
+    <string name="menu_discard">Delete note</string>
+    <string name="empty_list">No notes yet.\nTap Add to write one.</string>
+    <string name="untitled">(untitled)</string>
+    <string name="hint_title">Title</string>
+    <string name="hint_body">Note</string>
+    <string name="delete_title">Delete note</string>
+    <string name="delete_message">Delete \u201c%1$s\u201d?</string>
+    <string name="delete_confirm">Delete</string>
+</resources>

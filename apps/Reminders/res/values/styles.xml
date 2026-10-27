@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Framework Theme.Holo is the KitKat donor look (P1 series). -->
+    <style name="Theme.CandyReminders" parent="@android:style/Theme.Holo">
+        <item name="android:windowBackground">#FF1C1C1C</item>
+    </style>
+</resources>

@@ -27,6 +27,13 @@ CANDYOS_VENDORED=(
     "DeskClock         packages/apps/DeskClock"
     "Calendar          packages/apps/Etar"
     "CandyExperience   packages/apps/SetupWizard"
+    # CandyOS-original apps (docs/apps.md): fresh slots with no stock
+    # project to remove - repo leaves untracked dirs alone, and
+    # candyos-sync.sh refreshes them from apps/ on every sync.
+    # (Maps is the prebuilt Organic Maps APK via vendor/partner_gms,
+    # not a source app - see candyos-fetch-apps.sh.)
+    "Notes              packages/apps/Notes"
+    "Reminders          packages/apps/Reminders"
 )
 
 # Overlay directories vendored into the tree without replacing a stock

@@ -194,7 +194,7 @@
                     android:layout_width="96dp"
                     android:layout_height="96dp"
                     android:layout_marginTop="32dp"
-                    android:src="@drawable/ic_dot" />
+                    android:src="@mipmap/ic_launcher" />
 
                 <TextView
                     style="@style/SetupTitle"

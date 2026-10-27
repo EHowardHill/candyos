@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Framework Theme.Holo IS the 4.4 KitKat donor look here (see the
+         frameworks/base P1 series); the app only pins the window chrome
+         so the Holo dark palette matches the rest of CandyOS. -->
+    <style name="Theme.CandyNotes" parent="@android:style/Theme.Holo">
+        <item name="android:windowBackground">#FF1C1C1C</item>
+    </style>
+</resources>

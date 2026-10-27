@@ -21,5 +21,5 @@
 - Gallery
 - Notes
 - Clock
-- OSM Maps
-- Web Browser
+- Maps
+- Browser

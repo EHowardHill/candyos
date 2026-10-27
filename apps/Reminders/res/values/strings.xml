@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Reminders</string>
+    <string name="title_edit">Reminder</string>
+    <string name="menu_add">Add</string>
+    <string name="menu_save">Save</string>
+    <string name="menu_delete">Delete reminder</string>
+    <string name="menu_clear_done">Clear completed</string>
+    <string name="empty_list">No reminders yet.\nTap Add to set one.</string>
+    <string name="hint_title">What do you need to do?</string>
+    <string name="need_title">Give the reminder a title first</string>
+    <string name="past_due">Saved - the time is already in the past</string>
+    <string name="done_desc">Completed</string>
+    <string name="channel_name">Reminders</string>
+    <string name="fired_text">Time\u2019s up</string>
+</resources>

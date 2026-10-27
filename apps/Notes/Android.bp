@@ -1,0 +1,12 @@
+// CandyOS Notes: the CandyOS-original note-taking app (docs/apps.md).
+// Deliberately plain: Holo dark list + editor, one file per note in the
+// app files dir, no dependencies. The framework Theme.Holo is the 4.4
+// KitKat donor look (frameworks/base P1 series), so the action bar,
+// lists and dialogs land KitKat-styled with zero custom styling.
+android_app {
+    name: "CandyNotes",
+    product_specific: true,
+    sdk_version: "current",
+    srcs: ["src/**/*.kt"],
+    resource_dirs: ["res"],
+}

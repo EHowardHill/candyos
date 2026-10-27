@@ -1,0 +1,11 @@
+// CandyOS Reminders: the CandyOS-original reminder app (docs/apps.md).
+// Holo dark list of one-shot reminders with Holo date/time pickers,
+// AlarmManager scheduling and a notification when one fires. No
+// dependencies; framework Theme.Holo is the KitKat donor look.
+android_app {
+    name: "CandyReminders",
+    product_specific: true,
+    sdk_version: "current",
+    srcs: ["src/**/*.kt"],
+    resource_dirs: ["res"],
+}
