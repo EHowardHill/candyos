@@ -2,8 +2,4 @@
 *.rej
 *~
 .DS_Store
-
-# Bundled microG/Aurora APKs: fetched by scripts/candyos-fetch-apps.sh,
-# pinned there by version + SHA-256, not committed.
 vendor/partner_gms/**/*.apk
-
