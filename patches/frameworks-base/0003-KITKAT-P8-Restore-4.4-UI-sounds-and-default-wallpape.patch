@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Tue, 20 Oct 2026 14:14:29 -0500
-Subject: [PATCH 03/13] KITKAT-P8: Restore 4.4 UI sounds and default wallpaper
+Subject: [PATCH 03/14] KITKAT-P8: Restore 4.4 UI sounds and default wallpaper
 
 - 13 ui-sound sources from android-4.4.4_r1 replaced in the files
   AllAudio.mk / aosp_audio.mk install to /media/audio/ui/ (Effect_Tick,
