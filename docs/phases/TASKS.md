@@ -190,6 +190,42 @@ accept-and-document the loss:
       three mixed patches, and the tree no longer contains TASKS.md or
       kitkat_notes.txt at all.
 
+## Phase 32 — Bundled wallpapers [ ]
+
+User direction (2026-10-28): `assets/wallpapers/` is the wallpaper set —
+`default.jpg` becomes the system default, every image ships on the
+system, and the folder updates often, so a sync/build must always pick
+up the current contents. (Phase number reserved: 31 was the last used.)
+
+- [X] 32.1 Default wallpaper: the generated framework overlay
+      `vendor/candyos/overlay` overrides framework-res
+      `default_wallpaper` (drawable-nodpi + sw600dp + sw720dp buckets)
+      with `default.jpg`, registered as the LAST
+      `PRODUCT_PACKAGE_OVERLAY` by patches/vendor-lineage/0005 (wins over
+      the LineageOS overlays; the LOS RRO's own wallpaper entries were
+      already deleted in 31.1). The KitKat 4.4 wallpaper from the
+      frameworks/base P8 patch stays as the in-tree fallback.
+- [X] 32.2 All images on the system + pickable: CandyOS Experience gains
+      a Wallpapers screen (menu entry, Holo grid of thumbnails,
+      system + lock apply via WallpaperManager; SET_WALLPAPER +
+      platform-signed SET_WALLPAPER_HINTS). The images + the
+      string-array that drives the screen are GENERATED app res — folder
+      edits never touch app code.
+- [X] 32.3 The "every build" plumbing: scripts/candyos-gen-wallpapers.py
+      regenerates BOTH generated locations (repo overlay + repo app res)
+      from assets/wallpapers/ and pushes them into a standing tree when
+      given the tree argument; candyos-sync.sh runs it before the
+      vendored copies on every sync (so a sync IS a wallpaper refresh),
+      and `vendor/candyos` rides CANDYOS_VENDOR_TREES. Edit the folder,
+      re-run sync (or the script alone + rebuild), commit, done.
+- [ ] 32.4 On-device QA (rides the user's next build): default wallpaper
+      boots (home + lock), the Wallpapers grid renders all 9, each pick
+      applies system + lock, default entry applies what the overlay
+      ships. NOTE: whether the overlay lands static or as an enforced
+      RRO depends on the emulator target's ENFORCE_RRO setting — verify
+      the override actually wins in the built image.
+- [ ] 32.5 USER ACCEPTANCE (rides 28.5's build + pass).
+
 ## Backlog — deferred by ruling, not scheduled
 
 * Gallery (P16 Tier 3): the 4.4 Gallery2 donor == the app the modern

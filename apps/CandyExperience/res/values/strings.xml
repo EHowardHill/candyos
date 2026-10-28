@@ -7,6 +7,10 @@
     <string name="menu_entry_about">About</string>
     <string name="menu_entry_testing">Testing</string>
 
+    <!-- ===== Wallpapers ===== -->
+    <string name="wallpapers_title">Wallpapers</string>
+    <string name="wallpaper_set_toast">Wallpaper set</string>
+
     <!-- ===== Setup wizard ===== -->
     <string name="setup_welcome_title">Welcome to CandyOS</string>
     <string name="setup_welcome_body">A few quick choices and your device is ready.</string>

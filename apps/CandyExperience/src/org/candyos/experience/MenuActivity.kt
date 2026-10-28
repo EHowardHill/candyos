@@ -20,6 +20,7 @@ class MenuActivity : Activity() {
         Entry("About", AboutActivity::class.java),
         Entry("Updates", UpdatesActivity::class.java),
         Entry("Testing", TestingActivity::class.java),
+        Entry("Wallpapers", WallpapersActivity::class.java),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {

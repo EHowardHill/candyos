@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Tue, 27 Oct 2026 13:05:28 -0500
-Subject: [PATCH 3/4] CandyOS P26: replace the boot animation with the spinning
+Subject: [PATCH 3/5] CandyOS P26: replace the boot animation with the spinning
  candy wordmark
 
 vendor/lineage/bootanimation/ generates bootanimation.zip at build time

@@ -15,6 +15,13 @@
          (fixed="false") and requested at runtime as fallback. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- Wallpapers screen: SET_WALLPAPER is normal (install-time);
+         SET_WALLPAPER_HINTS is signature-level - granted because this is a
+         platform-signed app - and needed for the lock-screen wallpaper
+         (WallpapersActivity falls back to system-only if it is ever lost). -->
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS" />
+
     <!-- ===== GitHub release updater (daily check + silent install of
          bundled-in APKs; see docs/updater.md) ===== -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -79,6 +86,11 @@
         <activity
             android:name=".UpdatesActivity"
             android:label="@string/updates_title"
+            android:exported="false" />
+
+        <activity
+            android:name=".WallpapersActivity"
+            android:label="@string/wallpapers_title"
             android:exported="false" />
 
         <service

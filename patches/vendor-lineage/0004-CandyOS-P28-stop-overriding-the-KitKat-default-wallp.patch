@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Wed, 28 Oct 2026 14:43:25 -0500
-Subject: [PATCH 4/4] CandyOS P28: stop overriding the KitKat default wallpaper
+Subject: [PATCH 4/5] CandyOS P28: stop overriding the KitKat default wallpaper
  in the LOS RRO
 
 The LineageOS product overlay ships eight default_wallpaper.png entries

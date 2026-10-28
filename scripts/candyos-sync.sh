@@ -41,7 +41,14 @@ for pair in "${CANDYOS_PATCHED[@]}"; do
     apply_series "$TREE/$path" "$series"
 done
 
-# 4. Refresh the vendored app slots and the vendor/ overlays.
+# 4. Regenerate the wallpaper set from assets/wallpapers/ (repo-side
+#    vendor/candyos overlay + CandyExperience res), then refresh the
+#    vendored app slots and the vendor/ overlays. The folder is the source
+#    of truth: drop/remove/rename images (default.jpg = system default),
+#    sync, done.
+python3 "$CANDYOS_ROOT/scripts/candyos-gen-wallpapers.py" ||
+    die "wallpaper generation failed - check assets/wallpapers/ (default.jpg?)"
+
 vendor_apps
 vendor_trees
 

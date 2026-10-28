@@ -42,6 +42,7 @@ CANDYOS_VENDORED=(
 # tree>". The tree copy is regenerated from this repo after every sync.
 CANDYOS_VENDOR_TREES=(
     "partner_gms        vendor/partner_gms"
+    "candyos            vendor/candyos"
 )
 
 die() {

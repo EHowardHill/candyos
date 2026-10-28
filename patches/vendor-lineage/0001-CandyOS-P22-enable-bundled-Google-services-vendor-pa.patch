@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Fri, 23 Oct 2026 13:13:59 -0500
-Subject: [PATCH 1/4] CandyOS P22: enable bundled Google services
+Subject: [PATCH 1/5] CandyOS P22: enable bundled Google services
  (vendor/partner_gms)
 
 Turn on the stock LineageOS WITH_GMS hook so the CandyOS-vendored
