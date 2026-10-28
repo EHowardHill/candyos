@@ -77,8 +77,9 @@ and `docs/` explains all of it.
   in CandyOS Experience: daily check, silent install, how to track a new
   bundled app
 * [docs/contributing.md](docs/contributing.md) — how to make and submit changes
-* [docs/phases/TASKS.md](docs/phases/TASKS.md) — the phase tracker (P1–P22 done,
-  open phases live on)
+* [docs/phases/TASKS.md](docs/phases/TASKS.md) — the working tracker for open
+  work (P0–P27 closed, their record lives in that file's git history and the
+  forks; P28+ live on)
 * [vendor/partner_gms/README.md](vendor/partner_gms/README.md) — the bundled
   MindTheGapps + Organic Maps setup, the arch conditionality, and how to
   bump the pinned versions
