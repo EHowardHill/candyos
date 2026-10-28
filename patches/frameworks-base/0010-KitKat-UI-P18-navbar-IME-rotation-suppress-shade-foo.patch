@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Wed, 21 Oct 2026 20:29:12 -0500
-Subject: [PATCH 16/30] KitKat UI P18: navbar IME-rotation suppress, shade
+Subject: [PATCH 10/13] KitKat UI P18: navbar IME-rotation suppress, shade
  footer drop, QS gap, opaque scrims
 
 - 18.2 NavigationBarView.orientBackButton: 4.4 never rotated the back

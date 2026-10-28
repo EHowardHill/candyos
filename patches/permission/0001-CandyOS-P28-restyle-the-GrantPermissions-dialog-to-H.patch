@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Wed, 28 Oct 2026 14:44:06 -0500
+Subject: [PATCH] CandyOS P28: restyle the GrantPermissions dialog to Holo dark
+
+KitKat UI Project 14.4: the runtime permission dialog's GrantPermissions
+theme parented the hardcoded Material Light alert dialog; parent it to
+Theme.DeviceDefault.Dialog.Alert instead, which after the frameworks/base
+Holo rebase renders the 4.4 dark chrome (KitKat-style grant dialog)
+while keeping every behavioral item (the buttons, and the window
+attributes below, are untouched). Chrome-only - runtime permission
+behavior is unchanged.
+
+Live-tree edit from the P14 era, previously uncaptured: this project was
+not a patched project, so every candyos-sync silently reverted it
+(TASKS 31.2).
+
+Change-Id: Ica5318b54b58b3b02d8d230f3b5d272e376fe715
+---
+ PermissionController/res/values/themes.xml | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/PermissionController/res/values/themes.xml b/PermissionController/res/values/themes.xml
+index 4f59ec29d..da6344ca7 100644
+--- a/PermissionController/res/values/themes.xml
++++ b/PermissionController/res/values/themes.xml
+@@ -48,8 +48,14 @@
+         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+     </style>
+ 
++    <!-- KitKat UI Project (14.4): runtime permission dialogs restyled to
++         Holo dark (parent was the hardcoded Light alert dialog; the
++         framework DeviceDefault dark alert now renders 4.4 chrome).
++         Runtime permission behavior is unchanged - chrome only. NOTE:
++         this lives in the mainline PermissionController module; re-apply
++         after syncing that project. -->
+     <style name="GrantPermissions"
+-           parent="@android:style/Theme.DeviceDefault.Light.Dialog.Alert">
++           parent="@android:style/Theme.DeviceDefault.Dialog.Alert">
+         <item name="android:windowNoTitle">true</item>
+         <item name="android:windowBackground">@android:color/transparent</item>
+         <!-- The following attributes change the behavior of the dialog, hence they should not be
+-- 
+2.53.0
+

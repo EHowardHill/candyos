@@ -14,6 +14,7 @@ CANDYOS_PATCHED=(
     "latinime           packages/inputmethods/LatinIME"
     "vendor-lineage     vendor/lineage"
     "lineage-sdk        lineage-sdk"
+    "permission         packages/modules/Permission"
 )
 
 # Self-contained app ports vendored wholesale: "<apps/ directory> <slot in the

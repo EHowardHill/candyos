@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Tue, 20 Oct 2026 14:14:29 -0500
-Subject: [PATCH 02/30] KITKAT-P1: Install 2013 Roboto family and 4.4 window
+Subject: [PATCH 02/13] KITKAT-P1: Install 2013 Roboto family and 4.4 window
  animations
 
 - 12 TTFs from android-4.4.4_r1 installed as Roboto2013-* prebuilt fonts;

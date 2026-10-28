@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Tue, 20 Oct 2026 14:14:43 -0500
-Subject: [PATCH 06/30] KITKAT-P6: Lockscreen clock font and PIN pad restyle
+Subject: [PATCH 06/13] KITKAT-P6: Lockscreen clock font and PIN pad restyle
 
 - clock_default_large typeface cleaned up (font family comes from
   config_clockFontFamily -> kitkat-lock-clock = Roboto2013-Thin; TextAnimator

@@ -99,23 +99,37 @@ per-item record is the old TASKS.md (this file's git history):
 P21 happened because the shade "did not feel good" on the user's pass —
 so this phase carries the fix-the-feel burden, not just the revert:
 
-- [ ] 28.1 Recover the shade/QS commit set from fork history onto the
+- [/] 28.1 Recover the shade/QS commit set from fork history onto the
       candyos frameworks/base series (30 patches today; the rollback is
       0029): 48dp donor header, QQS = notifications-only, two-panel
       flip + gear toggle, donor QS grid + tiles + brightness dialog,
       KitKatPanelFling physics, ticker interplay unchanged (the ticker
-      survived P21 and ships today).
-- [ ] 28.2 Carry the three fixed-in-tree-but-never-rebuilt fixes of
+      survived P21 and ships today). DONE 2026-10-28: the series was
+      rebuilt as a clean 13-patch chain (the P21 rollback patch and the
+      old fork-tree tracker commits folded out — see 31.3), replayed on
+      the synced upstream revision, and diff-verified against the
+      pre-P21 tree state: the shade/QS set + the P23 ticker fix, byte
+      for byte. candyos-verify.sh green. PENDING: the 28.5 build shows it
+      on the emulator.
+- [X] 28.2 Carry the three fixed-in-tree-but-never-rebuilt fixes of
       the last batch: QQS max-tiles check-before-add, drag handle
       above the navbar, applyDonorFlipToMaxExpansionHeight on both
-      height writers.
+      height writers. All three verified present in the re-landed
+      tree (QuickQSPanelController.setTiles, status_bar_expanded.xml
+      bottom margin, both mMaxExpansionHeight writers) — they were in
+      the pre-P21 commits, so the re-land carries them by
+      construction; the 28.5 build re-verifies them on device.
 - [ ] 28.3 The P21 feel pass, on the canonical AVD AND the user's
       hands before any marker flips: drag/fling feel, gear/X taps,
       QQS<->QS transitions, brightness dialog open.
-- [ ] 28.4 Regenerate the series (candyos-save.sh), candyos-verify.sh
-      green, architecture.md change-map row updated.
+- [X] 28.4 Regenerate the series (candyos-save.sh), candyos-verify.sh
+      green, architecture.md change-map row updated. 13 patches,
+      BASE 993528cf0efb (= current upstream); all six series (incl.
+      the two NEW ones from Phase 31) verify clean.
 - [ ] 28.5 Full build + emulator battery + USER ACCEPTANCE GATE — the
       P21 lesson: this phase does not close without the user pass.
+      Build + emulator run by the user (28.3 and 28.5 markers flip on
+      that pass).
 
 ## Phase 29 — Lock screen [ ]
 
@@ -149,19 +163,32 @@ NOT captured by any series — every sync silently reverts them. Verify
 against a freshly synced tree, then either capture as a patch series or
 accept-and-document the loss:
 
-- [ ] 31.1 vendor/lineage default-wallpaper overlay deletions (the 8
+- [X] 31.1 vendor/lineage default-wallpaper overlay deletions (the 8
       entries under overlay/common/frameworks/base/core/res — the P8
       root cause; the word "wallpaper" appears nowhere in
       patches/vendor-lineage). Without them, the LOS product RRO
       re-overrides the KitKat framework-res wallpaper on every sync.
-- [ ] 31.2 packages/modules/Permission GrantPermissions restyle (P14.4:
+      CAPTURED 2026-10-28: committed in the vendor/lineage project and
+      regenerated into patches/vendor-lineage (0004, the P28 patch);
+      no XML/mk references the drawables. Fixed for every future sync.
+- [X] 31.2 packages/modules/Permission GrantPermissions restyle (P14.4:
       Theme.DeviceDefault.Dialog.Alert parent) — not a patched project;
       the runtime-permission dialog reverts to Material light on sync.
-- [ ] 31.3 The frameworks-base series carries the old fork-tree
+      CAPTURED 2026-10-28: the live-tree edit was still present (never
+      sync-clobbered since); committed it, added the NEW
+      patches/permission series (1 patch) and a CANDYOS_PATCHED entry
+      (packages/modules/Permission) to scripts/common.sh so sync/save/
+      verify/manage it like the others. Fixed for every future sync.
+- [X] 31.3 The frameworks-base series carries the old fork-tree
       TASKS.md bookkeeping (roughly half the 30 patches touch only the
       tracker). docs/phases/TASKS.md is canonical now; fold the
       tracker-only commits out when regenerating the series for P28.
-      Cosmetic, but it declutters review.
+      Cosmetic, but it declutters review. DONE 2026-10-28 with the P28
+      series rebuild: the 15 tracker-only patches (TASKS.md /
+      kitkat_notes.txt) are gone, the 13 surviving patches are
+      code+assets only, the TASKS.md hunks were filtered out of the
+      three mixed patches, and the tree no longer contains TASKS.md or
+      kitkat_notes.txt at all.
 
 ## Backlog — deferred by ruling, not scheduled
 
