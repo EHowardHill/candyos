@@ -96,7 +96,8 @@ class WallpapersActivity : Activity() {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     (128 * resources.displayMetrics.density).toInt())
                 scaleType = ImageView.ScaleType.CENTER_CROP
-                background = context.getDrawable(android.R.drawable.panel_background)
+                // 4.4-style flat dark cell (the QS tile background color).
+                setBackgroundColor(0xff161616.toInt())
             }
             view.setImageBitmap(thumb(wallpapers[position]))
             return view
