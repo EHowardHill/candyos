@@ -259,6 +259,13 @@ mark (already period-styled; user direction).
 - [X] 33.4 CandyOS originals re-tiled (Notes, Reminders): brand art kept,
       re-tiled onto the reference family geometry by candyos-gen-icons.py
       (repo apps/ + tree slots; no patch series — vendored apps).
+      AMENDED 2026-10-29 (user direction): Notes switched to the
+      user-supplied reference/icons/Notes.png (used as-is; non-square
+      references auto-cropped to content and square-padded), Reminders
+      stays re-tiled. Same pass: candyos-gen-wallpapers.py now takes the
+      system-default wallpaper as any single default.<ext> (Phase 32's
+      plumbing convention; the strict default.jpg name requirement is
+      gone).
 - [ ] 33.5 On-device QA (rides the next build): every drawer entry shows
       its KitKat icon at all densities, Settings + keyboard included;
       presigned exceptions documented (CandyLauncher "thelauncher",

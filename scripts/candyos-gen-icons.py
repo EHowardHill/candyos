@@ -3,18 +3,21 @@
 style from the reference set (P33).
 
 reference/icons/ (the committed reference PNGs) is the source of truth for
-the stock LineageOS apps that have a KitKat counterpart; the authentic 4.4
-donor density files under reference/donor-icons/ are copied byte-for-byte
-for Settings and the keyboard (rule 1: authentic, not a theme); the
-CandyOS-original Notes/Reminders art lives under reference/originals/ and
-is re-tiled onto KitKat geometry (rounded corners + darker border + soft
+the stock LineageOS apps that have a KitKat counterpart — and for the
+vendored Notes app (the user-supplied Notes.png); the authentic 4.4 donor
+density files under reference/donor-icons/ are copied byte-for-byte for
+Settings and the keyboard (rule 1: authentic, not a theme); the
+CandyOS-original Reminders art lives under reference/originals/ and is
+re-tiled onto KitKat geometry (rounded corners + darker border + soft
 shadow, matching the reference tile family); AudioFX and SIM Toolkit have
-no KitKat counterpart and get period-style glyphs drawn here.
+no KitKat counterpart and get period-style glyphs drawn here. Non-square
+reference art is auto-cropped to its content and square-padded.
 
 Regenerates (never hand-edit):
 
   apps/{Notes,Reminders}/res/mipmap-<dpi>/ic_launcher.png
-      The two vendored CandyOS-originals, re-tiled KitKat-style.
+      The vendored CandyOS-originals: Notes from reference/icons/Notes.png,
+      Reminders re-tiled from reference/originals/Reminders.png.
 
 With a LineageOS tree argument the in-tree copies are ALSO refreshed:
 
@@ -106,13 +109,16 @@ TREE_REMOVE = {
                     "drawable/ic_launcher_foreground.xml"],
 }
 
-# CandyOS-originals re-tiled from reference/originals (never CandyExperience:
-# its mark is already period-styled by design).
-RETILED = [
-    ("Notes", os.path.join(REPO, "apps", "Notes", "res")),
-    ("Reminders", os.path.join(REPO, "apps", "Reminders", "res")),
+# Vendored CandyOS-original app icons: <app> <res dir> <master source>.
+#   ref:<Reference.png>    used as-is (a non-square source is auto-cropped
+#                          to its alpha bbox and square-padded)
+#   retile:<originals.png> brand art re-tiled onto the reference tile family
+# (Never CandyExperience: its mark is already period-styled by design.)
+VENDORED_ICONS = [
+    ("Notes",     "apps/Notes/res",     "ref:Notes.png"),
+    ("Reminders", "apps/Reminders/res", "retile:Reminders.png"),
 ]
-TREE_RETILED_RES = {
+TREE_VENDORED_RES = {
     "Notes": "packages/apps/Notes/res",
     "Reminders": "packages/apps/Reminders/res",
 }
@@ -161,6 +167,24 @@ def compose_tile(art, shadow=True):
 
 def master_retile(path):
     return compose_tile(Image.open(path).convert("RGBA"))
+
+
+def prepare_ref(path):
+    """Return a square RGBA master. Square sources are used verbatim; a
+    non-square source (art exported on a wide canvas, say) is cropped to
+    its alpha bounding box and centered on a square pad."""
+    img = Image.open(path).convert("RGBA")
+    w, h = img.size
+    if w == h:
+        return img
+    bbox = img.getchannel("A").getbbox()
+    if bbox is None:
+        die(f"{path}: no visible content to crop")
+    img = img.crop(bbox)
+    side = max(img.size)
+    pad = Image.new("RGBA", (side, side), (0, 0, 0, 0))
+    pad.paste(img, ((side - img.width) // 2, (side - img.height) // 2), img)
+    return pad
 
 
 def vertical_gradient(size, top, bottom):
@@ -249,14 +273,22 @@ def main():
         if not os.path.isdir(os.path.join(tree, ".repo")):
             die(f"'{tree}' is not a repo-initialized LineageOS tree")
 
-    # 1. CandyOS-originals, re-tiled (repo side).
-    for name, res in RETILED:
-        master = master_retile(os.path.join(ORIGINALS, f"{name}.png"))
+    # 1. Vendored CandyOS-originals (repo side).
+    for name, res, source in VENDORED_ICONS:
+        kind, arg = source.split(":", 1)
+        if kind == "ref":
+            if not os.path.isfile(os.path.join(REF, arg)):
+                die(f"reference/icons/{arg} is missing")
+            master = prepare_ref(os.path.join(REF, arg))
+        else:
+            if not os.path.isfile(os.path.join(ORIGINALS, arg)):
+                die(f"reference/originals/{arg} is missing")
+            master = master_retile(os.path.join(ORIGINALS, arg))
         for dpi, size in DENSITY.items():
-            d = os.path.join(res, f"mipmap-{dpi}")
+            d = os.path.join(REPO, res, f"mipmap-{dpi}")
             os.makedirs(d, exist_ok=True)
             master.resize((size, size), Image.LANCZOS).save(os.path.join(d, "ic_launcher.png"))
-        print(f"candyos: apps/{name}: re-tiled KitKat icon ({len(DENSITY)} densities)")
+        print(f"candyos: {res}: KitKat icon written ({len(DENSITY)} densities)")
 
     if not tree:
         print("candyos: icons regenerated (pass a lineage tree to refresh "
@@ -271,7 +303,7 @@ def main():
             die(f"{base} does not exist - is this a synced CandyOS tree?")
         kind, arg = master_for(source)
         if kind == "copy512":
-            img = Image.open(arg).convert("RGBA")
+            img = prepare_ref(arg)
             for dpi, size in DENSITY.items():
                 d = os.path.join(base, f"{res_dir}-{dpi}")
                 os.makedirs(d, exist_ok=True)
@@ -293,15 +325,15 @@ def main():
         print(f"candyos: {project}: KitKat icon written ({res_dir}-<dpi>/{res_name}"
               f"{', adaptive set removed' if removed else ''})")
 
-    # 3. Vendored slots: same re-tiled PNGs the repo carries.
-    for name, res in RETILED:
-        t_res = os.path.join(tree, TREE_RETILED_RES[name])
+    # 3. Vendored slots: the same PNGs the repo carries.
+    for name, res, source in VENDORED_ICONS:
+        t_res = os.path.join(tree, TREE_VENDORED_RES[name])
         for dpi in DENSITY:
-            src = os.path.join(os.path.join(REPO, 'apps', name, 'res'), f"mipmap-{dpi}", "ic_launcher.png")
+            src = os.path.join(REPO, res, f"mipmap-{dpi}", "ic_launcher.png")
             d = os.path.join(t_res, f"mipmap-{dpi}")
             os.makedirs(d, exist_ok=True)
             shutil.copyfile(src, os.path.join(d, "ic_launcher.png"))
-        print(f"candyos: {TREE_RETILED_RES[name]}: re-tiled icon pushed")
+        print(f"candyos: {TREE_VENDORED_RES[name]}: icon pushed")
 
     print("candyos: tree updated - commit each listed project "
           "(docs/contributing.md Flow B), then candyos-save.sh")

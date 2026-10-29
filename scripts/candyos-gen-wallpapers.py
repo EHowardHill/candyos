@@ -5,7 +5,7 @@ Reads every image in assets/wallpapers/ and regenerates two generated
 (never hand-edited) locations in this repo:
 
   vendor/candyos/overlay/frameworks/base/core/res/res/
-      drawable-nodpi/default_wallpaper.<ext>          (from default.jpg)
+      drawable-nodpi/default_wallpaper.<ext>          (from default.<ext>)
       drawable-sw600dp-nodpi/default_wallpaper.<ext>
       drawable-sw720dp-nodpi/default_wallpaper.<ext>
     The CandyOS framework overlay (registered as a PRODUCT_PACKAGE_OVERLAY
@@ -77,9 +77,11 @@ def collect():
                    if os.path.splitext(f)[1].lower() in IMAGE_EXTS)
     if not files:
         die("assets/wallpapers/ is empty")
-    if "default.jpg" not in files:
-        die("assets/wallpapers/default.jpg is missing - it is the system "
-            "default wallpaper; name the default exactly default.jpg")
+    defaults = [f for f in files if os.path.splitext(f)[0] == "default"]
+    if len(defaults) != 1:
+        die("assets/wallpapers/ needs exactly one 'default.<ext>' image - it "
+            "is the system default wallpaper (any image extension; found: "
+            f"{', '.join(defaults) or 'none'})")
     return files
 
 
@@ -152,8 +154,9 @@ def push_tree(tree, files):
 
 def main():
     files = collect()
+    default = next(f for f in files if os.path.splitext(f)[0] == "default")
     clean_generated()
-    gen_overlay(os.path.join(ASSETS, "default.jpg"))
+    gen_overlay(os.path.join(ASSETS, default))
     gen_app(files)
     if len(sys.argv) > 1:
         tree = sys.argv[1]
