@@ -22,18 +22,37 @@ data class TrackedApp(
     val repoName: String,
     /** Optional label override; defaults to the installed app's label. */
     val label: String? = null,
+    /**
+     * Optional regex the release asset NAME must match (the first .apk
+     * asset wins otherwise). Needed when one release repo publishes
+     * several APKs: microg/GmsCore ships Services, Companion and -hw
+     * flavors per release, so each entry pins its own asset.
+     */
+    val assetFilter: String? = null,
 )
 
 object TrackedApps {
 
     /**
-     * The bundled-in APKs that publish releases on GitHub. Empty until the
-     * first such app lands; adding one entry here is the whole wiring:
+     * The bundled-in APKs that publish releases on GitHub. Adding one
+     * entry here is the whole wiring (see docs/updater.md for the
+     * release-tag conventions):
      *   TrackedApp("org.example.app", "Example", "example-android"),
-     * (see docs/updater.md for the release-tag conventions).
+     *
+     * The microG pair shares one release repo (microg/GmsCore publishes
+     * Services and Companion in lockstep), hence the per-entry asset
+     * filters; Aurora publishes on GitLab only, so it is NOT tracked —
+     * its built-in self-updater covers it (docs/updater.md).
      */
     val TRACKED: List<TrackedApp> = listOf(
-        // TrackedApp("org.example.app", "Example", "example-android"),
+        TrackedApp(
+            "com.google.android.gms", "microg", "GmsCore",
+            label = "microG Services",
+            assetFilter = "^com\\.google\\.android\\.gms-\\d+\\.apk$"),
+        TrackedApp(
+            "com.android.vending", "microg", "GmsCore",
+            label = "microG Companion",
+            assetFilter = "^com\\.android\\.vending-\\d+\\.apk$"),
     )
 
     private const val PREFS = "candy_updates"

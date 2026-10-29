@@ -89,6 +89,11 @@
             android:exported="false" />
 
         <activity
+            android:name=".PlayServicesActivity"
+            android:label="@string/play_title"
+            android:exported="false" />
+
+        <activity
             android:name=".WallpapersActivity"
             android:label="@string/wallpapers_title"
             android:exported="false" />

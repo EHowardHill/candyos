@@ -51,9 +51,9 @@ brunch <device>
 ```
 
 * `brunch` = `breakfast` + `mka bacon` and defaults to a `userdebug`
-  build. With MindTheGapps the Google apps carry real signatures, so
-  unlike the old microG setup nothing depends on the build being
-  debuggable — but keep `userdebug` for development anyway
+  build. microG's spoofed signature is granted through the P34
+  permission whitelist (not the debuggable-only LineageOS hook), so
+  `user` builds work too — but keep `userdebug` for development anyway
   (see [vendor/partner_gms/README.md](../vendor/partner_gms/README.md)).
 * Artifacts land in `out/target/product/<device>/`:
   * `lineage-21.0-<date>-UNOFFICIAL-<device>.zip` — the flashable package,

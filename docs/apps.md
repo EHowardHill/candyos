@@ -8,7 +8,8 @@
 
 ## Optional (in its own menu)
 
-- Play Store (bundled Google services)
+- Google services (microG Services + Companion, Aurora Store — bundled,
+  opt-in at first run and in CandyOS Experience > Google services)
 
 ## Optional Apps:
 

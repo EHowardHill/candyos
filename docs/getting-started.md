@@ -32,20 +32,20 @@ git clone https://github.com/EHowardHill/candyos ~/android/candyos
 ~/android/candyos/scripts/candyos-sync.sh ~/android/lineage
 ```
 
-* `candyos-fetch-apps.sh` downloads the pinned MindTheGapps zips and the
-  Organic Maps release APK into `vendor/partner_gms/` (they are not
-  committed to the repo) and generates the per-arch GApps makefiles
-  (`candyos-gen-gapps-mk.py`). Run it once after cloning, and again
-  whenever the pins change. Pass `arm64`, `arm`, or `none` to skip
-  arches you do not need (~600 MB each; the emulator needs none).
+* `candyos-fetch-apps.sh` downloads the pinned microG Services + microG
+  Companion + Aurora Store APKs and the Organic Maps release APK into
+  `vendor/partner_gms/` (they are not committed to the repo). Run it once
+  after cloning, and again whenever the pins change (~125 MB total; the
+  APKs are universal, so every target — including the emulator — gets
+  them).
 * `candyos-init.sh` runs `repo init` against the LineageOS manifest (branch
   `lineage-21.0`) and installs `manifest/candyos.xml` as a local manifest.
   If the tree was already initialized, it only refreshes the manifest.
 * `candyos-sync.sh` runs `repo sync`, then replays the CandyOS patch series
   onto frameworks/base, Settings, LatinIME, and vendor/lineage, then fills
   the six vendored app slots from `apps/` and copies the `vendor/`
-  overlays (bundled MindTheGapps Google services + Organic Maps) into the
-  tree. **Always sync
+  overlays (the bundled microG + Aurora Store + Organic Maps packages)
+  into the tree. **Always sync
   with this script** — a bare `repo sync` would rebase away the patches
   and leave stale vendored apps behind.
 
@@ -186,8 +186,8 @@ guarantees on the install chain are in
 ```
 
 That's the whole update story: it re-syncs, re-applies the patch series,
-re-vendores the apps and overlays, and warns if the bundled MindTheGapps/
-Organic Maps blobs are missing (fix: re-run `candyos-fetch-apps.sh`). If LineageOS
+re-vendores the apps and overlays, and warns if the bundled microG/
+Aurora/Organic Maps APKs are missing (fix: re-run `candyos-fetch-apps.sh`). If LineageOS
 upstream changed code the patches touch, `git am -3` usually resolves it;
 when it can't, the script stops with exact recovery instructions (resolve
 by hand, then run `candyos-save.sh` to refresh the stored series and
@@ -211,7 +211,7 @@ To check that the series still applies without a full sync round-trip:
   generated from `apps/`. Edit the copy in the CandyOS repo instead (see
   docs/contributing.md).
 * **`candyos: WARNING: vendor/partner_gms/... is missing!`** — the bundled
-  MindTheGapps trees / Organic Maps APK have not been fetched. Run
+  microG / Aurora / Organic Maps APKs have not been fetched. Run
   `~/android/candyos/scripts/candyos-fetch-apps.sh` and re-sync.
 * **`webview.apk: zip2zip: not a valid zip file`** (late in a full build) —
   the WebView prebuilt is a 134-byte git-lfs pointer instead of the real

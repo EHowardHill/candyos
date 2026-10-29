@@ -81,12 +81,17 @@ object UpdateEngine {
 
     private fun checkOne(context: Context, tracked: TrackedApp): Result {
         val prefs = TrackedApps.prefs(context)
-        val etagKey = "etag.${tracked.repoOwner}/${tracked.repoName}"
+        // ETag per tracked package, not per repo: two entries may share one
+        // release repo (the microG Services + Companion pair polls the same
+        // microg/GmsCore releases), and a shared key would turn the second
+        // entry's first poll into a 304 with no cached tag for it.
+        val etagKey = "etag.${tracked.packageName}@${tracked.repoOwner}/${tracked.repoName}"
         val etag = prefs.getString(etagKey, null)
 
         val state = mutableMapOf<String, String>()
         val (release, unchanged) =
-            GithubClient.latest(tracked.repoOwner, tracked.repoName, etag, state)
+            GithubClient.latest(
+                tracked.repoOwner, tracked.repoName, etag, state, tracked.assetFilter)
         state["etag"]?.let { prefs.edit().putString(etagKey, it).apply() }
 
         // 304: the release we already know about is still the latest.

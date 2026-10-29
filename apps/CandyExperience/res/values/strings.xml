@@ -23,6 +23,9 @@
     <string name="setup_apps_title">Default apps</string>
     <string name="setup_apps_body">Deselect to remove an app. You can bring any of them back later.</string>
 
+    <string name="setup_play_title">Google services</string>
+    <string name="setup_play_body">Optional Play compatibility: microG services let apps that depend on Google Play services work, Aurora Store downloads apps from the Play Store. Leave both off if you don\u2019t need them \u2014 you can change this anytime in CandyOS Experience.</string>
+
     <string name="setup_nav_title">Navigation</string>
     <string name="setup_nav_three">Three-button</string>
     <string name="setup_nav_three_body">Back, Home and Overview buttons at the bottom of the screen.</string>
@@ -35,6 +38,14 @@
     <string name="back_label">Back</string>
     <string name="next_label">Next</string>
     <string name="start_label">Start</string>
+
+    <!-- ===== Google services (microG + Aurora Store) ===== -->
+    <string name="play_title">Google services</string>
+    <string name="play_body">Turn the bundled Play compatibility on or off. Changes apply immediately and you can reverse them anytime.</string>
+    <string name="play_missing">This build carries no Google-services packages (fetch them per vendor/partner_gms/README.md, then rebuild).</string>
+    <string name="play_microg_label">microG services (Play services + Play Store stub)</string>
+    <string name="play_aurora_label">Aurora Store (Play Store client)</string>
+    <string name="play_hint">microG needs its battery-optimization exemption lifted after enabling (its own settings screen links there), and a reboot gives push notifications a clean start.</string>
 
     <!-- ===== About ===== -->
     <string name="about_title">About CandyOS</string>

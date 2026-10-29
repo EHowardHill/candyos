@@ -34,15 +34,16 @@ object GithubClient {
 
     /**
      * Fetch the latest release of owner/repo. Returns null when the repo
-     * has no releases (404) or the release ships no .apk asset; the ETag
-     * round-trip (304 => null with [unchanged]=true) is surfaced through
-     * [state].
+     * has no releases (404) or the release ships no .apk asset matching
+     * [assetFilter]; the ETag round-trip (304 => null with
+     * [unchanged]=true) is surfaced through [state].
      */
     fun latest(
         owner: String,
         repo: String,
         etag: String?,
         state: MutableMap<String, String>,
+        assetFilter: String? = null,
     ): Pair<Release?, Boolean> {
         var conn: HttpURLConnection? = null
         return try {
@@ -64,7 +65,7 @@ object GithubClient {
                 HttpURLConnection.HTTP_OK -> {
                     val etagHeader = conn.getHeaderField("ETag")
                     val body = conn.inputStream.bufferedReader().use { it.readText() }
-                    val parsed = parseRelease(body)
+                    val parsed = parseRelease(body, assetFilter)
                     if (etagHeader != null) state["etag"] = etagHeader
                     parsed
                 }
@@ -114,15 +115,17 @@ object GithubClient {
         return digest.digest().joinToString("") { "%02x".format(it) }
     }
 
-    private fun parseRelease(body: String): Pair<Release?, Boolean> {
+    private fun parseRelease(body: String, assetFilter: String?): Pair<Release?, Boolean> {
         return try {
             val json = JSONObject(body)
             val tag = json.optString("tag_name").ifBlank { return null to false }
             val assets = json.optJSONArray("assets") ?: return null to false
+            val filter = assetFilter?.toRegex()
             for (i in 0 until assets.length()) {
                 val a = assets.getJSONObject(i)
                 val name = a.optString("name")
                 if (!name.endsWith(".apk", ignoreCase = true)) continue
+                if (filter != null && !filter.matches(name)) continue
                 val sha = a.optString("digest").takeIf {
                     it.startsWith("sha256:", ignoreCase = true)
                 }?.substring(7)?.lowercase()

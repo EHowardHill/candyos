@@ -288,8 +288,8 @@ mark (already period-styled; user direction).
 - [ ] 33.5 On-device QA (rides the next build): every drawer entry shows
       its KitKat icon at all densities, Settings + keyboard included;
       presigned exceptions documented (CandyLauncher "thelauncher",
-      MindTheGapps, Organic Maps — cannot be restyled without breaking
-      signatures).
+      the microG/Aurora APKs, Organic Maps — cannot be restyled without
+      breaking signatures; list current as of P34).
 - [ ] 33.6 USER ACCEPTANCE (rides the 28.5 build + pass).
 
 ## Backlog — deferred by ruling, not scheduled
@@ -313,9 +313,10 @@ mark (already period-styled; user direction).
 - [ ] P26 build pass: full ROM build + emulator QA of the boot
       animation (26.1–26.4 verified against the build recipe; the AVD
       eyeball rides this).
-- [ ] P27.3: full arm64 device build with the fetched MindTheGapps
+- [ ] P27.3: full arm64 device build with the bundled Google-services
       tree — manifest_check / artifact-path pass, then Play Store
-      login + app install on hardware.
+      login + app install on hardware. (MindTheGapps era; the build part
+      rides P34.6 now — see the Phase 34 supersede note.)
 - [ ] P24.3: first real-device WebUSB install pass (rides the P27.3
       build).
 
@@ -327,3 +328,66 @@ mark (already period-styled; user direction).
       Music playback + DeskClock alarm-ring (audio AVD), Calendar
       month/day/week + event flows (P16), bouncer-over-wallpaper
       eyeball (= 29.2).
+## Phase 34 — microG + Aurora Store replace MindTheGapps [ ]
+
+User direction (2026-10-29): drop the real Google services (MindTheGapps)
+and ship the opt-in Play compatibility stack instead — microG Services +
+microG Companion + Aurora Store — with **whether it runs at all** being
+the user's call: a dedicated OTE step decides at first run, and the
+CandyOS Experience menu ("Google services") can flip it anytime after.
+
+- [X] 34.1 Remove MindTheGapps: fetch script pins, gapps-arm64/gapps-arm
+      extraction, gen-gapps-mk.py retired, .gitignore/common.sh cleaned,
+      docs rewritten (README, architecture, apps, getting-started,
+      install-webusb).
+- [X] 34.2 Signature spoofing, take two (the documented reason microG was
+      originally dropped): frameworks/base P34 patch
+      (patches/frameworks-base/0016) declares the hidden
+      FAKE_PACKAGE_SIGNATURE (signature|privileged) and spoofs the fixed
+      Google certificate for exactly com.google.android.gms +
+      com.android.vending when they hold it — CalyxOS approach,
+      metadata-independent (the LOS built-in userdebug hook is dead with
+      current microG: resource-typed fake-signature meta-data is dropped
+      by package parsing), works on user builds too. Whitelist grants
+      scoped in vendor/partner_gms/microg (GmsCore: +INSTALL_LOCATION_
+      PROVIDER, CHANGE_DEVICE_IDLE_TEMP_WHITELIST, UPDATE_APP_OPS_STATS +
+      power-save sysconfig — the LineageOS-for-microG grant set;
+      Companion: spoofing only).
+- [X] 34.3 vendor/partner_gms/microg: GmsCore + Companion product
+      priv-apps, AuroraStore product app, PRESIGNED verbatim installs,
+      uses-library sets mirrored from the pinned APKs; products/gms.mk
+      unconditional (universal APKs — the emulator QA images now carry
+      the whole stack; MindTheGapps was arm/arm64-only).
+- [X] 34.4 CandyOS Experience: dedicated OTE "Google services" step
+      (after Default apps), fresh-boot defaults pinned disabled by the
+      wizard, PlayConfig shared by the step and the new
+      PlayServicesActivity ("Google services" menu entry) with
+      instant-apply toggles; Aurora moved out of the generic
+      optional-apps list into the dedicated step.
+- [X] 34.5 Updater integration: microG Services + Companion tracked from
+      the shared microg/GmsCore release repo (new TrackedApp.assetFilter
+      regex per entry — a release carries -hw/.asc/org.microg.gms assets
+      that must not be picked; ETag cache key now per package so two
+      entries may share one repo). Aurora NOT tracked (GitLab-only
+      releases); its own self-updater covers it, and the pinned APK is
+      the upstream-signed build so in-app updates install over the
+      preload.
+- [ ] 34.6 QA (rides the next build): fresh-wipe OTE pass — play step
+      shows both rows unchecked, opt-in enables exactly the checked
+      packages, finish leaves microG off when unchecked; menu screen
+      round-trip both ways; spoof check — `adb shell dumpsys package
+      com.google.android.gms` shows the Google certificate
+      (F0:FD:6C:5B:41:0F:25:CB:25:C3:B5:33:46:C8:97:2F:AE:30:F8:EE:74:11:
+      DF:91:04:80:AD:6B:2D:60:DB:83), not the NOGAPPS one
+      (9B:D0:67:27:...); push notification end-to-end after battery-
+      optimization exemption; microG update pass once a newer GmsCore
+      release lands (assetFilter picks the right APKs).
+- [ ] 34.7 USER ACCEPTANCE (rides 34.6 + the P28.5 build).
+
+Notes / deltas accepted by this phase (rule 5):
+* Compatibility narrows vs real GApps: Play Integrity / some banking /
+  anti-tamper apps and paid-app licensing stay broken — inherent to
+  microG + a stub Play Store, not fixable at the CandyOS layer.
+* P27.3 (MindTheGapps arm64 device build + Play login pass) is superseded:
+  the equivalent hardware pass is now 34.6 (microG spoof + Aurora
+  download on hardware).

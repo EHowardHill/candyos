@@ -26,6 +26,7 @@ class SetupActivity : Activity() {
     private lateinit var navHint: TextView
     private lateinit var dots: LinearLayout
     private var appRows: Map<String, android.widget.CheckBox> = emptyMap()
+    private var playRows: Map<String, android.widget.CheckBox> = emptyMap()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +39,11 @@ class SetupActivity : Activity() {
             finish()
             return
         }
+
+        // The wizard runs exactly once per device: pin the Google-services
+        // preloads off until the user opts in on the play step (they boot
+        // enabled straight out of the image).
+        PlayConfig.ensureFreshDefaults(this)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN)
@@ -78,6 +84,7 @@ class SetupActivity : Activity() {
         buildDots()
         NavConfig.addRadioGroup(this, navGroup, R.id.nav_three, R.id.nav_gesture)
         appRows = AppsConfig.addRows(this, requireViewById(R.id.apps_rows))
+        playRows = PlayConfig.addRows(this, requireViewById(R.id.play_rows))
         updateChrome()
     }
 
@@ -96,6 +103,7 @@ class SetupActivity : Activity() {
         super.onResume()
         appRows = AppsConfig.addRows(this, requireViewById(R.id.apps_rows))
         if (::flipper.isInitialized) {
+            playRows = PlayConfig.addRows(this, requireViewById(R.id.play_rows))
             updateNetworkStatus()
         }
     }
@@ -136,6 +144,7 @@ class SetupActivity : Activity() {
         when (step) {
             STEP_NETWORK -> updateNetworkStatus()
             STEP_APPS -> appRows = AppsConfig.addRows(this, requireViewById(R.id.apps_rows))
+            STEP_PLAY -> playRows = PlayConfig.addRows(this, requireViewById(R.id.play_rows))
             STEP_NAV -> updateNavHint()
         }
     }
@@ -165,6 +174,7 @@ class SetupActivity : Activity() {
 
     private fun finishSetup() {
         AppsConfig.applySelections(this, appRows)
+        PlayConfig.applySelections(this, playRows)
         NavConfig.applyMode(this, NavConfig.selectedMode(navGroup, R.id.nav_gesture))
         Settings.Global.putInt(contentResolver, Settings.Global.DEVICE_PROVISIONED, 1)
         Settings.Secure.putInt(contentResolver, Settings.Secure.USER_SETUP_COMPLETE, 1)
@@ -187,7 +197,8 @@ class SetupActivity : Activity() {
     companion object {
         private const val STEP_NETWORK = 1
         private const val STEP_APPS = 2
-        private const val STEP_NAV = 3
+        private const val STEP_PLAY = 3
+        private const val STEP_NAV = 4
         private const val DOT_ALPHA_ACTIVE = 1f
         private const val DOT_ALPHA_INACTIVE = 0.3f
     }

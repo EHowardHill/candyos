@@ -7,12 +7,34 @@ lives in `apps/CandyExperience/src/org/candyos/experience/updates/`
 (the app has none, so the poll is plain `HttpURLConnection` +
 `org.json`).
 
+## Who is tracked
+
+* **microG Services + microG Companion** (P34): both APKs publish in the
+  same `microg/GmsCore` releases, so the two entries share a repo and
+  each pins its asset with `assetFilter` — a regex the release asset
+  name must match (`^com\.google\.android\.gms-\d+\.apk$` /
+  `^com\.android\.vending-\d+\.apk$`), because a GmsCore release also
+  carries `-hw` flavors, `.asc` signatures and an `org.microg.gms`
+  variant that must never be picked. Because both entries poll one repo,
+  the ETag cache key is per *package* (`etag.<pkg>@<owner>/<repo>`), not
+  per repo — a shared key would 304 the second entry's first poll before
+  it ever cached a release. Companion's `versionName` (0.3.x.40226)
+  doesn't sort against the shared release tag (v0.3.x.252432), so it
+  reinstalls once per new GmsCore release — harmless: the two ship in
+  lockstep upstream anyway.
+* **Aurora Store is NOT tracked**: Aurora publishes releases on GitLab
+  only (its GitHub repo carries tags but no release assets), so the
+  GitHub-only poller has nothing to fetch. Its built-in self-updater
+  covers updates in-app (installs prompt for confirmation), and the
+  preload is Aurora's own-signed build, so those updates install right
+  over it (see `vendor/partner_gms/README.md`).
+
 ## The pieces
 
 | Piece | File | What it does |
 |-------|------|--------------|
 | Registry | `updates/TrackedApps.kt` | The list of bundled apps ↔ GitHub repos. **This is the only file you edit when you bundle a new APK.** Also holds the per-app state (`SharedPreferences`: ETag, last-seen tag, last check) and the tag/version comparison. |
-| GitHub client | `updates/GithubClient.kt` | `GET /repos/<owner>/<repo>/releases/latest` with a cached `If-None-Match` ETag, and the streaming download with a SHA-256 computed on the fly. |
+| GitHub client | `updates/GithubClient.kt` | `GET /repos/<owner>/<repo>/releases/latest` with a cached `If-None-Match` ETag, asset selection (first `.apk` asset, optionally constrained by the entry's `assetFilter` regex), and the streaming download with a SHA-256 computed on the fly. |
 | Engine | `updates/UpdateEngine.kt` | Per-app pass: poll → compare → download → install. Posts one notification summarizing what happened (reuses the Testing bench's `POST_NOTIFICATIONS` grant + guard). |
 | Scheduler | `updates/UpdatesScheduler.kt` | The daily `JobScheduler` job (id 1001): `setPeriodic(24h)`, `NETWORK_TYPE_UNMETERED`, `setPersisted(true)`, `setRequiresBatteryNotLow(true)`. Persisted jobs re-register at boot through `RECEIVE_BOOT_COMPLETED` — no custom boot receiver. |
 | Job entry | `updates/UpdateJobService.kt` | Runs one engine pass on its executor and `jobFinished`s when done. |
@@ -21,8 +43,9 @@ lives in `apps/CandyExperience/src/org/candyos/experience/updates/`
 ## How a check goes
 
 1. For each tracked app: fetch `releases/latest`, pick the first
-   `.apk` asset. A 304 (ETag hit) means "already know this release" and
-   costs one tiny request per repo per day.
+   `.apk` asset that matches the entry's `assetFilter` (if it has one).
+   A 304 (ETag hit) means "already know this release" and costs one
+   tiny request per repo per day.
 2. Compare the release tag to the installed `versionName`
    (`isTagNewer`: `v1.2.3` ≡ `1.2.3`, numeric per-dot segment, lexical
    for non-numeric tails like `1.2.3-beta1`). Not newer → done.
