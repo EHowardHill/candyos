@@ -130,6 +130,25 @@ so this phase carries the fix-the-feel burden, not just the revert:
       P21 lesson: this phase does not close without the user pass.
       Build + emulator run by the user (28.3 and 28.5 markers flip on
       that pass).
+- [/] 28.6 QS footer actions flat-donor strip — user 28.3 emulator-pass
+      critique: the bottom band (settings/power/user row,
+      qs_footer_actions) was stock AOSP's M3 "underSurface" layer —
+      material_dynamic_neutral0 pure black, rounded top corners, 4dp
+      elevation shadow, alpha delayed to the last 10% of the QS
+      expansion (FooterActionsViewModel) — which the P24 flat
+      #ff161616 page turned into a black band popping in over the
+      gray page (read as a bug; no P12/P15/P20-era patch ever touched
+      the row). DONE 2026-10-29 (frameworks/base 0015):
+      qs_footer_actions_background flat #ff161616 with square top
+      corners (donor band: status_bar_expanded_header /
+      notification_header_bg, flat opaque #FF000000 full-bleed from
+      the first frame) + footer_actions outlineProvider=none (no
+      elevation shadow; the 4dp elevation stays matched to the QS
+      scroll view for z-order parity). The stock last-10% fade is
+      kept on purpose: band color == panel color makes the surface
+      transition invisible, only the glyphs ride the fade; the
+      keyguard QS gets the same flat band, matching its #ff161616
+      tiles. PENDING: the 28.5 emulator pass.
 
 ## Phase 29 — Lock screen [ ]
 

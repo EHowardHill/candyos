@@ -1,0 +1,93 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Thu, 29 Oct 2026 15:16:59 -0500
+Subject: [PATCH 15/15] CandyOS P28: QS footer actions flat-donor strip
+
+- 28.6.1 qs_footer_actions_background: flat #ff161616, square top
+  corners. The donor 4.4 shade band (status_bar_expanded_header,
+  notification_header_bg = flat opaque #FF000000, donor
+  values/colors.xml) was a full-bleed square-cornered band riding the
+  panel from the first frame. Stock AOSP kept the footer actions strip
+  on the M3 "underSurface" layer (material_dynamic_neutral0 = pure
+  black) with rounded top corners, 4dp elevation and a fade confined
+  to the last 10% of the QS expansion (FooterActionsViewModel alpha
+  delay 0.9) - which the P24 flat #ff161616 shade panel turned into a
+  black band popping in over the page (user 28.3 emulator-pass
+  critique: reads as a bug). Flatten to the P3 palette so the strip
+  reads seamless with the shade panel behind it (same ruling as the
+  P24 header strip, kitkat_shade_header_bg); the keyguard QS gets the
+  same flat band, matching its #ff161616 tiles.
+- 28.6.2 footer_actions: outlineProvider=none. The strip is a flat
+  band of the panel now, so it must not cast the stock 4dp elevation
+  shadow onto the page; the elevation itself stays matched to the QS
+  scroll view for z-order parity (the footer keeps drawing above the
+  QS content during the expansion animation).
+
+The stock last-10% fade is kept on purpose: with band color == panel
+color the surface transition is invisible - only the glyphs ride the
+fade, same as the header contents do.
+
+Change-Id: Ib9072564fdf9ffe12526bd61cda3d5870db9d486
+---
+ .../res-keyguard/layout/footer_actions.xml    |  7 +++++++
+ .../drawable/qs_footer_actions_background.xml | 20 ++++++++++++++++---
+ 2 files changed, 24 insertions(+), 3 deletions(-)
+
+diff --git a/packages/SystemUI/res-keyguard/layout/footer_actions.xml b/packages/SystemUI/res-keyguard/layout/footer_actions.xml
+index 4a2a1cb9dc6d..6395e1bfd8cd 100644
+--- a/packages/SystemUI/res-keyguard/layout/footer_actions.xml
++++ b/packages/SystemUI/res-keyguard/layout/footer_actions.xml
+@@ -16,11 +16,18 @@
+ -->
+ 
+ <!-- Action buttons for footer in QS/QQS, containing settings button, power off button etc -->
++<!-- KitKat UI Project (P28.6): the strip is a flat band of the shade
++     panel now (see qs_footer_actions_background), so it must not cast
++     the stock 4dp elevation shadow onto the page. outlineProvider=none
++     kills the shadow while the elevation itself stays matched to the
++     QS scroll view (z-order parity: the footer keeps drawing above the
++     QS content during the expansion animation). -->
+ <LinearLayout
+     xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_width="match_parent"
+     android:layout_height="@dimen/footer_actions_height"
+     android:elevation="@dimen/qs_panel_elevation"
++    android:outlineProvider="none"
+     android:paddingTop="@dimen/qs_footer_actions_top_padding"
+     android:paddingBottom="@dimen/qs_footer_actions_bottom_padding"
+     android:background="@drawable/qs_footer_actions_background"
+diff --git a/packages/SystemUI/res/drawable/qs_footer_actions_background.xml b/packages/SystemUI/res/drawable/qs_footer_actions_background.xml
+index a7e8762a2593..7e4fcd92b09f 100644
+--- a/packages/SystemUI/res/drawable/qs_footer_actions_background.xml
++++ b/packages/SystemUI/res/drawable/qs_footer_actions_background.xml
+@@ -13,10 +13,24 @@
+      See the License for the specific language governing permissions and
+      limitations under the License.
+ -->
++<!-- KitKat UI Project (P28.6): donor 4.4 shade band treatment for the
++     QS footer actions strip (settings/power/user row). The donor band
++     (status_bar_expanded_header, notification_header_bg = flat opaque
++     #FF000000) was a FLAT, full-bleed, square-cornered surface riding
++     the panel from the first frame - no rounded corners, no elevation
++     shadow. Stock AOSP kept this strip on the M3 "underSurface" layer
++     (material_dynamic_neutral0 = pure black) with rounded top corners
++     and 4dp elevation, fading in over only the last 10% of the QS
++     expansion - which the P24 flat #ff161616 shade panel turned into a
++     black band that pops in over the page. Flatten to the P3 palette
++     so the strip reads seamless with the shade panel behind it (same
++     ruling as the P24 header strip, kitkat_shade_header_bg); the
++     keyguard QS gets the same flat band, matching its #ff161616
++     tiles. -->
+ <inset xmlns:android="http://schemas.android.com/apk/res/android">
+     <shape>
+-        <solid android:color="?attr/underSurface"/>
+-        <corners android:topLeftRadius="@dimen/qs_corner_radius"
+-                 android:topRightRadius="@dimen/qs_corner_radius"/>
++        <solid android:color="#ff161616"/>
++        <corners android:topLeftRadius="0dp"
++                 android:topRightRadius="0dp"/>
+     </shape>
+ </inset>
+-- 
+2.53.0
+

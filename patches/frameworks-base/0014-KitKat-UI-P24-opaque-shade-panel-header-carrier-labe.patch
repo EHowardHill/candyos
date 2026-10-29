@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Wed, 28 Oct 2026 16:45:37 -0500
-Subject: [PATCH 14/14] KitKat UI P24: opaque shade panel/header, carrier label
+Subject: [PATCH 14/15] KitKat UI P24: opaque shade panel/header, carrier label
  anti-pop
 
 - 24.1 kitkat_shade_panel_bg (flat #ff161616, P3 palette): donor 4.4
