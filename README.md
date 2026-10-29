@@ -40,7 +40,10 @@ or packaging chain).
 CandyOS modifies LineageOS in exactly three ways:
 
 * **Patch series** (`patches/`) — changes to repos that upstream actively
-  develops (frameworks/base, Settings, LatinIME, vendor/lineage) are stored
+  develops (frameworks/base, Settings, LatinIME, vendor/lineage,
+  lineage-sdk, packages/modules/Permission, and the nine launcher-icon apps
+  Contacts / Dialer / Messaging / Jelly / Glimpse / DocumentsUI /
+  Aperture / AudioFX / Stk) are stored
   as ordered `git am` series and replayed on top of the stock upstream
   checkouts after every sync.
 * **Vendored apps** (`apps/`) — self-contained apps and KitKat-era app ports

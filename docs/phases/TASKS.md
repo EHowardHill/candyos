@@ -226,6 +226,46 @@ up the current contents. (Phase number reserved: 31 was the last used.)
       the override actually wins in the built image.
 - [ ] 32.5 USER ACCEPTANCE (rides 28.5's build + pass).
 
+## Phase 33 — KitKat launcher icons [ ]
+
+User direction (2026-10-29): ALL built-in LineageOS apps use KitKat-styled
+icons; `reference/icons/` (the committed 43-PNG KitKat reference set) is
+the reference. Source of truth + generator: `reference/icons/`,
+`reference/donor-icons/`, `reference/originals/` and
+`scripts/candyos-gen-icons.py` (repo app res + the eleven patched projects;
+see docs/architecture.md "Launcher icons (P33)").
+
+Already KitKat by construction (no change): the vendored 4.4 ports
+(Calculator, Calendar, DeskClock, Music, Sound Recorder) — donor icons,
+verified against the reference set. CandyOS Experience keeps its candy
+mark (already period-styled; user direction).
+
+- [X] 33.1 Donor-byte icons where a 4.4 donor exists: Settings
+      (settings-4.4 ic_launcher_settings, per-density drawables replacing
+      the adaptive icon) and the LatinIME keyboard drawer entry
+      (latinime-4.4 ic_launcher_keyboard, mdpi..xxhdpi). New patches
+      0003/0004 on the settings/latinime series.
+- [X] 33.2 Reference-set icons for the stock drawer apps: Contacts
+      (People), Dialer (Phone), Messaging, Jelly (Browser), Glimpse
+      (Gallery), DocumentsUI (Downloads — Files' 4.4 ancestor), Aperture
+      (Camera). Nine NEW one-patch series (patches/contacts dialer
+      messaging jelly glimpse documentsui aperture audiofx stk),
+      registered in CANDYOS_PATCHED; candyos-save.sh + candyos-verify.sh
+      green (all 15 series apply clean).
+- [X] 33.3 No-counterpart apps: AudioFX (synthesized Holo-dark EQ-fader
+      tile) and Stk (synthesized gray SIM-card tile) — KitKat-family
+      geometry (rounded corners, darker border ring, soft shadow), drawn
+      by candyos-gen-icons.py.
+- [X] 33.4 CandyOS originals re-tiled (Notes, Reminders): brand art kept,
+      re-tiled onto the reference family geometry by candyos-gen-icons.py
+      (repo apps/ + tree slots; no patch series — vendored apps).
+- [ ] 33.5 On-device QA (rides the next build): every drawer entry shows
+      its KitKat icon at all densities, Settings + keyboard included;
+      presigned exceptions documented (CandyLauncher "thelauncher",
+      MindTheGapps, Organic Maps — cannot be restyled without breaking
+      signatures).
+- [ ] 33.6 USER ACCEPTANCE (rides the 28.5 build + pass).
+
 ## Backlog — deferred by ruling, not scheduled
 
 * Gallery (P16 Tier 3): the 4.4 Gallery2 donor == the app the modern

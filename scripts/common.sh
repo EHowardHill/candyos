@@ -15,6 +15,16 @@ CANDYOS_PATCHED=(
     "vendor-lineage     vendor/lineage"
     "lineage-sdk        lineage-sdk"
     "permission         packages/modules/Permission"
+    # P33 KitKat launcher icons (reference/icons via candyos-gen-icons.py)
+    "contacts           packages/apps/Contacts"
+    "dialer             packages/apps/Dialer"
+    "messaging          packages/apps/Messaging"
+    "jelly              packages/apps/Jelly"
+    "glimpse            packages/apps/Glimpse"
+    "documentsui        packages/apps/DocumentsUI"
+    "aperture           packages/apps/Aperture"
+    "audiofx            packages/apps/AudioFX"
+    "stk                packages/apps/Stk"
 )
 
 # Self-contained app ports vendored wholesale: "<apps/ directory> <slot in the

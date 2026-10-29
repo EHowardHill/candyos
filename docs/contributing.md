@@ -27,7 +27,7 @@ lunch lineage_sdk_phone_x86_64-ap2a-userdebug && m -j$(nproc)  # build + test
 # then: git commit + push + PR, as with any repo
 ```
 
-## Flow B — patched projects (frameworks/base, Settings, LatinIME)
+## Flow B — patched projects (frameworks/base, Settings, LatinIME, and the rest listed in `scripts/common.sh` `CANDYOS_PATCHED`)
 
 You develop in the LineageOS tree, on top of the already-applied patch
 series. CandyOS then re-serializes your commits into `patches/`.
