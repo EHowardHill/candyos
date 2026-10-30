@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Thu, 22 Oct 2026 08:00:14 -0500
-Subject: [PATCH 11/16] KitKat UI P18.4: hide the QS build-text footer (donor
+Subject: [PATCH 11/17] KitKat UI P18.4: hide the QS build-text footer (donor
  QS had none)
 
 qs_footer_impl (modern build/version footer) rendered 48dp+8dp above

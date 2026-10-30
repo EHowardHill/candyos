@@ -1,0 +1,144 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Fri, 30 Oct 2026 13:50:39 -0500
+Subject: [PATCH 17/17] KitKat UI P35: restore the 4.4 translucent nav bar
+ gradient scrim
+
+Re-wire the BarTransitions gradient machinery (vestigial since the
+flat-color rewrite: mGradient/mGradientAlpha kept but never targeted)
+into the per-bar 4.4 scrim: a bar flagged with the new
+setGradientScrimEnabled(true) draws its gradient drawable at full
+alpha over a fully transparent bar in MODE_SEMI_TRANSPARENT /
+MODE_TRANSLUCENT, instead of the flat semi-transparent overlay.
+
+NavigationBarTransitions opts in and swaps its gradient drawable
+(nav_background.9.png, a solid black patch) for the new
+nav_bar_kitkat_scrim.xml: a near-black gradient rising from the
+bottom of the bar fading to transparent at the top - the 4.4
+windowTranslucentNavigation look. The P9 opaque default is
+unaffected; apps that ask for a translucent nav bar get the 4.4
+scrim. PhoneStatusBarTransitions keeps the flat overlay.
+
+Change-Id: Ia117f778659a019c541780dc5f6f30a7ae3cf07e
+---
+ .../res/drawable/nav_bar_kitkat_scrim.xml     | 28 +++++++++++++++++++
+ .../NavigationBarTransitions.java             |  8 +++++-
+ .../statusbar/phone/BarTransitions.java       | 25 +++++++++++++++--
+ 3 files changed, 58 insertions(+), 3 deletions(-)
+ create mode 100644 packages/SystemUI/res/drawable/nav_bar_kitkat_scrim.xml
+
+diff --git a/packages/SystemUI/res/drawable/nav_bar_kitkat_scrim.xml b/packages/SystemUI/res/drawable/nav_bar_kitkat_scrim.xml
+new file mode 100644
+index 000000000000..e528f33293ba
+--- /dev/null
++++ b/packages/SystemUI/res/drawable/nav_bar_kitkat_scrim.xml
+@@ -0,0 +1,28 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++  ~ KitKat UI Project: the 4.4 translucent nav bar scrim. When an app asked
++  ~ for windowTranslucentNavigation, 4.4 made the bar fully transparent and
++  ~ drew a dark gradient rising from the bottom of the screen over the app
++  ~ content, instead of a flat translucent overlay. Used by
++  ~ NavigationBarTransitions via the BarTransitions gradient machinery.
++  ~
++  ~ Licensed under the Apache License, Version 2.0 (the "License");
++  ~ you may not use this file except in compliance with the License.
++  ~ You may obtain a copy of the License at
++  ~
++  ~      http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~ Unless required by applicable law or agreed to in writing, software
++  ~ distributed under the License is distributed on an "AS IS" BASIS,
++  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++  ~ See the License for the specific language governing permissions and
++  ~ limitations under the License.
++  -->
++<shape xmlns:android="http://schemas.android.com/apk/res/android"
++       android:shape="rectangle">
++    <gradient
++        android:angle="90"
++        android:startColor="#ee000000"
++        android:endColor="#00000000"
++        />
++</shape>
+\ No newline at end of file
+diff --git a/packages/SystemUI/src/com/android/systemui/navigationbar/NavigationBarTransitions.java b/packages/SystemUI/src/com/android/systemui/navigationbar/NavigationBarTransitions.java
+index 3e34318a5fb5..6d2f0e20cea5 100644
+--- a/packages/SystemUI/src/com/android/systemui/navigationbar/NavigationBarTransitions.java
++++ b/packages/SystemUI/src/com/android/systemui/navigationbar/NavigationBarTransitions.java
+@@ -74,7 +74,13 @@ public final class NavigationBarTransitions extends BarTransitions implements
+             NavigationBarView view,
+             LightBarTransitionsController.Factory lightBarTransitionsControllerFactory,
+             DisplayTracker displayTracker) {
+-        super(view, R.drawable.nav_background);
++        super(view, R.drawable.nav_bar_kitkat_scrim);
++        // KitKat UI Project: apps requesting windowTranslucentNavigation put
++        // the bar in MODE_SEMI_TRANSPARENT; draw the 4.4 gradient scrim
++        // (dark gradient rising from the bottom of the screen over a
++        // transparent bar) rather than the flat translucent overlay. The
++        // opaque default from P9 is unaffected.
++        setGradientScrimEnabled(true);
+ 
+         mView = view;
+         mLightTransitionsController = lightBarTransitionsControllerFactory.create(this);
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/BarTransitions.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/BarTransitions.java
+index f62a79f199e9..4faa06eb36a2 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/BarTransitions.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/BarTransitions.java
+@@ -82,6 +82,16 @@ public class BarTransitions {
+         mView.setBackground(mBarBackground);
+     }
+ 
++    /**
++     * KitKat UI Project: 4.4 scrim support. When enabled, the
++     * semi-transparent/translucent modes draw {@link #mGradient} at full
++     * alpha over a fully transparent bar (the 4.4 "dark gradient rising from
++     * the screen edge" effect) instead of the flat translucent overlay.
++     */
++    protected void setGradientScrimEnabled(boolean enabled) {
++        mBarBackground.setGradientScrimEnabled(enabled);
++    }
++
+     public void destroy() {
+         // To be overridden
+     }
+@@ -169,6 +179,7 @@ public class BarTransitions {
+         private float mOverrideAlpha = 1f;
+         private PorterDuffColorFilter mTintFilter;
+         private Paint mPaint = new Paint();
++        private boolean mGradientScrimEnabled;
+ 
+         private int mGradientAlphaStart;
+         private int mColorStart;
+@@ -201,6 +212,11 @@ public class BarTransitions {
+             invalidateSelf();
+         }
+ 
++        public void setGradientScrimEnabled(boolean enabled) {
++            mGradientScrimEnabled = enabled;
++            invalidateSelf();
++        }
++
+         public float getOverrideAlpha() {
+             return mOverrideAlpha;
+         }
+@@ -280,9 +296,14 @@ public class BarTransitions {
+             if (mMode == MODE_WARNING) {
+                 targetColor = mWarning;
+             } else if (mMode == MODE_TRANSLUCENT) {
+-                targetColor = mSemiTransparent;
++                // KitKat UI Project: with the scrim enabled, 4.4 drew the
++                // gradient drawable over a fully transparent bar instead of
++                // the flat translucent overlay.
++                targetColor = mGradientScrimEnabled ? mTransparent : mSemiTransparent;
++                targetGradientAlpha = mGradientScrimEnabled ? 0xff : 0;
+             } else if (mMode == MODE_SEMI_TRANSPARENT) {
+-                targetColor = mSemiTransparent;
++                targetColor = mGradientScrimEnabled ? mTransparent : mSemiTransparent;
++                targetGradientAlpha = mGradientScrimEnabled ? 0xff : 0;
+             } else if (mMode == MODE_TRANSPARENT || mMode == MODE_LIGHTS_OUT_TRANSPARENT) {
+                 targetColor = mTransparent;
+             } else {
+-- 
+2.53.0
+

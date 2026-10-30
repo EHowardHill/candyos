@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Thu, 29 Oct 2026 15:16:59 -0500
-Subject: [PATCH 15/16] CandyOS P28: QS footer actions flat-donor strip
+Subject: [PATCH 15/17] CandyOS P28: QS footer actions flat-donor strip
 
 - 28.6.1 qs_footer_actions_background: flat #ff161616, square top
   corners. The donor 4.4 shade band (status_bar_expanded_header,
