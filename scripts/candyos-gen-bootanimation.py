@@ -4,12 +4,12 @@
 Builds the frame set that the patches/vendor-lineage series installs as
 vendor/lineage/bootanimation/bootanimation.tar (Phase 26,
 docs/phases/TASKS.md). Run this to regenerate the tar after changing
-assets/CandyOSwordswhite.svg, then commit the refreshed patch series as
+apps/assets/CandyOSwordswhite.svg, then commit the refreshed patch series as
 usual (scripts/candyos-save.sh).
 
-The movie is the CandyOS wordmark from assets/CandyOSwordswhite.svg -
+The movie is the CandyOS wordmark from apps/assets/CandyOSwordswhite.svg -
 the spinning candy disc and the "CandyOS" text - rendered from the SVG
-with the Roboto 2013 family the ROM pins (bundled in assets/fonts/,
+with the Roboto 2013 family the ROM pins (bundled in apps/assets/fonts/,
 Apache-2.0, from frameworks/base/data/fonts). The disc spins clockwise
 in place; the text stays static. Layout, 60 fps, 6 degrees per frame
 (one revolution per second):
@@ -59,8 +59,8 @@ import tempfile
 import xml.etree.ElementTree as ET
 
 CANDYOS_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SOURCE_SVG = os.path.join(CANDYOS_ROOT, "assets", "CandyOSwordswhite.svg")
-FONTS_DIR = os.path.join(CANDYOS_ROOT, "assets", "fonts")
+SOURCE_SVG = os.path.join(CANDYOS_ROOT, "apps", "assets", "CandyOSwordswhite.svg")
+FONTS_DIR = os.path.join(CANDYOS_ROOT, "apps", "assets", "fonts")
 
 SVG_UNITS = (297.0, 210.0)  # viewBox of CandyOSwordswhite.svg
 RENDER_SCALE = 16  # px per SVG user unit
