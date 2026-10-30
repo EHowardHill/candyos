@@ -4,20 +4,18 @@ style from the reference set (P33).
 
 reference/icons/ (the committed reference PNGs) is the source of truth for
 the stock LineageOS apps that have a KitKat counterpart — and for the
-vendored Notes app (the user-supplied Notes.png); the authentic 4.4 donor
-density files under reference/donor-icons/ are copied byte-for-byte for
-Settings and the keyboard (rule 1: authentic, not a theme); the
-CandyOS-original Reminders art lives under reference/originals/ and is
-re-tiled onto KitKat geometry (rounded corners + darker border + soft
-shadow, matching the reference tile family); AudioFX and SIM Toolkit have
+vendored Notes and Reminders apps (the user-supplied Notes.png /
+Reminders.png); the authentic 4.4 donor density files under
+reference/donor-icons/ are copied byte-for-byte for Settings and the
+keyboard (rule 1: authentic, not a theme); AudioFX and SIM Toolkit have
 no KitKat counterpart and get period-style glyphs drawn here. Non-square
 reference art is auto-cropped to its content and square-padded.
 
 Regenerates (never hand-edit):
 
   apps/{Notes,Reminders}/res/mipmap-<dpi>/ic_launcher.png
-      The vendored CandyOS-originals: Notes from reference/icons/Notes.png,
-      Reminders re-tiled from reference/originals/Reminders.png.
+      The vendored CandyOS-originals, from reference/icons/Notes.png and
+      reference/icons/Reminders.png (auto-cropped, square-padded).
 
 With a LineageOS tree argument the in-tree copies are ALSO refreshed:
 
@@ -116,7 +114,10 @@ TREE_REMOVE = {
 # (Never CandyExperience: its mark is already period-styled by design.)
 VENDORED_ICONS = [
     ("Notes",     "apps/Notes/res",     "ref:Notes.png"),
-    ("Reminders", "apps/Reminders/res", "retile:Reminders.png"),
+    # Reminders: the user-supplied reference/icons/Reminders.png (1920x1080
+    # with a wide transparent margin) is auto-cropped to its content and
+    # square-padded by prepare_ref, like Notes.
+    ("Reminders", "apps/Reminders/res", "ref:Reminders.png"),
 ]
 TREE_VENDORED_RES = {
     "Notes": "packages/apps/Notes/res",
