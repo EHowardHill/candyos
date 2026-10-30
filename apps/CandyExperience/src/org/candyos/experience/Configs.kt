@@ -7,7 +7,6 @@ import android.os.SystemProperties
 import android.provider.Settings
 import android.widget.CheckBox
 import android.widget.LinearLayout
-import android.widget.RadioGroup
 
 class AppsConfig private constructor(
     val packageName: String,
@@ -180,34 +179,6 @@ object PlayConfig {
             }
         }
     }
-}
-
-object NavConfig {
-    const val MODE_THREE_BUTTON = 0
-    const val MODE_GESTURE = 2
-    private const val NAVIGATION_MODE = "navigation_mode"
-
-    fun currentMode(context: Context): Int =
-        Settings.Global.getInt(context.contentResolver, NAVIGATION_MODE, MODE_THREE_BUTTON)
-
-    fun applyMode(context: Context, mode: Int) {
-        Settings.Global.putInt(context.contentResolver, NAVIGATION_MODE, mode)
-    }
-
-    fun addRadioGroup(
-        context: Context,
-        group: RadioGroup,
-        threeId: Int,
-        gestureId: Int,
-    ) {
-        val current = currentMode(context)
-        group.check(
-            if (current == MODE_GESTURE) gestureId else threeId,
-        )
-    }
-
-    fun selectedMode(group: RadioGroup, gestureId: Int): Int =
-        if (group.checkedRadioButtonId == gestureId) MODE_GESTURE else MODE_THREE_BUTTON
 }
 
 object SysInfo {

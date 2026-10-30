@@ -11,7 +11,6 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.ViewFlipper
 
@@ -22,8 +21,6 @@ class SetupActivity : Activity() {
     private lateinit var next: Button
     private lateinit var networkIcon: ImageView
     private lateinit var networkStatus: TextView
-    private lateinit var navGroup: RadioGroup
-    private lateinit var navHint: TextView
     private lateinit var dots: LinearLayout
     private var appRows: Map<String, android.widget.CheckBox> = emptyMap()
     private var playRows: Map<String, android.widget.CheckBox> = emptyMap()
@@ -54,8 +51,6 @@ class SetupActivity : Activity() {
         next = requireViewById(R.id.next)
         networkIcon = requireViewById(R.id.network_icon)
         networkStatus = requireViewById(R.id.network_status)
-        navGroup = requireViewById(R.id.nav_group)
-        navHint = requireViewById(R.id.nav_hint)
         dots = requireViewById(R.id.dots)
 
         requireViewById<Button>(R.id.pick_wifi).setOnClickListener {
@@ -79,10 +74,7 @@ class SetupActivity : Activity() {
             }
         }
 
-        navGroup.setOnCheckedChangeListener { _, _ -> updateNavHint() }
-
         buildDots()
-        NavConfig.addRadioGroup(this, navGroup, R.id.nav_three, R.id.nav_gesture)
         appRows = AppsConfig.addRows(this, requireViewById(R.id.apps_rows))
         playRows = PlayConfig.addRows(this, requireViewById(R.id.play_rows))
         updateChrome()
@@ -145,17 +137,7 @@ class SetupActivity : Activity() {
             STEP_NETWORK -> updateNetworkStatus()
             STEP_APPS -> appRows = AppsConfig.addRows(this, requireViewById(R.id.apps_rows))
             STEP_PLAY -> playRows = PlayConfig.addRows(this, requireViewById(R.id.play_rows))
-            STEP_NAV -> updateNavHint()
         }
-    }
-
-    private fun updateNavHint() {
-        navHint.setText(
-            if (navGroup.checkedRadioButtonId == R.id.nav_gesture) {
-                R.string.setup_nav_gesture_body
-            } else {
-                R.string.setup_nav_three_body
-            })
     }
 
     private fun updateNetworkStatus() {
@@ -175,7 +157,6 @@ class SetupActivity : Activity() {
     private fun finishSetup() {
         AppsConfig.applySelections(this, appRows)
         PlayConfig.applySelections(this, playRows)
-        NavConfig.applyMode(this, NavConfig.selectedMode(navGroup, R.id.nav_gesture))
         Settings.Global.putInt(contentResolver, Settings.Global.DEVICE_PROVISIONED, 1)
         Settings.Secure.putInt(contentResolver, Settings.Secure.USER_SETUP_COMPLETE, 1)
 
@@ -198,7 +179,6 @@ class SetupActivity : Activity() {
         private const val STEP_NETWORK = 1
         private const val STEP_APPS = 2
         private const val STEP_PLAY = 3
-        private const val STEP_NAV = 4
         private const val DOT_ALPHA_ACTIVE = 1f
         private const val DOT_ALPHA_INACTIVE = 0.3f
     }

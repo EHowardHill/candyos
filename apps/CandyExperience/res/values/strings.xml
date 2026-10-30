@@ -26,12 +26,6 @@
     <string name="setup_play_title">Google services</string>
     <string name="setup_play_body">Optional Play compatibility: microG services let apps that depend on Google Play services work, Aurora Store downloads apps from the Play Store. Leave both off if you don\u2019t need them \u2014 you can change this anytime in CandyOS Experience.</string>
 
-    <string name="setup_nav_title">Navigation</string>
-    <string name="setup_nav_three">Three-button</string>
-    <string name="setup_nav_three_body">Back, Home and Overview buttons at the bottom of the screen.</string>
-    <string name="setup_nav_gesture">Gesture</string>
-    <string name="setup_nav_gesture_body">Swipe from the edges to go Back, Home and Overview.</string>
-
     <string name="setup_finish_title">All set</string>
     <string name="setup_finish_body">Enjoy your CandyOS device.</string>
 
