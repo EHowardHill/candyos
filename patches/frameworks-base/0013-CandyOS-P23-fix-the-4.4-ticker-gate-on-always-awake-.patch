@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Fri, 23 Oct 2026 15:52:37 -0500
-Subject: [PATCH 13/17] CandyOS P23: fix the 4.4 ticker gate on always-awake
+Subject: [PATCH 13/18] CandyOS P23: fix the 4.4 ticker gate on always-awake
  boots (emulator)
 
 Change-Id: I624479394ff2a0feb188cd8bc87d7ec744b36420

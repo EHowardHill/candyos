@@ -1,0 +1,71 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Fri, 30 Oct 2026 16:09:38 -0500
+Subject: [PATCH 18/18] KitKat UI P36: fix 2-button mode falling back to the
+ 3-button layout
+
+NavigationBarInflaterView.getDefaultLayout() picked the quickstep
+(2-button) layout only when the launcher exposed the quickstep
+OverviewProxy service (shouldShowSwipeUpUI); on launchers without
+it (CandyLauncher / the emulator) mode 1 silently inflated the full
+config_navBarLayout instead - three buttons under a 'two-button'
+setting. Select the layout by interaction mode instead
+(QuickStepContract.isSwipeUpMode), with the proxy check kept as a
+legacy fallback.
+
+config_navBarLayoutQuickstep is re-pointed at the KitKat geometry:
+left[.5W],back[80AC];home[80AC];right[.5W] - the back/home icons in
+absolute 80dp centered cells matching config_navBarLayout, minus the
+recent button (recents is the swipe up on quickstep-capable
+launchers). Stock used weighted quickstep cells
+(back[1.7WC];home;menu_ime[1.7WC]).
+
+Change-Id: I8ac3173b02b624eebd8e6f6678b115bb5c9eebd0
+---
+ packages/SystemUI/res/values/config.xml                   | 8 +++++++-
+ .../systemui/navigationbar/NavigationBarInflaterView.java | 8 +++++++-
+ 2 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/packages/SystemUI/res/values/config.xml b/packages/SystemUI/res/values/config.xml
+index 22af5a25f566..d55b9c5c9805 100644
+--- a/packages/SystemUI/res/values/config.xml
++++ b/packages/SystemUI/res/values/config.xml
+@@ -347,7 +347,13 @@
+          (donor navigation_key_width), distributed start/center/end with
+          flexible side spacers, instead of weight-stretched buttons. -->
+     <string name="config_navBarLayout" translatable="false">left[.5W],back[80AC];home[80AC];recent[80AC],right[.5W]</string>
+-    <string name="config_navBarLayoutQuickstep" translatable="false">back[1.7WC];home;menu_ime[1.7WC]</string>
++    <!-- KitKat UI Project: 2-button mode reuses the KitKat back/home icons in
++         absolute 80dp centered cells (matching config_navBarLayout) with no
++         recent button; recents is a swipe up from the home area on
++         quickstep-capable launchers. Stock used weighted quickstep cells
++         (back[1.7WC];home;menu_ime[1.7WC]). Three gravity groups are
++         required: start;center;end. -->
++    <string name="config_navBarLayoutQuickstep" translatable="false">left[.5W],back[80AC];home[80AC];right[.5W]</string>
+     <string name="config_navBarLayoutHandle" translatable="false">back[70AC];home_handle;ime_switcher[70AC]</string>
+ 
+     <!-- Whether to show a warning notification when device's skin temperature is high. -->
+diff --git a/packages/SystemUI/src/com/android/systemui/navigationbar/NavigationBarInflaterView.java b/packages/SystemUI/src/com/android/systemui/navigationbar/NavigationBarInflaterView.java
+index 73ca35557133..cf1654a9f638 100644
+--- a/packages/SystemUI/src/com/android/systemui/navigationbar/NavigationBarInflaterView.java
++++ b/packages/SystemUI/src/com/android/systemui/navigationbar/NavigationBarInflaterView.java
+@@ -193,9 +193,15 @@ public class NavigationBarInflaterView extends FrameLayout {
+     }
+ 
+     protected String getDefaultLayout() {
++        // KitKat UI Project: select the layout by interaction mode. Stock
++        // AOSP gated the quickstep (2-button) layout on the launcher's
++        // OverviewProxy availability (shouldShowSwipeUpUI); on launchers
++        // without the quickstep service (CandyLauncher / the emulator)
++        // 2-button mode silently fell back to the full 3-button layout.
+         final int defaultResource = QuickStepContract.isGesturalMode(mNavBarMode)
+                 ? R.string.config_navBarLayoutHandle
+-                : mOverviewProxyService.shouldShowSwipeUpUI()
++                : (QuickStepContract.isSwipeUpMode(mNavBarMode)
++                        || mOverviewProxyService.shouldShowSwipeUpUI())
+                         ? R.string.config_navBarLayoutQuickstep
+                         : R.string.config_navBarLayout;
+         if (!mIsHintEnabled && defaultResource == R.string.config_navBarLayoutHandle) {
+-- 
+2.53.0
+

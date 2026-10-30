@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Thu, 22 Oct 2026 09:08:58 -0500
-Subject: [PATCH 12/17] KitKat UI P20: full shade/QS donor rebuild
+Subject: [PATCH 12/18] KitKat UI P20: full shade/QS donor rebuild
 
 - 20.2a NotificationShadeDepthController.shouldApplyShadeBlur -> false
   (shade blur/zoom off; keyguard pipeline untouched) - risk-ruled
