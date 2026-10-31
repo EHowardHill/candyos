@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/finalassetyellow.png" alt="CandyOS">
+  <img src="apps/assets/finalassetyellow.png" alt="CandyOS">
 </p>
 
 # CandyOS
