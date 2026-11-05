@@ -65,7 +65,7 @@ index 255b2c92e709..4257760c55a7 100644
              android:focusable="false"
              android:clickable="false"
 diff --git a/packages/SettingsLib/MainSwitchPreference/res/values/styles.xml b/packages/SettingsLib/MainSwitchPreference/res/values/styles.xml
-index 870812ae6caf..caa68bb5890d 100644
+index 870812ae6caf..d5838e155c1a 100644
 --- a/packages/SettingsLib/MainSwitchPreference/res/values/styles.xml
 +++ b/packages/SettingsLib/MainSwitchPreference/res/values/styles.xml
 @@ -17,10 +17,10 @@
@@ -83,10 +83,10 @@ index 870812ae6caf..caa68bb5890d 100644
 +         thumb) with the ON/OFF track labels, replacing the tinted
 +         Material shapes. No minHeight/minWidth: the 9-patch must not be
 +         stretched to the modern touch-target size (the bar provides it). -->
-+    <style name="SwitchBar.Switch.Settingslib" parent="@android:style/Widget.Holo.CompoundButton.Switch" />
++    <style name="SwitchBar.Switch.Settingslib" parent="@*android:style/Widget.Holo.CompoundButton.Switch" />
  </resources>
 diff --git a/packages/SettingsLib/SettingsTheme/res/values-v31/styles.xml b/packages/SettingsLib/SettingsTheme/res/values-v31/styles.xml
-index 5dcf8b892d71..b0691701054e 100644
+index 5dcf8b892d71..78fe34c3242d 100644
 --- a/packages/SettingsLib/SettingsTheme/res/values-v31/styles.xml
 +++ b/packages/SettingsLib/SettingsTheme/res/values-v31/styles.xml
 @@ -37,16 +37,16 @@
@@ -103,14 +103,14 @@ index 5dcf8b892d71..b0691701054e 100644
 +         thumb) with the ON/OFF track labels, replacing the M3 rounded
 +         pill shapes. No minHeight: the 9-patch must not be stretched to
 +         the modern touch-target height (the row/bar provides it). -->
-+    <style name="Switch.SettingsLib" parent="@android:style/Widget.Holo.CompoundButton.Switch" />
++    <style name="Switch.SettingsLib" parent="@*android:style/Widget.Holo.CompoundButton.Switch" />
  
      <style name="SwitchCompat.SettingsLib" parent="@style/Widget.AppCompat.CompoundButton.Switch">
 -        <item name="android:minHeight">@dimen/settingslib_preferred_minimum_touch_target</item>
 -        <item name="track">@drawable/settingslib_switch_track</item>
 -        <item name="android:thumb">@drawable/settingslib_switch_thumb</item>
 +        <item name="track">@*android:drawable/switch_track_holo_dark</item>
-+        <item name="thumb">@*android:drawable/switch_inner_holo_dark</item>
++        <item name="android:thumb">@*android:drawable/switch_inner_holo_dark</item>
      </style>
  
      <style name="HorizontalProgressBar.SettingsLib"
