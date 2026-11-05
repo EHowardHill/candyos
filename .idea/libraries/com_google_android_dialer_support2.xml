@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="com.google.android.dialer.support2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/vendor/partner_gms/gapps-arm64/system/product/framework/com.google.android.dialer.support.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

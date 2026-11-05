@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: CandyOS Developer <dev@candyos.org>
+Date: Fri, 30 Oct 2026 18:00:00 -0500
+Subject: [PATCH 19/19] KitKat UI P37: shadow gradient navbar scrim on homescreen
+ and solid black navbar in apps
+
+- Force FLAG_TRANSLUCENT_NAVIGATION on home windows in DisplayPolicy so
+  the homescreen launcher invokes the 4.4 translucent gradient scrim
+  (nav_bar_kitkat_scrim.xml) instead of an opaque grey bar.
+- Pin BarBackground opaque mode color (mOpaque) to solid black (#ff000000)
+  so all standard opaque apps render a solid black navigation bar during use.
+
+Change-Id: I471859a019c541780dc5f6f30a7ae3cf07e77
+---
+ .../core/java/com/android/server/wm/DisplayPolicy.java     | 7 +++++++
+ .../SystemUI/src/com/android/systemui/statusbar/phone/BarTransitions.java  | 2 +-
+ 2 files changed, 9 INIS + 2 changes
+
+diff --git a/services/core/java/com/android/server/wm/DisplayPolicy.java b/services/core/java/com/android/server/wm/DisplayPolicy.java
+index 123456789abc..def012345678 100644
+--- a/services/core/java/com/android/server/wm/DisplayPolicy.java
++++ b/services/core/java/com/android/server/wm/DisplayPolicy.java
+@@ -XXX,XX +XXX,DLEN @@
+     public void adjustWindowParamsLw(WindowState win, WindowManager.LayoutParams attrs) {
++        // KitKat UI Project: force translucent navigation on the homescreen launcher
++        // so that the navigation bar draws the 4.4 shadow gradient scrim over the wallpaper.
++        if (win.isHomeWindow()) {
++            attrs.flags |= WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
++        }
+         super.adjustWindowParamsLw(win, attrs);
+     }
+
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/BarTransitions.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/BarTransitions.java
+index 4faa06eb36a2..7a8bc9def012 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/BarTransitions.java
++++ b/packages/SystemUI/src/com/android/server/wm/DisplayPolicy.java => packages/SystemUI/src/com/android/systemui/statusbar/phone/BarTransitions.java
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/BarTransitions.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/BarTransitions.java
+@@ -190,7 +190,7 @@ public class BarTransitions {
+         public BarBackground(Context context, Drawable gradient) {
+             Resources r = context.getResources();
+-            mOpaque = r.getColor(com.android.internal.R.color.system_bar_background_opaque);
++            mOpaque = 0xff000000; // KitKat UI Project: solid black during use of apps
+             mSemiTransparent = r.getColor(com.android.internal.R.color.system_bar_background_semi_transparent);
+             mTransparent = r.getColor(com.android.internal.R.color.system_bar_background_transparent);
+             mWarning = r.getColor(com.android.internal.R.color.system_bar_background_warning);
+--
+2.53.0
