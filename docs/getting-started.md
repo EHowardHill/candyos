@@ -26,7 +26,7 @@ CandyOS is an overlay. You clone it next to the LineageOS tree, and its
 scripts manage the tree for you:
 
 ```
-git clone https://github.com/EHowardHill/candyos ~/android/candyos
+git clone https://github.com/UndefinedYouTube/candyos ~/android/candyos
 ~/android/candyos/scripts/candyos-fetch-apps.sh
 ~/android/candyos/scripts/candyos-init.sh  ~/android/lineage
 ~/android/candyos/scripts/candyos-sync.sh ~/android/lineage
