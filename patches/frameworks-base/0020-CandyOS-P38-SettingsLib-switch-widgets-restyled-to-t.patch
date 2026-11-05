@@ -1,0 +1,119 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Thu, 5 Nov 2026 13:52:08 -0600
+Subject: [PATCH 20/20] CandyOS P38: SettingsLib switch widgets restyled to the
+ 4.4 Holo switch
+
+Switch.SettingsLib, SwitchCompat.SettingsLib and
+SwitchBar.Switch.Settingslib - the switchStyle for every Settings
+surface (the main switch bar, panel dialogs, framework switch
+widgets) - are parented to Widget.Holo.CompoundButton.Switch /
+switch_track_holo_dark + switch_inner_holo_dark: the exact 4.4
+donor drawables (switch_bg_holo_dark 9-patch track, state-list
+thumb, ON/OFF track labels) instead of the M3 rounded pill
+shapes. The modern 48dp min-height / fixed-height constraints are
+dropped so the 9-patch renders at its intrinsic size; the row or
+bar supplies the touch target (the widgets are clickable=false
+anyway). settingslib_main_switch_bar (v31/v33) moves to
+wrap_content height for the same reason.
+
+The settingslib_switch_track/thumb shape drawables become unused;
+the upstream files stay in place to limit drift.
+
+Change-Id: If45ca56715a5b089dad4f911abc9ce097aa83df3
+---
+ .../layout-v31/settingslib_main_switch_bar.xml   |  4 +++-
+ .../layout-v33/settingslib_main_switch_bar.xml   |  4 +++-
+ .../MainSwitchPreference/res/values/styles.xml   | 12 ++++++------
+ .../SettingsTheme/res/values-v31/styles.xml      | 16 ++++++++--------
+ 4 files changed, 20 insertions(+), 16 deletions(-)
+
+diff --git a/packages/SettingsLib/MainSwitchPreference/res/layout-v31/settingslib_main_switch_bar.xml b/packages/SettingsLib/MainSwitchPreference/res/layout-v31/settingslib_main_switch_bar.xml
+index e3f8fbb88a65..b65acece98e9 100644
+--- a/packages/SettingsLib/MainSwitchPreference/res/layout-v31/settingslib_main_switch_bar.xml
++++ b/packages/SettingsLib/MainSwitchPreference/res/layout-v31/settingslib_main_switch_bar.xml
+@@ -47,10 +47,12 @@
+             android:textAppearance="?android:attr/textAppearanceListItem"
+             style="@style/MainSwitchText.Settingslib" />
+ 
++        <!-- KitKat UI Project (P38): wrap_content so the 4.4 Holo switch
++             9-patch renders at its intrinsic size (48dp would stretch it). -->
+         <Switch
+             android:id="@android:id/switch_widget"
+             android:layout_width="wrap_content"
+-            android:layout_height="48dp"
++            android:layout_height="wrap_content"
+             android:layout_gravity="center_vertical"
+             android:focusable="false"
+             android:clickable="false"
+diff --git a/packages/SettingsLib/MainSwitchPreference/res/layout-v33/settingslib_main_switch_bar.xml b/packages/SettingsLib/MainSwitchPreference/res/layout-v33/settingslib_main_switch_bar.xml
+index 255b2c92e709..4257760c55a7 100644
+--- a/packages/SettingsLib/MainSwitchPreference/res/layout-v33/settingslib_main_switch_bar.xml
++++ b/packages/SettingsLib/MainSwitchPreference/res/layout-v33/settingslib_main_switch_bar.xml
+@@ -49,10 +49,12 @@
+             android:lineBreakWordStyle="phrase"
+             style="@style/MainSwitchText.Settingslib" />
+ 
++        <!-- KitKat UI Project (P38): wrap_content so the 4.4 Holo switch
++             9-patch renders at its intrinsic size (48dp would stretch it). -->
+         <Switch
+             android:id="@android:id/switch_widget"
+             android:layout_width="wrap_content"
+-            android:layout_height="48dp"
++            android:layout_height="wrap_content"
+             android:layout_gravity="center_vertical"
+             android:focusable="false"
+             android:clickable="false"
+diff --git a/packages/SettingsLib/MainSwitchPreference/res/values/styles.xml b/packages/SettingsLib/MainSwitchPreference/res/values/styles.xml
+index 870812ae6caf..caa68bb5890d 100644
+--- a/packages/SettingsLib/MainSwitchPreference/res/values/styles.xml
++++ b/packages/SettingsLib/MainSwitchPreference/res/values/styles.xml
+@@ -17,10 +17,10 @@
+ 
+ <resources>
+ 
+-    <style name="SwitchBar.Switch.Settingslib" parent="@android:style/Widget.Material.CompoundButton.Switch">
+-        <item name="android:trackTint">@color/settingslib_switchbar_switch_track_tint</item>
+-        <item name="android:thumbTint">@color/settingslib_switchbar_switch_thumb_tint</item>
+-        <item name="android:minHeight">48dp</item>
+-        <item name="android:minWidth">48dp</item>
+-    </style>
++    <!-- KitKat UI Project (P38): the 4.4 framework Holo switch - the
++         donor geometry (switch_bg_holo_dark 9-patch track, state-list
++         thumb) with the ON/OFF track labels, replacing the tinted
++         Material shapes. No minHeight/minWidth: the 9-patch must not be
++         stretched to the modern touch-target size (the bar provides it). -->
++    <style name="SwitchBar.Switch.Settingslib" parent="@android:style/Widget.Holo.CompoundButton.Switch" />
+ </resources>
+diff --git a/packages/SettingsLib/SettingsTheme/res/values-v31/styles.xml b/packages/SettingsLib/SettingsTheme/res/values-v31/styles.xml
+index 5dcf8b892d71..b0691701054e 100644
+--- a/packages/SettingsLib/SettingsTheme/res/values-v31/styles.xml
++++ b/packages/SettingsLib/SettingsTheme/res/values-v31/styles.xml
+@@ -37,16 +37,16 @@
+         <item name="android:textAllCaps">true</item>
+     </style>
+ 
+-    <style name="Switch.SettingsLib" parent="@android:style/Widget.Material.CompoundButton.Switch">
+-        <item name="android:minHeight">@dimen/settingslib_preferred_minimum_touch_target</item>
+-        <item name="android:track">@drawable/settingslib_switch_track</item>
+-        <item name="android:thumb">@drawable/settingslib_switch_thumb</item>
+-    </style>
++    <!-- KitKat UI Project (P38): the 4.4 framework Holo switch - the
++         donor geometry (switch_bg_holo_dark 9-patch track, state-list
++         thumb) with the ON/OFF track labels, replacing the M3 rounded
++         pill shapes. No minHeight: the 9-patch must not be stretched to
++         the modern touch-target height (the row/bar provides it). -->
++    <style name="Switch.SettingsLib" parent="@android:style/Widget.Holo.CompoundButton.Switch" />
+ 
+     <style name="SwitchCompat.SettingsLib" parent="@style/Widget.AppCompat.CompoundButton.Switch">
+-        <item name="android:minHeight">@dimen/settingslib_preferred_minimum_touch_target</item>
+-        <item name="track">@drawable/settingslib_switch_track</item>
+-        <item name="android:thumb">@drawable/settingslib_switch_thumb</item>
++        <item name="track">@*android:drawable/switch_track_holo_dark</item>
++        <item name="thumb">@*android:drawable/switch_inner_holo_dark</item>
+     </style>
+ 
+     <style name="HorizontalProgressBar.SettingsLib"
+-- 
+2.53.0
+

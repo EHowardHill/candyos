@@ -167,13 +167,83 @@ monet pinned). Open work:
 
 ## Phase 30 — Settings visual pass [ ]
 
-Settings ships dark Holo with 4.4 icons (P7 + 11.6); the code work is
-done. Remaining:
+Settings ships dark Holo with 4.4 icons (P7 + 11.6, plus the P38 code
+additions below). Remaining:
 
 - [ ] 30.1 On-device visual walk: About phone, main list, dialogs,
       dark-mode switch colors, search pill (restyles itself dark via
       the cascade), the modern-only pages' vector-icon hybrid
-      (accepted per rule 5).
+      (accepted per rule 5). The walk now also covers the P38 output:
+      Holo row/bar switches, dark in-app dialogs, the pinned-dark
+      TabLayout/credential surfaces. One deliberate leave-alone to
+      eyeball: Theme.Settings colorPrimary still points at
+      primary_device_default_settings_light (the P11.6 sweep chose
+      that; flip it dark only if the walk shows a light surface).
+
+## Phase 37 — Homescreen navbar gradient scrim [ ]
+
+The 2026-11-04 "Nav bar shadow attempt" commit landed as a hand-forged
+patch file (placeholder hunk headers, non-existent
+win.isHomeWindow()) that could never apply — candyos-verify died on
+it. Re-landed for real in frameworks/base 0019:
+
+- [X] 37.1 The real change: DisplayPolicy.adjustWindowParamsLw forces
+      FLAG_TRANSLUCENT_NAVIGATION on home-activity windows, so the
+      launcher draws behind the bar and NavigationBarTransitions
+      renders the P35 nav_bar_kitkat_scrim.xml gradient over the
+      wallpaper. The attempt's second half (BarBackground mOpaque
+      pinned black) was already the tree state
+      (system_bar_background_opaque = #ff000000) — a no-op, not
+      carried.
+- [ ] 37.2 On-device QA (rides the next build): scrim over the
+      launcher wallpaper, launcher lays out correctly edge-to-edge
+      (CandyLauncher is presigned/unpatchable), no regressions on
+      the opaque-black bar in apps.
+
+## Phase 38 — Settings 4.4 fidelity pass [ ]
+
+User direction (2026-11-06): finish making Settings resemble the 4.4
+donor. The 11.6 cascade had dressed the page chrome (dark surfaces,
+4.4 category headers, 16dp paddings); four widget/dialog surfaces
+still rendered modern:
+
+- [X] 38.1 Row switches: androidx SwitchPreferenceCompat's widget
+      layout was a MaterialSwitch under
+      Theme.Material3.DynamicColors.DayNight — M3 pills with
+      force-styled Material colors on every row. Now the plain
+      android.widget.Switch (the 4.4 donor widget); androidx binds
+      any Checkable, so no code changed. (Settings 0004.)
+- [X] 38.2 SettingsLib switch styles (Switch.SettingsLib,
+      SwitchCompat.SettingsLib, SwitchBar.Switch.Settingslib — the
+      switchStyle for the main switch bar, panel dialogs, framework
+      switches) reparented to Widget.Holo.CompoundButton.Switch:
+      the 4.4 switch_bg_holo_dark 9-patch track, state-list thumb
+      and ON/OFF track labels, replacing the M3 shape drawables.
+      The 48dp fixed heights are dropped so the 9-patch renders at
+      intrinsic size. (frameworks-base 0020.)
+- [X] 38.3 DayNight light-mode leaks pinned dark: the app's AndroidX
+      alert dialogs (Theme.AlertDialog.Base was
+      AppCompat.DayNight.Dialog.Alert with surface_light — every
+      in-app dialog rendered light in day mode; now the dark
+      AppCompat parent + system_neutral1_800, mirroring the
+      SettingsLib 11.6 fix) and Theme.TabTheme /
+      Theme.CollapsingToolbar.Settings (MaterialComponents.DayNight
+      with light pins; now the dark MaterialComponents base).
+      (Settings 0005.)
+- [ ] 38.4 Compile check: `m Settings` (validates the new XML res —
+      the @*android:drawable refs and style parents — plus
+      SettingsLib res; the DisplayPolicy change rides the services
+      jar build). Run by the user with the next build.
+- [ ] 38.5 On-device QA (rides 30.1's walk): Holo switches in rows
+      and the Wi-Fi/Bluetooth switch bar, ON/OFF track labels at
+      intrinsic size, dark dialogs (Wi-Fi forget/edit, reset
+      confirmations), dark TabLayout/credential pages.
+
+Rule 5 deltas accepted: the face-enroll accessibility toggle keeps
+its MaterialSwitch (no 4.4 counterpart); Theme.Settings colorPrimary
+stays settings_light pending the 30.1 eyeball (see above); the M3
+settingslib switch shape drawables stay in-tree (unused, upstream
+drift kept low).
 
 ## Phase 31 — Single-repo migration loose ends [ ]
 

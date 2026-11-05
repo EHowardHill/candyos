@@ -1,0 +1,60 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Thu, 5 Nov 2026 13:52:04 -0600
+Subject: [PATCH 19/20] KitKat UI P37: shadow gradient navbar scrim on
+ homescreen and solid black navbar in apps
+
+Re-land of the 2026-11-04 'Nav bar shadow attempt' (the hand-forged
+patches/frameworks-base/0019) as a real commit: the stored patch had
+placeholder hunk headers and could never apply - candyos-verify
+died on it. Implemented against the tree as it actually is:
+
+- DisplayPolicy.adjustWindowParamsLw forces
+  FLAG_TRANSLUCENT_NAVIGATION on home-activity windows, so the
+  launcher draws behind the bar and the navbar enters translucent
+  mode on the homescreen: NavigationBarTransitions then renders the
+  P35 nav_bar_kitkat_scrim.xml gradient over the wallpaper instead
+  of the opaque bar. The attempt's win.isHomeWindow() does not
+  exist in this tree; the activity type is the real check, and
+  adjustWindowParamsLw runs from addWindow before the flags are
+  first consulted.
+
+- The attempt's second half (BarBackground mOpaque pinned to solid
+  black) is already the tree state: SystemUI
+  system_bar_background_opaque is #ff000000, so that hunk is a
+  no-op and is not carried.
+
+Change-Id: I6b4ac25c0fa49c7b2a6d9d43711198bd011aeedb
+---
+ .../core/java/com/android/server/wm/DisplayPolicy.java    | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/services/core/java/com/android/server/wm/DisplayPolicy.java b/services/core/java/com/android/server/wm/DisplayPolicy.java
+index 91fc05043155..9bd22c683680 100644
+--- a/services/core/java/com/android/server/wm/DisplayPolicy.java
++++ b/services/core/java/com/android/server/wm/DisplayPolicy.java
+@@ -16,6 +16,7 @@
+ 
+ package com.android.server.wm;
+ 
++import static android.app.WindowConfiguration.ACTIVITY_TYPE_HOME;
+ import static android.app.WindowConfiguration.WINDOWING_MODE_FREEFORM;
+ import static android.inputmethodservice.InputMethodService.ENABLE_HIDE_IME_CAPTION_BAR;
+ import static android.view.Display.TYPE_INTERNAL;
+@@ -970,6 +971,13 @@ public class DisplayPolicy {
+      * are modified in-place.
+      */
+     public void adjustWindowParamsLw(WindowState win, WindowManager.LayoutParams attrs) {
++        // KitKat UI Project (P37): force translucent navigation on the home
++        // window so the launcher draws behind the nav bar and the bar renders
++        // the 4.4 shadow gradient scrim (nav_bar_kitkat_scrim.xml) over the
++        // wallpaper instead of an opaque bar.
++        if (win.getActivityType() == ACTIVITY_TYPE_HOME) {
++            attrs.flags |= WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
++        }
+         switch (attrs.type) {
+             case TYPE_SYSTEM_OVERLAY:
+             case TYPE_SECURE_SYSTEM_OVERLAY:
+-- 
+2.53.0
+

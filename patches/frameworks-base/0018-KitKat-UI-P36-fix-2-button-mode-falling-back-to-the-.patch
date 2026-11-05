@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Fri, 30 Oct 2026 16:09:38 -0500
-Subject: [PATCH 18/18] KitKat UI P36: fix 2-button mode falling back to the
+Subject: [PATCH 18/20] KitKat UI P36: fix 2-button mode falling back to the
  3-button layout
 
 NavigationBarInflaterView.getDefaultLayout() picked the quickstep

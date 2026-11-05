@@ -1,0 +1,49 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ethan Hill <ethan.hill1999@outlook.com>
+Date: Thu, 5 Nov 2026 13:52:13 -0600
+Subject: [PATCH 4/5] CandyOS P38: preference row switch is the 4.4 framework
+ Holo switch
+
+preference_widget_switch_compat - the widget layout androidx
+SwitchPreferenceCompat inflates for every row toggle - drops the
+M3 MaterialSwitch (and its Theme.Material3.DynamicColors.DayNight
+overlay, which force-styled rows Material even on the Holo
+cascade) for the plain android.widget.Switch. It renders the
+SettingsLib switchStyle (now the 4.4 Holo switch, CandyOS P38 in
+frameworks/base) via the theme's android:switchStyle; androidx
+SwitchPreferenceCompat binds any Checkable (the non-SwitchCompat
+branch of syncSwitchView), so state sync is unchanged.
+
+Change-Id: I807cfa04b2651727896de288aa4c737b8c9457e9
+---
+ res/layout/preference_widget_switch_compat.xml | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/res/layout/preference_widget_switch_compat.xml b/res/layout/preference_widget_switch_compat.xml
+index e833171d5da..b57f811b928 100644
+--- a/res/layout/preference_widget_switch_compat.xml
++++ b/res/layout/preference_widget_switch_compat.xml
+@@ -15,12 +15,17 @@
+   ~ limitations under the License.
+   -->
+ 
+-<com.google.android.material.materialswitch.MaterialSwitch
++<!-- KitKat UI Project (P38): the row toggle is the 4.4 framework Holo
++     switch (android.widget.Switch), replacing the M3 MaterialSwitch with
++     its DayNight overlay. androidx SwitchPreferenceCompat binds any
++     Checkable, and the Holo track/thumb drawables come from the theme's
++     android:switchStyle (Switch.SettingsLib, parented to
++     Widget.Holo.CompoundButton.Switch by the SettingsLib P38 change). -->
++<Switch
+     xmlns:android="http://schemas.android.com/apk/res/android"
+     android:id="@+id/switchWidget"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:background="@null"
+     android:clickable="false"
+-    android:focusable="false"
+-    android:theme="@style/Theme.Material3.DynamicColors.DayNight" />
++    android:focusable="false" />
+-- 
+2.53.0
+

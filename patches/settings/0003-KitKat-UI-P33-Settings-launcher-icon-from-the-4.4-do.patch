@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Ethan Hill <ethan.hill1999@outlook.com>
 Date: Thu, 29 Oct 2026 13:57:00 -0500
-Subject: [PATCH 3/3] KitKat UI P33: Settings launcher icon from the 4.4 donor
+Subject: [PATCH 3/5] KitKat UI P33: Settings launcher icon from the 4.4 donor
  (P33.1)
 
 The authentic android-4.4.4_r1 Settings launcher icon (settings-4.4 donor mipmap set, vendored in the CandyOS repo at reference/donor-icons/settings), byte-identical, as per-density bitmap drawables replacing the adaptive drawable/ic_launcher_settings.xml; the manifest reference (@drawable/ic_launcher_settings) picks them up unchanged. Also removes the orphaned ic_launcher_background/foreground/monochrome drawables.
