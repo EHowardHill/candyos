@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/apps/Calculator/Calculator.iml" filepath="$PROJECT_DIR$/apps/Calculator/Calculator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/Calendar/Calendar.iml" filepath="$PROJECT_DIR$/apps/Calendar/Calendar.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/CandyExperience/CandyExperience.iml" filepath="$PROJECT_DIR$/apps/CandyExperience/CandyExperience.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/DeskClock/DeskClock.iml" filepath="$PROJECT_DIR$/apps/DeskClock/DeskClock.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/Music/Music.iml" filepath="$PROJECT_DIR$/apps/Music/Music.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/Notes/Notes.iml" filepath="$PROJECT_DIR$/apps/Notes/Notes.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/Reminders/Reminders.iml" filepath="$PROJECT_DIR$/apps/Reminders/Reminders.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/SoundRecorder/SoundRecorder.iml" filepath="$PROJECT_DIR$/apps/SoundRecorder/SoundRecorder.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/candyos.iml" filepath="$PROJECT_DIR$/.idea/candyos.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/Calendar/tests/tests.iml" filepath="$PROJECT_DIR$/apps/Calendar/tests/tests.iml" />
+    </modules>
+  </component>
+</project>
