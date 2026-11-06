@@ -39,7 +39,7 @@ git clone https://github.com/UndefinedYouTube/candyos ~/android/candyos
   APKs are universal, so every target — including the emulator — gets
   them).
 * `candyos-init.sh` runs `repo init` against the LineageOS manifest (branch
-  `lineage-21.0`) and installs `manifest/candyos.xml` as a local manifest.
+  `lineage-24.0`) and installs `manifest/candyos.xml` as a local manifest.
   If the tree was already initialized, it only refreshes the manifest.
 * `candyos-sync.sh` runs `repo sync`, then replays the CandyOS patch series
   onto frameworks/base, Settings, LatinIME, and vendor/lineage, then fills
@@ -60,7 +60,7 @@ fastmirror/close server helps). Subsequent syncs are incremental.
 ```
 cd ~/android/lineage
 source build/envsetup.sh
-lunch lineage_sdk_phone_x86_64-ap2a-userdebug
+lunch lineage_sdk_phone_x86_64-ap4a-userdebug
 m -j8
 ```
 
@@ -112,7 +112,7 @@ Details and fallbacks:
   ```
   cd ~/android/lineage
   source build/envsetup.sh
-  lunch lineage_sdk_phone_x86_64-ap2a-userdebug
+  lunch lineage_sdk_phone_x86_64-ap4a-userdebug
   emulator -gpu swiftshader_indirect -no-snapshot -no-audio \
            -skin 1080x2220 -dpi-device 440
   ```
@@ -139,7 +139,7 @@ on her side (no Android Studio, Java, or adb; unzipping is the install):
 ```
 
 It verifies the arm64 WebView LFS blob (pulling it if needed), builds
-`lineage_sdk_phone_arm64-ap2a-userdebug` (images in
+`lineage_sdk_phone_arm64-ap4a-userdebug` (images in
 `out/target/product/emu64a/`), downloads Google's darwin-arm64 emulator
 package (cached in `out/candyos-mac-bundle/cache/`), and assembles
 `out/candyos-mac-bundle/CandyOS-macOS-Apple-Silicon.zip` (~3 GB): the
@@ -163,7 +163,7 @@ Caveats:
 
 ## Install it on a device (WebUSB)
 
-The same synced tree builds for any LineageOS 21-supported device, and the
+The same synced tree builds for any LineageOS 24-supported device, and the
 install runs from a browser — no adb/fastboot on the host:
 
 ```

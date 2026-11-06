@@ -15,7 +15,7 @@ per-platform setup, lives on the LineageOS wiki:
 
 ## Requirements
 
-* **A device supported by LineageOS 21**, with an unlockable bootloader.
+* **A device supported by LineageOS 24**, with an unlockable bootloader.
   CandyOS publishes no device list (yet) — pick from
   <https://wiki.lineageos.org/devices/> and follow that device's LineageOS
   installation guide for everything device-specific: which images to
@@ -56,7 +56,7 @@ brunch <device>
   `user` builds work too — but keep `userdebug` for development anyway
   (see [vendor/partner_gms/README.md](../vendor/partner_gms/README.md)).
 * Artifacts land in `out/target/product/<device>/`:
-  * `lineage-21.0-<date>-UNOFFICIAL-<device>.zip` — the flashable package,
+  * `lineage-24.0-<date>-UNOFFICIAL-<device>.zip` — the flashable package,
     named and formatted exactly like a LineageOS build because it is the
     same build system;
   * the images the device's install guide calls for — `recovery.img`
@@ -93,7 +93,7 @@ command. In shape:
    *Apply update > Apply from ADB*, then switch to the **ADB** tab, click
    **Connect** again (the device re-enumerates after every reboot — that
    is normal WebUSB behavior), **Choose ZIP** → the CandyOS
-   `lineage-21.0-<date>-UNOFFICIAL-<device>.zip`, then **Sideload**.
+   `lineage-24.0-<date>-UNOFFICIAL-<device>.zip`, then **Sideload**.
    If you also have local adb installed, run `adb kill-server` first so
    the daemon does not claim the device from the browser.
 6. **Reboot.** When sideloading finishes, reboot to system from the

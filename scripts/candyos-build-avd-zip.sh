@@ -11,7 +11,7 @@
 # 1. Verifies the WebView prebuilt is the real APK, not an unfetched
 #    git-lfs pointer (a pointer file kills the build hours in - see
 #    docs/getting-started.md Troubleshooting).
-# 2. Builds lineage_sdk_phone_<arch>-ap2a-userdebug (m -j8); images land
+# 2. Builds lineage_sdk_phone_<arch>-ap4a-userdebug (m -j8); images land
 #    in out/target/product/<product>/.
 # 3. Stages the AVD image under SDK system-image naming plus ready-to-copy
 #    AVD config templates and a README - DATA ONLY. No scripts or programs
@@ -53,13 +53,13 @@ done
 
 case "$ARCH" in
     x86_64)
-        TARGET=lineage_sdk_phone_x86_64-ap2a-userdebug
+        TARGET=lineage_sdk_phone_x86_64-ap4a-userdebug
         PRODUCT=emu64x
         ABI=x86_64
         CPU=x86_64
         ;;
     arm64)
-        TARGET=lineage_sdk_phone_arm64-ap2a-userdebug
+        TARGET=lineage_sdk_phone_arm64-ap4a-userdebug
         PRODUCT=emu64a
         ABI=arm64-v8a
         CPU=arm64

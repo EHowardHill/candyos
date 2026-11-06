@@ -3,7 +3,7 @@
   CandyOS local manifest (installed into .repo/local_manifests/ by
   scripts/candyos-init.sh).
 
-  LineageOS 21 tree, KitKat look-and-feel. The LineageOS source stays stock;
+  LineageOS 24 tree, KitKat look-and-feel. The LineageOS source stays stock;
   CandyOS layers its changes on top after every sync:
 
     * frameworks/base, packages/apps/Settings and
@@ -11,20 +11,25 @@
       scripts/candyos-sync.sh replays the ordered git-am series from
       patches/ on top of them.
 
-    * The six app slots below are removed from the manifest entirely so the
+    * The app slots below are removed from the manifest entirely so the
       stock (and forked) versions never get checked out. scripts/
       candyos-sync.sh fills each slot with the corresponding CandyOS-vendored
       KitKat app from apps/. Module names are intentionally kept identical
-      to the stock apps (TrebuchetQuickStep, ExactCalculator, Recorder,
-      Eleven, DeskClock, Etar) so vendor/lineage product config keeps
-      resolving without changes:
+      to the stock apps (ExactCalculator, Recorder, DeskClock, Etar) so
+      vendor/lineage product config keeps resolving without changes:
 
-      packages/apps/Trebuchet      <- apps/CandyLauncher (prebuilt CandyLauncher.apk)
       packages/apps/ExactCalculator<- apps/Calculator     (4.4.4_r1 Calculator)
       packages/apps/Recorder       <- apps/SoundRecorder   (4.4.4_r1 SoundRecorder)
-      packages/apps/Eleven         <- apps/Music           (4.4.4_r1 Music)
       packages/apps/DeskClock      <- apps/DeskClock       (4.4.4_r1 DeskClock)
       packages/apps/Etar           <- apps/Calendar        (4.4.4_r1 Calendar)
+
+      LineageOS 24 dropped Trebuchet and Eleven upstream (Launcher3 and
+      Music replace them), so those two slots have no stock project to
+      remove — they are plain untracked directories that candyos-sync.sh
+      fills the same way:
+
+      packages/apps/Trebuchet      <- apps/CandyLauncher (prebuilt CandyLauncher.apk)
+      packages/apps/Eleven         <- apps/Music           (4.4.4_r1 Music)
 
     * The SetupWizard slot is removed and filled the same way, by the
       CandyOS Experience app (the first-run onboarding and the "about the
@@ -34,10 +39,8 @@
       packages/apps/SetupWizard    <- apps/CandyExperience  (CandyOS Experience)
 -->
 <manifest>
-  <remove-project name="LineageOS/android_packages_apps_Trebuchet" />
   <remove-project name="LineageOS/android_packages_apps_ExactCalculator" />
   <remove-project name="LineageOS/android_packages_apps_Recorder" />
-  <remove-project name="LineageOS/android_packages_apps_Eleven" />
   <remove-project name="LineageOS/android_packages_apps_DeskClock" />
   <remove-project name="LineageOS/android_packages_apps_Etar" />
   <remove-project name="LineageOS/android_packages_apps_SetupWizard" />

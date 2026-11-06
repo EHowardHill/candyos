@@ -50,7 +50,7 @@ back, scoped down to near-nothing:
     FAKE_PACKAGE_SIGNATURE only.
   * `microg/sysconfig-com.google.android.gms.xml` — power-save / data-save
     exemptions so GCM keeps its connection.
-* LineageOS 21 also has its own built-in spoofing hook
+* LineageOS 24 also has its own built-in spoofing hook
   (`isMicrogSigned`/`generateFakeSignature` in ComputerEngine,
   userdebug-only), but it reads the app's `fake-signature` meta-data,
   which current microG builds store as a *string resource* — package
@@ -61,7 +61,7 @@ back, scoped down to near-nothing:
 
 ## How it is wired in
 
-LineageOS 21's stock hook, unchanged: `vendor/lineage/config/partner_gms.mk`
+LineageOS 24's stock hook, unchanged: `vendor/lineage/config/partner_gms.mk`
 includes `vendor/partner_gms/products/gms.mk` whenever `WITH_GMS` is true
 (the flag is set by `patches/vendor-lineage/`). `products/gms.mk` now just
 adds `OrganicMaps`, `GmsCore`, `Companion` and `AuroraStore` to

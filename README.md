@@ -35,7 +35,7 @@ git clone https://github.com/UndefinedYouTube/candyos ~/android/candyos
 ~/android/candyos/scripts/candyos-sync.sh ~/android/lineage
 cd ~/android/lineage
 source build/envsetup.sh
-lunch lineage_sdk_phone_x86_64-ap2a-userdebug
+lunch lineage_sdk_phone_x86_64-ap4a-userdebug
 m -j8
 ~/android/candyos/scripts/candyos-emulator.sh ~/android/lineage
 ```
@@ -51,7 +51,7 @@ Prerequisites (disk, RAM, packages, repo tool) and emulator instructions are in
 CandyOS installs on physical devices over **WebUSB**: flash from a
 Chromium-family browser with
 [Lineage Flash Tools](https://flash.lineageos.org) — no adb/fastboot on
-the host. Build for any LineageOS 21-supported device
+the host. Build for any LineageOS 24-supported device
 (`breakfast <device> && brunch <device>`) and follow
 [docs/install-webusb.md](docs/install-webusb.md), which also records why
 the WebUSB path is supported (the overlay never touches the USB, recovery,

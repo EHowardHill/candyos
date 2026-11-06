@@ -3,7 +3,7 @@
 
 CANDYOS_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LINEAGE_MANIFEST_URL="https://github.com/LineageOS/android.git"
-LINEAGE_BRANCH="lineage-21.0"
+LINEAGE_BRANCH="lineage-24.0"
 
 # Repos modified via patch series: "<patches/ subdirectory> <path in the LineageOS tree>".
 # These stay as STOCK LineageOS checkouts; candyos-sync.sh replays the series on

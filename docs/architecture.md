@@ -149,7 +149,7 @@ lives in this repo.
 
 ## Tree state after `candyos-sync.sh`
 
-* Patched projects: detached HEAD at `m/lineage-21.0` (the synced upstream
+* Patched projects: detached HEAD at `m/lineage-24.0` (the synced upstream
   revision) plus the CandyOS patch commits on top. Never keep personal
   branches checked out in these projects — `candyos-sync.sh` resets them.
 * Vendored slots: plain directories (no `.git`), exact copies of `apps/`.

@@ -20,7 +20,7 @@ commit convention). Open work starts at P28.
 
 ## Goal
 
-Make LineageOS 21 (Android 14) look and behave like stock Android 4.4
+Make LineageOS 24 (Android 14) look and behave like stock Android 4.4
 KitKat across all system surfaces, with the feature set staying modern,
 delivered as patch series + vendored apps + vendor overlays
 (docs/architecture.md).

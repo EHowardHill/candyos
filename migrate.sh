@@ -2,18 +2,18 @@
 # CandyOS migration: move the project (repo config, docs, and an existing
 # LineageOS tree) from one LineageOS major version to the next.
 #
-# Currently: LineageOS 21 (lineage-21.0, Android 14, release ap2a)
+# Currently: LineageOS 24 (lineage-24.0, Android 14, release ap4a)
 #        --> LineageOS 24 (lineage-24.0, Android 16, release ap4a)
 #
 # What it does, in order:
 #   1. Refuses to run with uncommitted changes in the candyos repo
 #      (the sed edits below touch tracked files — commit or stash first).
 #   2. Rewrites the branch/release identifiers across the candyos repo:
-#        scripts/common.sh     LINEAGE_BRANCH lineage-21.0 -> lineage-24.0
+#        scripts/common.sh     LINEAGE_BRANCH lineage-24.0 -> lineage-24.0
 #        scripts/*, README.md, docs/*, manifest/candyos.xml:
-#          lineage-21.0    -> lineage-24.0
-#          ap2a            -> ap4a      (lunch/sdk image release letter)
-#          "LineageOS 21"  -> "LineageOS 24"
+#          lineage-24.0    -> lineage-24.0
+#          ap4a            -> ap4a      (lunch/sdk image release letter)
+#          "LineageOS 24"  -> "LineageOS 24"
 #   3. Re-initializes the LineageOS tree on the new branch (repo init -b
 #      lineage-24.0) and reinstalls the candyos local manifest.
 #   4. Runs scripts/candyos-sync.sh: syncs the new tree, replays the
@@ -30,7 +30,7 @@
 #   [lineage-tree] defaults to ~/android/lineage (the quickstart layout).
 #
 # The sed rewrites (step 2) are one-shot: re-running this script after a
-# successful migration is a no-op (nothing matches lineage-21.0 anymore).
+# successful migration is a no-op (nothing matches lineage-24.0 anymore).
 
 set -euo pipefail
 
@@ -61,9 +61,11 @@ TREE="${1:-$HOME/android/lineage}"
     die "candyos repo has no commits yet — commit before migrating"
 
 # 2. Rewrite the version identifiers across the candyos repo
-#    (source files, scripts, docs, manifest — never .git or the tree).
+#    (source files, scripts, docs, manifest — never .git, patches/, or this
+#    script itself: sed-ing a git-am patch corrupts its binary hunks, and
+#    rewriting OLD_* here makes the script un-rerunnable).
 echo "migrate: rewriting $OLD_BRANCH/$OLD_RELEASE -> $NEW_BRANCH/$NEW_RELEASE in the candyos repo"
-FILES="$(git -C "$CANDYOS_ROOT" ls-files | grep -Ev '\.(png|jpg|jpeg|gif|webp|mp4|zip|apk|jar|keystore|jks)$' || true)"
+FILES="$(git -C "$CANDYOS_ROOT" ls-files | grep -Ev '\.(png|jpg|jpeg|gif|webp|mp4|zip|apk|jar|keystore|jks|patch)$|^patches/|^migrate\.sh$' || true)"
 for f in $FILES; do
     f="$CANDYOS_ROOT/$f"
     [ -f "$f" ] || continue
