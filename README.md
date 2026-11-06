@@ -4,6 +4,28 @@
 
 # CandyOS
 
+
+## What is CandyOS?
+
+*Do you miss earlier versions of Android? Do you miss when tech felt like it was “made by nerds for nerds”. Do you want charm, freedom, and fun on your mobile device?*
+
+CandyOS is a custom Android ROM. It's goal is to recreate Android KitKat's UX and UI on a modern usable version of Android. The goal is to stay true to KitKat's look and feel, but new features can be added for usability and enhancement. (Such as allowing to user to change the UI accent color). We are focused on giving users full freedom, minimal bloat, and a phone that will work for _them_. 
+
+### Project Constitution: 
+**1.** **UI** is enjoyable and fun to use, clean and productive
+
+**2.** **UX** has human design, respects the user, freedom, no bloat, ads, dark patterns
+
+**3.** **Open Source** so users can read the code running on their devices
+
+- - - - -
+
+Please contribute in any way you can!
+If you want to get more involved, join our **Discord Server**: https://discord.gg/uc6M5HJtnX
+
+- - - - 
+
+
 ## Quickstart
 
 ```
